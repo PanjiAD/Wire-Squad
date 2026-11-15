@@ -1,0 +1,23 @@
+from common import *
+def cell(svg,cap): return f'<div style="text-align:center">{svg}<div class="cap">{cap}</div></div>'
+blue=''.join(cell(tile_svg('blue',n,w=72),f'<b>blue {n}</b>'+(' (bar)' if n in(6,9) else '')) for n in range(1,13))
+s1=sec('1. Blue 1-12, front (owner view)','Base 72x252. Number at both ends, bottom one rotated 180 degrees. 6 and 9 carry an underline bar. Motif: wavy wire.',f'<div class="panel" style="background:{DESK}"><div class="row" style="gap:6px;align-items:flex-start">{blue}</div></div>')
+yr=cell(tile_svg('yellow','6.1',w=96),'<b>yellow</b> template, label 6.1<br>square clip motif')+cell(tile_svg('yellow','1.1',w=96),'yellow, label 1.1')+cell(tile_svg('red','9.5',w=96),'<b>red</b> template, label 9.5<br>round button + warning triangle')+cell(tile_svg('red','1.5',w=96),'red, label 1.5')+cell(tile_svg(back=True,w=96),'<b>back</b> (opponent view)<br>identical for every wire')
+s2=sec('2. Yellow, red, back','Yellow and red show a small decimal label instead of a big integer (they have no playable value). The back leaks nothing: no number, no color hint.',f'<div class="panel" style="background:{DESK}"><div class="row" style="gap:36px;align-items:flex-start">{yr}</div></div>')
+cuts=cell(tile_cut('blue',7),'cut, blue 7 (flat 252x72)')+cell(tile_cut('blue',9),'cut, blue 9 (bar kept)')+cell(tile_cut('yellow','6.1'),'cut, yellow')+cell(tile_cut('red','9.5'),'cut, red (revealed)')
+up=f'<div style="display:flex;gap:18px;align-items:flex-start"><div style="position:relative;width:96px;height:300px">'+tile_svg('blue',7,w=70)+f'</div><div class="cap" style="text-align:left;width:150px;margin-top:0"><b>Upright cut</b>: wire snapped, tile fades 35% while lifting out of the rack, then lays down flat (320ms).</div></div>'
+s3=sec('3. Cut state','Cut tiles lie face-up in a strip in front of the rack. The wire is snapped in two and the plate is slightly faded.',f'<div class="panel" style="background:{DESK}"><div class="row" style="gap:26px;align-items:flex-start">{cuts}</div></div>')
+sts=[('normal',''),('hover','hover'),('selected','selected'),('target','target'),('info-marked','marked'),('disabled','disabled'),('revealed-by-teammate','revealed')]
+ov=''.join(cell(tile_svg('blue',7,s,w=84),f'<b>{n}</b>') for n,s in sts)
+s4=sec('4. State overlays (composable)','Overlays are separate SVG groups drawn before or after the tile body, so states combine: <span class="mono">selected target</span>, <span class="mono">hover marked</span>. Target pulses (stops under reduced motion). Disabled is 35% desaturate. Info-marked adds a notch at the base where an info token attaches. Revealed has a green tick corner.',f'<div class="panel" style="background:{DESK}"><div class="row" style="gap:20px;align-items:flex-start">{ov}</div></div>')
+seq=[('blue',1),('blue',2),('blue',2),('blue',3),('blue',4),('blue',6),('yellow','6.1'),('blue',7),('blue',9),('red','9.5'),('blue',11),('blue',12)]
+rows=''
+for n,s in sts:
+    r=''.join(tile_svg(k,l,s,w=58) for k,l in seq)
+    rows+=f'<div style="margin-bottom:12px"><div class="disp" style="font-size:16px;margin:0 0 4px">{n}</div><div style="display:flex;gap:6px">{r}</div></div>'
+s5=sec('5. Preview: a 12-tile rack row in every state','Same row in each state. The row is the real mix a hand could hold: sorted ascending, decimals slot between integers.',f'<div class="panel" style="background:{DESK}">{rows}</div>')
+sz=''.join(f'<div style="text-align:center">{tile_svg("blue",8,w=w)}<div class="cap"><b>{w}px wide</b><br>{lab}</div></div>' for w,lab in [(24,'minimum (14 tiles on a 360px phone)'),(36,'phone, legible'),(48,'tablet'),(96,'desktop, crisp')])
+ph=f'<div style="width:360px;background:{INK};border-radius:14px;padding:10px;display:flex;gap:2px;overflow:hidden">'+''.join(tile_svg(k,l,w=22) for k,l in seq+[('blue',12),('blue',12)])+'</div><div class="cap">14 tiles at 22px stay inside 360px (rack compresses; tap to zoom)</div>'
+s6=sec('6. Sizing guide','Numerals use the heaviest display face; at 36 px wide the 28-34 unit numerals stay about 12-15 px tall. Under 28 px wide the UI switches to a zoom/focus view for the active stand.',f'<div class="panel" style="background:{DESK}"><div class="row" style="gap:28px;align-items:flex-end">{sz}</div><div style="margin-top:18px">{ph}</div></div>')
+inner=hdr('P1: Wire tile set','Hidden-information tile: owner sees the front, opponents see only the back. Colors are always paired with a motif (wave, square clip, round button), never color alone.')+s1+s2+s3+s4+s5+s6+'<div style="height:60px"></div>'
+write('P1_WireTiles.dc.html','P1 Wire tile','A',1280,3400,inner)

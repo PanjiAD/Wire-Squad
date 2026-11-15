@@ -1,0 +1,179 @@
+{
+  "version": 1,
+  "note": "Mission data for Wire Squad. Values flagged unverified come from community sources or low-resolution images; see SPEC.md section 14.",
+  "missions": [
+    {
+      "id": 1,
+      "title": "Training, Day 1",
+      "tier": "novice",
+      "lesson": "Lesson 1: How to cut a wire?",
+      "setup": {
+        "blue": { "values": [1, 6] },
+        "yellow": { "count": 0 },
+        "red": { "count": 0 },
+        "equipment": "none"
+      },
+      "twoPlayer": null,
+      "rules": [
+        "No Equipment cards in this mission.",
+        "Every player still has one personal Double Detector, even when no Equipment cards are dealt."
+      ],
+      "success": "The team learns to trust the sorted stands. Every wire is cut.",
+      "failure": "A wrong cut rattles the team. Deal again and retry the lesson.",
+      "unverified": []
+    },
+    {
+      "id": 2,
+      "title": "Training, Day 2",
+      "tier": "novice",
+      "lesson": "Lesson 2: How to cut a YELLOW wire",
+      "setup": {
+        "blue": { "values": [1, 8] },
+        "yellow": { "count": 2, "valueRange": [1, 7] },
+        "red": { "count": 0 },
+        "equipment": "none"
+      },
+      "twoPlayer": null,
+      "rules": [
+        "Yellow wires have no number. All of them are simply YELLOW.",
+        "A yellow wire can only be cut by pairing it with a yellow wire of your own during a Dual Cut.",
+        "Yellow Info tokens cannot be used during setup."
+      ],
+      "success": "Both yellow wires are gone and nobody called out a number.",
+      "failure": "A yellow wire was mistaken for a numbered wire. Deal again.",
+      "unverified": []
+    },
+    {
+      "id": 3,
+      "title": "Training, Day 3",
+      "tier": "novice",
+      "lesson": "Lesson 3: How (NOT) to cut a RED wire",
+      "setup": {
+        "blue": { "values": [1, 10] },
+        "yellow": { "count": 0 },
+        "red": { "count": 1, "valueRange": [1, 9] },
+        "equipment": "players",
+        "reroll": [2, 12]
+      },
+      "twoPlayer": null,
+      "rules": [
+        "Never point at a red wire. Pointing at red detonates the bomb.",
+        "Red wires are removed with Reveal Your Red Wires once every wire left in that player's hand is red. Both stands count.",
+        "If Walkie-Talkies or Equal Label is drawn during setup, discard it and draw a replacement."
+      ],
+      "success": "The red wire is exposed without a single mistake.",
+      "failure": "The red wire was cut. The bomb goes off and the lesson repeats.",
+      "unverified": []
+    },
+    {
+      "id": 4,
+      "title": "First Day in the Field",
+      "tier": "intermediate",
+      "lesson": "Everything you learned, on one bomb.",
+      "setup": {
+        "blue": { "values": "all" },
+        "yellow": { "count": 2 },
+        "red": { "count": 1 },
+        "equipment": "players"
+      },
+      "twoPlayer": {
+        "yellow": { "count": 4 },
+        "red": { "count": 1 }
+      },
+      "rules": [
+        "This mission uses every blue wire.",
+        "Cut both yellow wires by pairing them with yellow wires of your own. With two players there are four yellow wires: cut them two by two.",
+        "The single red wire can never be cut. A player may reveal red wires only when every wire left in their hand (both stands) is red."
+      ],
+      "success": "The field team clears its first real bomb.",
+      "failure": "The red wire went off. Reset the wires and try again.",
+      "unverified": ["twoPlayer"]
+    },
+    {
+      "id": 5,
+      "title": "Second Day in the Field",
+      "tier": "intermediate",
+      "lesson": "Two yellows, three possibilities.",
+      "setup": {
+        "blue": { "values": "all" },
+        "yellow": { "count": 2, "candidates": 3, "hiddenDraw": true },
+        "red": { "count": 1 },
+        "equipment": "players"
+      },
+      "twoPlayer": {
+        "yellow": { "count": 2, "candidates": 3, "hiddenDraw": true },
+        "red": { "count": 2 }
+      },
+      "rules": [
+        "Before dealing, draw three yellow wires and mark all three values with the question side up.",
+        "Shuffle those three face down, add two of them to the blue pile, and set the third aside unseen.",
+        "Both yellow wires must be cut by pairing them with yellow wires of your own."
+      ],
+      "success": "Two of three possibilities, and the right two.",
+      "failure": "The team guessed wrong one time too many.",
+      "unverified": []
+    },
+    {
+      "id": 6,
+      "title": "Third Day in the Field",
+      "tier": "intermediate",
+      "lesson": "Four yellow wires, one red wire.",
+      "setup": {
+        "blue": { "values": "all" },
+        "yellow": { "count": 4 },
+        "red": { "count": 1 },
+        "equipment": "players"
+      },
+      "twoPlayer": null,
+      "rules": [
+        "All four yellow wires are in play and must be paired off."
+      ],
+      "success": "Four yellows cleared without touching the red.",
+      "failure": "The bomb wins this round.",
+      "unverified": ["setup", "title", "lesson", "rules", "twoPlayer"]
+    },
+    {
+      "id": 7,
+      "title": "Last Day of Class",
+      "tier": "intermediate",
+      "lesson": "One red wire out of two.",
+      "setup": {
+        "blue": { "values": "all" },
+        "yellow": { "count": 0 },
+        "red": { "count": 1, "candidates": 2, "hiddenDraw": true },
+        "equipment": "players"
+      },
+      "twoPlayer": null,
+      "rules": [
+        "Draw two red wires, mark both values, keep one and set the other aside unseen.",
+        "No yellow wires are in this mission."
+      ],
+      "success": "Class dismissed with a clean board.",
+      "failure": "One mistake too many. The final exam waits.",
+      "unverified": ["setup", "title", "lesson", "rules", "twoPlayer"]
+    },
+    {
+      "id": 8,
+      "title": "Final Exam",
+      "tier": "expert",
+      "lesson": "Everything the team has learned.",
+      "setup": {
+        "blue": { "values": "all" },
+        "yellow": { "count": 2, "candidates": 3, "hiddenDraw": true },
+        "red": { "count": 1, "candidates": 2, "hiddenDraw": true },
+        "equipment": "players"
+      },
+      "twoPlayer": {
+        "yellow": { "count": 4 },
+        "red": { "count": 1, "candidates": 3, "hiddenDraw": true }
+      },
+      "rules": [
+        "Apply every rule learned so far.",
+        "Two of three yellow values are in play. One of two red values is in play."
+      ],
+      "success": "The team becomes an official BOMB BUSTERS squad. The first Surprise box is unlocked.",
+      "failure": "Luckily it was a fake bomb. Study some more and retake the test.",
+      "unverified": ["twoPlayer"]
+    }
+  ]
+}

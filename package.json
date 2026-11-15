@@ -1,0 +1,17 @@
+{
+  "name": "wire-squad",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Wire Squad / Bomb Busters online - pure rules engine and local hotseat demo",
+  "scripts": {
+    "test": "node --test \"tests/*.test.js\"",
+    "sim": "node tests/simulate-cli.js",
+    "sim:oracle": "node tests/simulate-cli.js 25 1 --oracle",
+    "build": "node tools/bundle.mjs",
+    "serve": "node tools/serve.mjs",
+    "check:supabase": "node tools/check-supabase.mjs",
+    "check:online": "node tools/check-online.mjs",
+    "check:online:win": "node tools/check-online-win.mjs"
+  }
+}

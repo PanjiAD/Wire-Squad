@@ -1,0 +1,11 @@
+{
+  "name": "wire-squad",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Wire Squad / Bomb Busters online - pure rules engine",
+  "scripts": {
+    "test": "node --test tests/",
+    "sim": "node tests/simulate-cli.js"
+  }
+}

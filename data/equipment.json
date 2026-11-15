@@ -1,0 +1,102 @@
+{
+  "version": 1,
+  "note": "Original paraphrases of the 12 base-game Equipment cards. Unlock number = card number.",
+  "cards": [
+    {
+      "number": 1,
+      "id": "label-neq",
+      "name": "Not-Equal Label",
+      "timing": "any",
+      "effect": "labelNeq",
+      "text": "Place the not-equal (!=) token between two adjacent wires on your stand that have different values. One of them may already be cut."
+    },
+    {
+      "number": 2,
+      "id": "walkie-talkies",
+      "name": "Walkie-Talkies",
+      "timing": "any",
+      "effect": "walkie",
+      "text": "Swap one of your uncut wires with a teammate, face down. Each of you moves the received wire onto your stand. Info tokens travel with their wire."
+    },
+    {
+      "number": 3,
+      "id": "triple-detector",
+      "name": "Triple Detector",
+      "timing": "turn",
+      "effect": "triple",
+      "text": "During your Dual Cut, announce one number and point at three wires on a single teammate stand. One match is enough."
+    },
+    {
+      "number": 4,
+      "id": "post-it",
+      "name": "Post-It",
+      "timing": "any",
+      "effect": "postIt",
+      "text": "Place one Info token in front of one of your own uncut blue wires."
+    },
+    {
+      "number": 5,
+      "id": "super-detector",
+      "name": "Super Detector",
+      "timing": "turn",
+      "effect": "super",
+      "text": "During your Dual Cut, announce one number and point at every wire on a single teammate stand. One match is enough."
+    },
+    {
+      "number": 6,
+      "id": "rewinder",
+      "name": "Rewinder",
+      "timing": "any",
+      "effect": "rewinder",
+      "text": "Move the detonator dial back one space."
+    },
+    {
+      "number": 7,
+      "id": "emergency-batteries",
+      "name": "Emergency Batteries",
+      "timing": "any",
+      "effect": "batteries",
+      "text": "Flip one or two used Character cards face up so their personal items can be used again."
+    },
+    {
+      "number": 8,
+      "id": "general-radar",
+      "name": "General Radar",
+      "timing": "any",
+      "effect": "radar",
+      "text": "Name a number from 1 to 12. Every player says whether they hold at least one uncut blue wire of that value, answering separately for each stand."
+    },
+    {
+      "number": 9,
+      "id": "stabilizer",
+      "name": "Stabilizer",
+      "timing": "turnStart",
+      "effect": "stabilizer",
+      "text": "Arm at the start of your turn. A failed Dual Cut does not move the dial, and a red wire does not detonate. A wrong guess still places an Info token."
+    },
+    {
+      "number": 10,
+      "id": "xy-ray",
+      "name": "X or Y Ray",
+      "timing": "turn",
+      "effect": "ray",
+      "text": "During your Dual Cut, announce two values instead of one. A match on either value succeeds. Can be combined with a Detector."
+    },
+    {
+      "number": 11,
+      "id": "coffee-mug",
+      "name": "Coffee Mug",
+      "timing": "turn",
+      "effect": "coffee",
+      "text": "Instead of your action, pass your turn to any player. The dial does not move."
+    },
+    {
+      "number": 12,
+      "id": "label-eq",
+      "name": "Equal Label",
+      "timing": "any",
+      "effect": "labelEq",
+      "text": "Place the equal (=) token between two adjacent wires of the same value on your stand."
+    }
+  ]
+}

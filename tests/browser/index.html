@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Wire Squad engine tests</title>
+<style>
+  body { background: #1e1f24; color: #f6f1e7; font: 13px/1.5 ui-monospace, Consolas, monospace; margin: 0; padding: 24px; }
+  h1 { font-size: 15px; margin: 0 0 12px; color: #f2c230; }
+  pre { white-space: pre-wrap; margin: 0; }
+  #out { padding: 16px; background: #141519; border-radius: 8px; min-height: 200px; }
+</style>
+<script type="importmap">
+{
+  "imports": {
+    "node:test": "./test.js",
+    "node:assert/strict": "./assert.js"
+  }
+}
+</script>
+</head>
+<body>
+<h1>Wire Squad - engine test suite (browser run)</h1>
+<pre id="out">running...</pre>
+<script type="module">
+  import { registry } from './test.js';
+  import { runAll } from './runner.js';
+
+  import '../setup.test.js';
+  import '../dualcut.test.js';
+  import '../detector.test.js';
+  import '../solo-reveal.test.js';
+  import '../tokens.test.js';
+  import '../equipment.test.js';
+  import '../view.test.js';
+  import '../sim.test.js';
+
+  runAll(registry, document.getElementById('out')).catch((error) => {
+    document.getElementById('out').textContent = `runner crashed: ${error && error.stack}`;
+    console.error(error);
+  });
+</script>
+</body>
+</html>

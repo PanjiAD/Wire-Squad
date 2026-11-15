@@ -1,0 +1,19 @@
+{
+  "version": 1,
+  "note": "Placeholder character data. Only the Captain's Double Detector is verified; the other four characters reuse it until card photos arrive.",
+  "characters": [
+    { "id": "captain", "name": "Captain", "personal": "doubleDetector", "unverified": false },
+    { "id": "scout", "name": "Scout", "personal": "doubleDetector", "unverified": true },
+    { "id": "engineer", "name": "Engineer", "personal": "doubleDetector", "unverified": true },
+    { "id": "medic", "name": "Medic", "personal": "doubleDetector", "unverified": true },
+    { "id": "rookie", "name": "Rookie", "personal": "doubleDetector", "unverified": true }
+  ],
+  "personalItems": {
+    "doubleDetector": {
+      "id": "doubleDetector",
+      "name": "Double Detector",
+      "timing": "turn",
+      "text": "During your Dual Cut, announce one number and point at two wires on a single teammate stand. Both, one, or none may match."
+    }
+  }
+}
