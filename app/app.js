@@ -37,6 +37,7 @@ import {
 } from '../net/client.js';
 import { SUPABASE_URL, SUPABASE_ANON_KEY } from '../net/config.js';
 import { STRINGS } from './strings.en.js';
+import { chooseBotAction, botToAct, botNameForSeat, isBotName } from '../bot/bot.js';
 import {
   artIcon,
   artWire,
@@ -85,6 +86,11 @@ function applySettings() {
 }
 
 const UI = {
+  bots: [false, false, false, false, false],
+  botIds: [],
+  lastHuman: null,
+  botTimer: null,
+  botTimerKey: null,
   captainPick: 'random',
   retryKind: null,
   equip: null,
@@ -415,17 +421,24 @@ function meId(view) {
     : UI.state.players[UI.state.activeIndex].id;
 }
 
+function isBotId(id) {
+  return UI.botIds.includes(id);
+}
+
 function canAct(view) {
   if (view.openTurn) return false;
-  return !isOnline() || view.you === view.activeId;
+  if (!isOnline()) return !isBotId(view.activeId);
+  return view.you === view.activeId;
 }
 
 function canResolve(view) {
-  return !isOnline() || (view.pending && view.you === view.pending.actorId);
+  if (!isOnline()) return !(view.pending && isBotId(view.pending.actorId));
+  return view.pending && view.you === view.pending.actorId;
 }
 
 function canSetup(view) {
-  return !isOnline() || view.you === view.setupSeatId;
+  if (!isOnline()) return !isBotId(view.setupSeatId);
+  return view.you === view.setupSeatId;
 }
 
 function onlineStale(includeSelf = false) {
@@ -448,7 +461,16 @@ function currentViewerId(state) {
     : state.pending
       ? state.pending.actor
       : state.activeIndex;
-  return state.players[seat].id;
+  const id = state.players[seat].id;
+  if (!isBotId(id)) {
+    UI.lastHuman = id;
+    return id;
+  }
+  // A bot is deciding: keep showing the last human who looked, so nobody has
+  // to pass the device around while the bot plays.
+  if (UI.lastHuman && state.players.some((player) => player.id === UI.lastHuman)) return UI.lastHuman;
+  const human = state.players.find((player) => !isBotId(player.id));
+  return human ? human.id : id;
 }
 
 // Hotseat hides everything except the current viewer's wires. When the game is
@@ -612,7 +634,10 @@ function setupScreen() {
     names.push(`
       <label class="name-field">
         <span>${esc(t('player'))} ${index + 1}${UI.captainPick === index ? ` - ${esc(t('captain'))}` : ''}</span>
-        <input data-name-input="${index}" value="${esc(UI.names[index] || '')}" maxlength="18" spellcheck="false">
+        <span class="name-row">
+          <input data-name-input="${index}" value="${esc(UI.bots[index] ? botNameForSeat(index) : (UI.names[index] || ''))}" maxlength="18" spellcheck="false"${UI.bots[index] ? ' disabled' : ''}>
+          <button type="button" class="btn small bot-toggle${UI.bots[index] ? ' primary' : ' ghost'}" data-act="bot-toggle" data-i="${index}" aria-pressed="${Boolean(UI.bots[index])}">${esc(t('botToggle'))}</button>
+        </span>
       </label>`);
   }
 
@@ -1411,11 +1436,15 @@ function lobbyScreen() {
     return `<li class="li${mine ? ' me' : ''}">
       <span class="av" style="--av:${seatColor(player.seat)}">${esc(initialFor(player.name))}</span>
       <span class="li-name">${esc(player.name)}
+        ${isBotName(player.name) ? `<span class="pill bot">${esc(t('botTag'))}</span>` : ''}
         ${isCaptain ? `<span class="pill cap">${esc(t('captainLabel'))}</span>` : ''}
         ${mine ? `<span class="pill you">${esc(t('you'))}</span>` : ''}
         ${player.is_host ? `<span class="pill host">${esc(t('host'))}</span>` : ''}
       </span>
       ${makeCaptain}
+      ${isHost && (online.botIds || []).includes(player.id)
+        ? `<button class="btn small ghost" data-act="remove-bot" data-id="${esc(player.id)}">${esc(t('botRemove'))}</button>`
+        : ''}
       <span class="li-state"><span class="cd ${stateClass}" aria-hidden="true"></span><span class="cd-label">${esc(stateLabel)}</span></span>
       ${toggle}
     </li>`;
@@ -1465,6 +1494,9 @@ function lobbyScreen() {
               ? `<button class="btn ghost" data-act="choose-mission">${esc(t('chooseMission'))}</button>`
               : `<span class="muted small">${esc(t('hostPicksMission'))}</span>`}
           </div>
+          ${isHost && players.length < target
+            ? `<div class="bot-add-row"><button class="btn ghost" data-act="add-bot">${esc(t('botAdd'))}</button><span class="muted small">${esc(t('botHint'))}</span></div>`
+            : ''}
           <div class="start-box">
             ${isHost
               ? `<button class="btn primary big" data-act="start-online" ${canStart ? '' : 'disabled'}>${esc(startLabel)}</button>
@@ -1997,7 +2029,7 @@ function openTurnPanel(view) {
     ? (mine
       ? `<button class="btn big primary snip-btn" data-act="snip" data-id="${esc(me)}">${esc(t('snipButton'))}</button>`
       : `<p class="waiting-box">${esc(t('openTurnWait', { name: playerName(view, last || view.activeId) }))}</p>`)
-    : `<div class="target-row">${eligible.map((player) => `<button class="target-btn snip-target" data-act="snip" data-id="${esc(player.id)}">${esc(t('snipButton'))} ${esc(player.name)}</button>`).join('')}</div>`;
+    : `<div class="target-row">${eligible.filter((player) => !isBotId(player.id)).map((player) => `<button class="target-btn snip-target" data-act="snip" data-id="${esc(player.id)}">${esc(t('snipButton'))} ${esc(player.name)}</button>`).join('')}</div>`;
   return `
     <section class="panel action-panel open-turn">
       <div class="action-head"><h3>${esc(t('openTurnTitle'))}</h3></div>
@@ -2477,6 +2509,7 @@ function beginOnline(options) {
     stateSeq: -1,
     status: 'lobby',
     isHost: false,
+    botIds: loadOnlineBots(options.code),
     connection: 'connecting',
     busy: false,
     timer: null,
@@ -2499,7 +2532,7 @@ function beginOnline(options) {
 async function createOnlineRoom() {
   if (UI.busyAction) return;
   const name = onlineNameValue();
-  if (!isValidName(name)) {
+  if (!isValidName(name) || isBotName(name)) {
     UI.error = t('nameRequired');
     render();
     return;
@@ -2562,7 +2595,7 @@ async function joinOnlineRoom(session = null) {
   const fromSession = Boolean(session);
   const name = fromSession ? session.name : onlineNameValue();
   const code = normalizeRoomCode(fromSession ? session.code : UI.onlineCode);
-  if (!isValidName(name)) {
+  if (!isValidName(name) || isBotName(name)) {
     UI.error = t('nameRequired');
     render();
     return;
@@ -2627,6 +2660,7 @@ function startPolling() {
   }, POLL_MS);
   online.heartbeat = setInterval(() => {
     touchPlayer(online.client, { code: online.code, playerId: online.playerId }).catch(() => {});
+    touchOnlineBots();
   }, HEARTBEAT_MS);
 }
 
@@ -2719,7 +2753,7 @@ function applySnapshot(snapshot, force = false) {
   if (changed) render();
 }
 
-async function submitOnline(action) {
+async function submitOnline(action, asId = null) {
   const online = UI.online;
   if (!online || online.busy) return;
   UI.agent = null;
@@ -2747,7 +2781,7 @@ async function submitOnline(action) {
   try {
     const result = await submitAction(online.client, {
       code: online.code,
-      playerId: online.playerId,
+      playerId: asId || online.playerId,
       baseSeq: online.seq,
       action,
       state: next,
@@ -3037,7 +3071,7 @@ function startHotseatGame(retry = false) {
   else UI.captain = Math.min(Number(UI.captainPick) || 0, UI.playerCount - 1);
   const players = [];
   for (let index = 0; index < UI.playerCount; index += 1) {
-    players.push({ name: UI.names[index] || `Player ${index + 1}` });
+    players.push({ name: UI.bots[index] ? botNameForSeat(index) : (UI.names[index] || `Player ${index + 1}`) });
   }
   const seed = (Date.now() ^ Math.floor(Math.random() * 0xffffffff)) >>> 0;
   try {
@@ -3048,6 +3082,9 @@ function startHotseatGame(retry = false) {
       seed: seed || 1,
       captainIndex: UI.captain,
     });
+    UI.botIds = UI.state.players.filter((_, index) => UI.bots[index]).map((player) => player.id);
+    UI.lastHuman = null;
+    stopBotTimer();
     UI.banners = [];
     UI.seenLog = 0;
     UI.fx = null;
@@ -3377,9 +3414,30 @@ async function onClick(event) {
       break;
     case 'count':
       UI.playerCount = Number(el.dataset.n);
+      for (let i = UI.playerCount - 1; i >= 0; i -= 1) {
+        if (UI.bots.slice(0, UI.playerCount).every(Boolean)) UI.bots[i] = false;
+      }
       if (typeof UI.captainPick === 'number' && UI.captainPick >= UI.playerCount) UI.captainPick = 'random';
       render();
       break;
+    case 'add-bot':
+      addOnlineBot();
+      break;
+    case 'remove-bot':
+      removeOnlineBot(el.dataset.id);
+      break;
+    case 'bot-toggle': {
+      const index = Number(el.dataset.i);
+      const humans = Array.from({ length: UI.playerCount }, (_, i) => i).filter((i) => i !== index && !UI.bots[i]).length;
+      if (!UI.bots[index] && humans === 0) {
+        UI.error = t('botNeedHuman');
+      } else {
+        UI.bots[index] = !UI.bots[index];
+        UI.error = '';
+      }
+      render();
+      break;
+    }
     case 'start':
       startHotseatGame();
       break;
@@ -4376,7 +4434,7 @@ function snipScreen(view) {
         <h2>${esc(t('snipWho'))}</h2>
         <p class="curtain-why">${esc(t('openTurnHelp'))}</p>
         ${remaining !== null ? `<div class="seq-strip special timer${remaining < 60000 ? ' hurry' : ''}"><span class="seq-title">${esc(t('timerTitle'))}</span><span class="timer-clock" data-timer>${esc(clockText(remaining))}</span></div>` : ''}
-        <div class="target-row">${eligible.map((player) => `<button class="btn big primary snip-target" data-act="snip" data-id="${esc(player.id)}">${esc(t('snipButton'))} ${esc(player.name)}</button>`).join('')}</div>
+        <div class="target-row">${eligible.filter((player) => !isBotId(player.id)).map((player) => `<button class="btn big primary snip-target" data-act="snip" data-id="${esc(player.id)}">${esc(t('snipButton'))} ${esc(player.name)}</button>`).join('')}</div>
         <p class="muted small">${esc(t('snipWhoHelp'))}</p>
         ${errorBox()}
       </div>
@@ -4542,6 +4600,158 @@ function render() {
     if (seat) seat.scrollIntoView({ block: 'start', behavior: 'auto' });
   }
   if (!UI.draft) UI.draftScrolled = null;
+  scheduleBot();
+}
+
+// ---------------------------------------------------------------------------
+// Bots (level 2). In hotseat the browser plays for them; online the host does.
+
+function stopBotTimer() {
+  if (UI.botTimer) clearTimeout(UI.botTimer);
+  UI.botTimer = null;
+  UI.botTimerKey = null;
+}
+
+function botView(state, id) {
+  return publicView(state, id);
+}
+
+function botWaitMs(state, botId) {
+  const view = publicView(state, botId);
+  if (view.openTurn) return 1800 + Math.random() * 4200; // a "Snip!" race
+  return 900 + Math.random() * 700;
+}
+
+function botStoreKey(code) {
+  return `ws-bots-${code}`;
+}
+
+function loadOnlineBots(code) {
+  try {
+    const raw = typeof localStorage === 'undefined' ? null : localStorage.getItem(botStoreKey(code));
+    const list = raw ? JSON.parse(raw) : [];
+    return Array.isArray(list) ? list.filter((id) => typeof id === 'string') : [];
+  } catch {
+    return [];
+  }
+}
+
+function saveOnlineBots() {
+  const online = UI.online;
+  if (!online) return;
+  try {
+    if (typeof localStorage !== 'undefined') localStorage.setItem(botStoreKey(online.code), JSON.stringify(online.botIds));
+  } catch {
+    // ignore
+  }
+}
+
+function touchOnlineBots() {
+  const online = UI.online;
+  if (!online || !online.isHost) return;
+  for (const id of online.botIds) {
+    touchPlayer(online.client, { code: online.code, playerId: id }).catch(() => {});
+  }
+}
+
+async function addOnlineBot() {
+  const online = UI.online;
+  if (!online || !online.isHost || online.busy) return;
+  const players = online.players || [];
+  if (players.length >= onlineTargetPlayers()) return;
+  const used = new Set(players.map((player) => player.name));
+  let name = '';
+  for (let seat = 0; seat < 20; seat += 1) {
+    const candidate = botNameForSeat(seat);
+    if (!used.has(candidate)) { name = candidate; break; }
+  }
+  if (!name) return;
+  const id = newPlayerId();
+  try {
+    await joinRoom(online.client, { code: online.code, playerId: id, name });
+    online.botIds = online.botIds.concat(id);
+    saveOnlineBots();
+    if (onlineReadySupport()) {
+      await setPlayerReady(online.client, { code: online.code, playerId: id, ready: true }).catch(() => {});
+    }
+    await refreshOnline(true);
+  } catch (error) {
+    UI.error = netErrorText(error);
+    render();
+  }
+}
+
+async function removeOnlineBot(id) {
+  const online = UI.online;
+  if (!online || !online.isHost || !online.botIds.includes(id)) return;
+  try {
+    await leaveRoom(online.client, { code: online.code, playerId: id });
+    online.botIds = online.botIds.filter((botId) => botId !== id);
+    saveOnlineBots();
+    await refreshOnline(true);
+  } catch (error) {
+    UI.error = netErrorText(error);
+    render();
+  }
+}
+
+// Online the host's browser plays every bot it added. When the host leaves or
+// goes away nothing drives the bots, so they stop with the room.
+function scheduleOnlineBot() {
+  const online = UI.online;
+  const state = UI.state;
+  if (!online || !online.isHost || online.botIds.length === 0 || !state
+    || online.status !== 'playing' || UI.screen !== 'game'
+    || (state.phase !== 'setup' && state.phase !== 'playing')) { stopBotTimer(); return; }
+  const botId = botToAct(publicView(state, online.playerId), online.botIds);
+  if (!botId) { stopBotTimer(); return; }
+  const seq = online.seq;
+  const key = `${state.gameId}|${seq}|${botId}`;
+  if (UI.botTimer && UI.botTimerKey === key) return;
+  stopBotTimer();
+  UI.botTimerKey = key;
+  UI.botTimer = setTimeout(function fire() {
+    UI.botTimer = null;
+    UI.botTimerKey = null;
+    const live = UI.online;
+    if (!live || !UI.state) return;
+    if (live.seq !== seq) { scheduleOnlineBot(); return; }
+    if (live.busy) { UI.botTimer = setTimeout(fire, 500); UI.botTimerKey = key; return; }
+    try {
+      const action = chooseBotAction(botView(UI.state, botId), botId);
+      if (action) submitOnline(action, botId);
+    } catch (error) {
+      UI.error = error.message || String(error);
+      render();
+    }
+  }, botWaitMs(state, botId));
+}
+
+function scheduleBot() {
+  if (isOnline()) { scheduleOnlineBot(); return; }
+  const state = UI.state;
+  if (!state || UI.screen !== 'game' || UI.botIds.length === 0) { stopBotTimer(); return; }
+  if (state.phase !== 'setup' && state.phase !== 'playing') { stopBotTimer(); return; }
+  const view = publicView(state, state.players[0].id);
+  const botId = botToAct(view, UI.botIds);
+  if (!botId) { stopBotTimer(); return; }
+  if (curtainNeeded(openView(state))) { stopBotTimer(); return; }
+  const key = `${state.gameId}|${state.log.length}|${botId}|${state.turnNumber}`;
+  if (UI.botTimer && UI.botTimerKey === key) return;
+  stopBotTimer();
+  UI.botTimerKey = key;
+  UI.botTimer = setTimeout(() => {
+    UI.botTimer = null;
+    UI.botTimerKey = null;
+    if (UI.state !== state) return;
+    try {
+      const action = chooseBotAction(botView(state, botId), botId);
+      if (action) apply(action);
+    } catch (error) {
+      UI.error = error.message || String(error);
+      render();
+    }
+  }, botWaitMs(state, botId));
 }
 
 function boot() {

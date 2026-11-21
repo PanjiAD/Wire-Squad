@@ -1,4 +1,4 @@
-import { PERSONAL_ITEMS } from './data.js';
+import { PERSONAL_ITEMS, getMission, resolveSetup } from './data.js';
 import { clone, cutBlueCount, lockedValues } from './helpers.js';
 
 function tokenSummary(state, wire) {
@@ -122,6 +122,7 @@ export function publicView(state, viewerId) {
         cut: state.sequence.cards.map((value) => cutBlueCount(state, value)),
       }
       : null,
+    setup: resolveSetup(getMission(state.missionId), state.playerCount),
     locked: lockedValues(state),
     deadlyValue: state.deadlyValue ?? null,
     finalValue: state.finalValue ?? null,

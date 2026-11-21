@@ -25,6 +25,7 @@ const MODULES = [
   'engine/setup.js',
   'engine/actions.js',
   'engine/view.js',
+  'bot/bot.js',
   'net/config.js',
   'net/client.js',
   'app/strings.en.js',

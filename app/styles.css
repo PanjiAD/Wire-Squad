@@ -2931,3 +2931,10 @@ html.colorblind .wire.yellow::after { background: radial-gradient(rgba(30,31,36,
 .eq-tape { position: absolute; left: 2px; top: 2px; min-width: 18px; height: 18px; line-height: 18px; text-align: center; font-size: 11px; font-weight: 800; border-radius: 4px; background: #F2C230; color: #1E1F24; border: 2px solid #1E1F24; }
 .tape-note { font-style: normal; font-weight: 600; opacity: .8; }
 .mission-card .mlock { margin-left: auto; align-self: center; color: #4a4c57; }
+
+.name-row { display: flex; gap: 6px; align-items: stretch; }
+.name-row input { flex: 1; min-width: 0; }
+.name-row input:disabled { background: var(--paper2, #eee); color: var(--muted); }
+.bot-toggle { flex: none; }
+.pill.bot { background: var(--ink, #234); color: #fff; }
+.bot-add-row { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; margin: 8px 0; }
