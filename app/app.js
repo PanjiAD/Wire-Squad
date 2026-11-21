@@ -4338,6 +4338,18 @@ function eventLine(view) {
   return `<button class="event-line phone-only" data-act="psheet-open" data-v="log">${PHONE_ICON.list}<span>${esc(text)}</span></button>`;
 }
 
+// Phone: the free middle of the screen shows the mission, captain and the dial.
+function phoneBoard(view) {
+  const captain = view.players.find((player) => player.id === view.captainId);
+  return `<section class="phone-board phone-only" aria-label="Board">
+      <div class="pb-head" data-act="rules-open" role="button" tabindex="0" aria-label="${esc(t('missionRules'))}">
+        <span class="pb-mission"><b>#${view.missionId}</b> ${esc(view.mission.title)}</span>
+        <span class="pb-captain">${CROWN}<span>${esc(captain ? captain.name : '')}</span></span>
+      </div>
+      ${dialTrack(view, 56)}
+    </section>`;
+}
+
 function tableSummary(view) {
   const done = view.validation.length;
   const cells = Array.from({ length: 12 }, (_, index) => {
@@ -4486,7 +4498,7 @@ function gameScreen(view) {
             </div>
             ${boardCenter(view)}
           </div>
-          <div class="phone-mid">${tableSummary(view)}</div>
+          <div class="phone-mid">${UI.draft ? '' : phoneBoard(view)}${tableSummary(view)}</div>
           <div class="bottom-dock">
             <div class="action-dock">${actionPanel(view)}</div>
             <div class="me-seat">${playerPanel(view, view.players[me], me)}${holdRow(view, me)}</div>
@@ -4673,17 +4685,19 @@ function touchOnlineBots() {
 
 async function addOnlineBot() {
   const online = UI.online;
-  if (!online || !online.isHost || online.busy) return;
+  if (!online || !online.isHost || online.busy || online.addingBot) return;
   const players = online.players || [];
   if (players.length >= onlineTargetPlayers()) return;
+  // The server gives the lowest free seat, so name the bot after that seat's
+  // mascot: five bots always get five different names.
+  const seats = new Set(players.map((player) => player.seat));
+  let seat = 0;
+  while (seats.has(seat) && seat < 4) seat += 1;
   const used = new Set(players.map((player) => player.name));
-  let name = '';
-  for (let seat = 0; seat < 20; seat += 1) {
-    const candidate = botNameForSeat(seat);
-    if (!used.has(candidate)) { name = candidate; break; }
-  }
-  if (!name) return;
+  let name = botNameForSeat(seat);
+  for (let step = 1; used.has(name) && step < 5; step += 1) name = botNameForSeat(seat + step);
   const id = newPlayerId();
+  online.addingBot = true;
   try {
     await joinRoom(online.client, { code: online.code, playerId: id, name });
     online.botIds = online.botIds.concat(id);
@@ -4695,6 +4709,8 @@ async function addOnlineBot() {
   } catch (error) {
     UI.error = netErrorText(error);
     render();
+  } finally {
+    online.addingBot = false;
   }
 }
 

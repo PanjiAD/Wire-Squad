@@ -2958,6 +2958,63 @@ html.colorblind .wire.yellow::after { background: radial-gradient(rgba(30,31,36,
   .game .table { width: 100%; box-sizing: border-box; }
   .game .table-main { flex: 1 1 100%; width: 100%; }
 }
+
+/* ---------------------------------------------------------------------------
+   Phone fill: one screen, no page scroll, bigger opponent racks.
+   - body used 100vh (the tall viewport on Chrome Android), which made the page
+     scroll by the height of the address bar. dvh is the visible height.
+   - Opponent mini racks grow to use the free middle space; with two opponents
+     they stack so each rack gets the full width. */
+@supports (height: 100dvh) {
+  body { min-height: 100dvh; }
+}
+@media (max-width: 699px) {
+  .game .table-main { justify-content: flex-start; }
+  .game .arena { flex: 1 1 auto; display: flex; flex-direction: column; justify-content: center; min-height: 0; }
+  .game .opponents { flex: 0 0 auto; align-content: center; align-items: center; }
+  .game .phone-mid { margin-top: 0; }
+
+  /* bigger racks inside the collapsed cards */
+  .opponents .player:not(.expanded) { flex-basis: min(300px, 84vw); padding: 8px 10px; }
+  .opponents .player:not(.expanded) .stand { --lab: 8px; --ww: min(20px, max(8px, calc((100cqw - var(--lab) - 2px * var(--u, 8)) / var(--u, 8)))); }
+  .opponents .player:not(.expanded) .player-name { font-size: 15px; }
+  .opponents .player:not(.expanded) .avatar { width: 32px; height: 32px; }
+  .opponents .player:not(.expanded) .wire-count { font-size: 12px; }
+
+  /* two opponents: stack them, full width each */
+  .game .opponents[data-n="2"]:not(:has(.player.expanded)) { flex-direction: column; overflow: visible; align-items: stretch; gap: 8px; }
+  .game .opponents[data-n="2"]:not(:has(.player.expanded)) .player:not(.expanded) { flex: 0 0 auto; width: 100%; box-sizing: border-box; }
+  .game .opponents[data-n="2"] .player:not(.expanded) .wire-count { display: inline-flex; }
+}
+@media (max-width: 699px) and (max-height: 700px) {
+  .opponents .player:not(.expanded) .stand { --ww: min(14px, max(7px, calc((100cqw - var(--lab) - 2px * var(--u, 8)) / var(--u, 8)))); }
+}
+
+/* Phone: rack size follows the free height (dvh), capped by the width. */
+@media (max-width: 699px) {
+  .game .opponents[data-n="1"] { flex-direction: column; overflow: visible; align-items: stretch; }
+  .game .opponents[data-n="1"] .player:not(.expanded) { flex: 0 0 auto; width: 100%; box-sizing: border-box; }
+  .game .opponents[data-n="1"] .player:not(.expanded) .stand {
+    --ww: min(clamp(14px, calc((100dvh - 650px) / 6.4), 38px), max(8px, calc((100cqw - var(--lab) - 2px * var(--u, 8)) / var(--u, 8))));
+  }
+  .game .opponents[data-n="2"] .player:not(.expanded) .stand {
+    --ww: min(clamp(12px, calc((100dvh - 730px) / 6.4), 26px), max(8px, calc((100cqw - var(--lab) - 2px * var(--u, 8)) / var(--u, 8))));
+  }
+}
+
+/* Phone board: mission line + dial in the middle of the screen. */
+@media (max-width: 699px) {
+  .phone-board { display: flex; flex-direction: column; gap: 6px; margin-bottom: 8px; padding: 8px 10px; border: var(--line); border-radius: 12px; background: var(--cream); box-shadow: 3px 3px 0 var(--ink); }
+  .pb-head { display: flex; align-items: center; justify-content: space-between; gap: 8px; cursor: pointer; font: 800 13px system-ui, sans-serif; }
+  .pb-mission { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .pb-captain { display: inline-flex; align-items: center; gap: 4px; flex: none; font-weight: 700; }
+  .pb-captain .crown { width: 16px; height: 16px; }
+  .phone-board .dial-container { flex-direction: row; align-items: center; gap: 10px; }
+  .phone-board .dial { flex: 1 1 auto; min-width: 0; }
+  .phone-board .dial-track { flex-wrap: wrap; }
+}
+@media (max-width: 699px) and (max-height: 780px) { .phone-board .pb-head { display: none; } .phone-board { padding: 6px 10px; margin-bottom: 6px; } }
+@media (max-width: 699px) and (max-height: 700px) { .phone-board { display: none; } }
 </style>
 </head>
 <body>
@@ -11878,6 +11935,18 @@ function eventLine(view) {
   return `<button class="event-line phone-only" data-act="psheet-open" data-v="log">${PHONE_ICON.list}<span>${esc(text)}</span></button>`;
 }
 
+// Phone: the free middle of the screen shows the mission, captain and the dial.
+function phoneBoard(view) {
+  const captain = view.players.find((player) => player.id === view.captainId);
+  return `<section class="phone-board phone-only" aria-label="Board">
+      <div class="pb-head" data-act="rules-open" role="button" tabindex="0" aria-label="${esc(t('missionRules'))}">
+        <span class="pb-mission"><b>#${view.missionId}</b> ${esc(view.mission.title)}</span>
+        <span class="pb-captain">${CROWN}<span>${esc(captain ? captain.name : '')}</span></span>
+      </div>
+      ${dialTrack(view, 56)}
+    </section>`;
+}
+
 function tableSummary(view) {
   const done = view.validation.length;
   const cells = Array.from({ length: 12 }, (_, index) => {
@@ -12026,7 +12095,7 @@ function gameScreen(view) {
             </div>
             ${boardCenter(view)}
           </div>
-          <div class="phone-mid">${tableSummary(view)}</div>
+          <div class="phone-mid">${UI.draft ? '' : phoneBoard(view)}${tableSummary(view)}</div>
           <div class="bottom-dock">
             <div class="action-dock">${actionPanel(view)}</div>
             <div class="me-seat">${playerPanel(view, view.players[me], me)}${holdRow(view, me)}</div>
@@ -12213,17 +12282,19 @@ function touchOnlineBots() {
 
 async function addOnlineBot() {
   const online = UI.online;
-  if (!online || !online.isHost || online.busy) return;
+  if (!online || !online.isHost || online.busy || online.addingBot) return;
   const players = online.players || [];
   if (players.length >= onlineTargetPlayers()) return;
+  // The server gives the lowest free seat, so name the bot after that seat's
+  // mascot: five bots always get five different names.
+  const seats = new Set(players.map((player) => player.seat));
+  let seat = 0;
+  while (seats.has(seat) && seat < 4) seat += 1;
   const used = new Set(players.map((player) => player.name));
-  let name = '';
-  for (let seat = 0; seat < 20; seat += 1) {
-    const candidate = botNameForSeat(seat);
-    if (!used.has(candidate)) { name = candidate; break; }
-  }
-  if (!name) return;
+  let name = botNameForSeat(seat);
+  for (let step = 1; used.has(name) && step < 5; step += 1) name = botNameForSeat(seat + step);
   const id = newPlayerId();
+  online.addingBot = true;
   try {
     await joinRoom(online.client, { code: online.code, playerId: id, name });
     online.botIds = online.botIds.concat(id);
@@ -12235,6 +12306,8 @@ async function addOnlineBot() {
   } catch (error) {
     UI.error = netErrorText(error);
     render();
+  } finally {
+    online.addingBot = false;
   }
 }
 
