@@ -1064,8 +1064,6 @@ function homeScreen() {
 }
 
 function createRoomScreen() {
-  const code = UI.pendingCode || makeRoomCode();
-  UI.pendingCode = code;
   const target = Number(UI.targetPlayers) || 4;
   const zone = startZoneFor(target);
   const busy = Boolean(UI.busyAction);
@@ -1074,7 +1072,6 @@ function createRoomScreen() {
   for (let count = MIN_PLAYERS; count <= MAX_PLAYERS; count += 1) {
     counts.push(`<button class="seg-btn${target === count ? ' on' : ''}" data-act="target-count" data-n="${count}" aria-pressed="${target === count}">${count}</button>`);
   }
-  const tiles = code.split('').map((letter) => `<span class="code-tile">${esc(letter)}</span>`).join('');
   return `
     <div class="pregame">
       ${pregameTopbar(t('createRoomTitle'), `<button class="btn ghost small" data-act="home">${esc(t('home'))}</button>`)}
@@ -1093,15 +1090,7 @@ function createRoomScreen() {
                   ${artIcon('user', 20, 'currentColor')}
                 </span>
               </label>
-              <div>
-                <div class="disp field-title">${esc(t('roomCodePreview'))}</div>
-                <div class="code-row">${tiles}</div>
-                <p class="muted small">${esc(t('roomCodeHelp'))}</p>
-                <div class="create-actions">
-                  <button class="btn ghost" data-act="copy-pending">${artIcon('copy', 20, 'currentColor', 2)} ${esc(t('copy'))}</button>
-                  <button class="btn ghost" data-act="share-pending">${artIcon('share', 20, 'currentColor', 2)} ${esc(t('share'))}</button>
-                </div>
-              </div>
+              <p class="muted small code-later">${esc(t('roomCodeLater'))}</p>
             </div>
             <div class="create-dial">
               ${artDial(zone, 220)}
@@ -3009,7 +2998,6 @@ async function onClick(event) {
     case 'create-open':
       UI.mode = 'local';
       UI.screen = 'create';
-      UI.pendingCode = makeRoomCode();
       UI.soloConfirm = null;
       UI.error = '';
       UI.notice = '';
@@ -3029,25 +3017,6 @@ async function onClick(event) {
     case 'target-count':
       setTargetPlayersOnline(Number(el.dataset.n));
       break;
-    case 'copy-pending': {
-      const code = UI.pendingCode || '';
-      const ok = await copyText(code);
-      showToast(ok ? t('copied') : t('copyManual', { code }));
-      render();
-      break;
-    }
-    case 'share-pending': {
-      const code = UI.pendingCode || '';
-      const text = t('shareText', { code });
-      if (navigator.share) {
-        navigator.share({ title: t('appTitle'), text }).catch(() => {});
-      } else {
-        const ok = await copyText(code);
-        showToast(ok ? t('copied') : t('copyManual', { code }));
-      }
-      render();
-      break;
-    }
     case 'create-room':
       createOnlineRoom();
       break;

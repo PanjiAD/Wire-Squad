@@ -513,6 +513,7 @@ export const STRINGS = {
   localCrewTitle: 'Crew on this screen',
   startLocal: 'Start mission',
   shareRoomCode: 'Share code',
+  roomCodeLater: 'The room code appears as soon as the room is created. Share it from the lobby.',
   roomCodeHelp: 'Read the code over voice chat, or use Copy and Share.',
   readyOn: 'Ready',
   readyOff: 'Not ready',
