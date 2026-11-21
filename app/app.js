@@ -4361,6 +4361,7 @@ function menuRows(view) {
   const status = online ? roomStatusLabel(UI.online.room || {}) : '';
   const rows = [];
   if (UI.state.phase === 'playing') rows.push(row('rules-open', 'book', t('missionRules')));
+  rows.push(`<button class="menu-row" data-act="psheet-open" data-v="log">${PHONE_ICON.list}<span>${esc(t('log'))}</span></button>`);
   rows.push(row('settings-open', 'gear', t('settings')));
   rows.push(row('help-open', 'help', t('howToPlay')));
   if (online && UI.online.isHost && status === 'playing') rows.push(row('pause-room', 'pause', t('pauseRoom')));
@@ -4485,7 +4486,6 @@ function gameScreen(view) {
             </div>
             ${boardCenter(view)}
           </div>
-          ${eventLine(view)}
           <div class="phone-mid">${tableSummary(view)}</div>
           <div class="bottom-dock">
             <div class="action-dock">${actionPanel(view)}</div>
@@ -4531,6 +4531,8 @@ function render() {
     draft: keepDraftScroll ? (root.querySelector('.draft-scroll')?.scrollTop || 0) : 0,
     log: root.querySelector('.log-panel')?.scrollTop || 0,
     stage: root.querySelector('.deal-stage')?.scrollLeft || 0,
+    opps: root.querySelector('.opponents')?.scrollLeft || 0,
+    racks: [...root.querySelectorAll('.player[data-seat] .rack')].map((el) => [el.closest('.player').dataset.seat, el.scrollLeft]),
     sheet: root.querySelector('.psheet-body')?.scrollTop || 0,
   };
   const oldNeedle = root.querySelector('.bb-needle');
@@ -4554,6 +4556,21 @@ function render() {
     if (log && previous.log) log.scrollTop = previous.log;
     const stage = root.querySelector('.deal-stage');
     if (stage && previous.stage) stage.scrollLeft = previous.stage;
+    // Re-rendering rebuilds the nodes; put every horizontal scroller back so a
+    // swipe to the next opponent stays put while a Dual Cut is being built.
+    const opps = root.querySelector('.opponents');
+    if (opps && previous.opps) {
+      const snap = opps.style.scrollSnapType;
+      opps.style.scrollSnapType = 'none';
+      opps.scrollLeft = previous.opps;
+      opps.style.scrollSnapType = snap;
+    }
+    const rackNow = [...root.querySelectorAll('.player[data-seat] .rack')];
+    for (const [seat, left] of previous.racks) {
+      if (!left) continue;
+      const el = rackNow.find((node) => node.closest('.player').dataset.seat === seat);
+      if (el) el.scrollLeft = left;
+    }
     const sheetBody = root.querySelector('.psheet-body');
     if (sheetBody && previous.sheet) sheetBody.scrollTop = previous.sheet;
     updateScrollHints();
