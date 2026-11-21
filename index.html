@@ -2894,6 +2894,27 @@ html.colorblind .wire.yellow::after { background: radial-gradient(rgba(30,31,36,
   .opponents .player:not(.expanded) .ord { margin-top: 2px; font-size: 9px; }
   .me-seat .ord { margin: 1px 10px 0; }
 }
+
+/* Mission card as a button: details open in a popup */
+.mc-tap { all: unset; box-sizing: border-box; display: flex; flex-direction: column; align-items: flex-start; gap: 6px; cursor: pointer; border-radius: 16px; }
+.mc-tap:focus-visible { outline: 4px solid var(--blue); outline-offset: 3px; }
+.mc-tap-hint { display: inline-flex; align-items: center; min-height: 32px; padding: 0 12px; border: 3px solid var(--ink); border-radius: 999px; background: var(--cream); font: 800 12px system-ui, sans-serif; color: var(--ink); box-shadow: 2px 2px 0 var(--ink); }
+.mission-info-card { max-width: 520px; width: calc(100vw - 24px); max-height: 86dvh; overflow-y: auto; }
+
+/* Mission 9: Number cards strip */
+.seq-strip { display: flex; flex-direction: column; gap: 4px; padding: 8px 10px; border: 3px solid var(--ink); border-radius: 12px; background: #fff7d6; min-width: 0; }
+.seq-title { font-weight: 900; font-size: 12px; letter-spacing: .06em; text-transform: uppercase; }
+.seq-row { display: flex; align-items: center; gap: 4px; flex-wrap: nowrap; min-width: 0; }
+.seq-card { flex: 1 1 0; min-width: 0; display: flex; flex-direction: column; align-items: center; padding: 4px 4px; border: 2px solid var(--ink); border-radius: 8px; background: #fff; line-height: 1.1; }
+.seq-card b { font-size: 24px; font-family: var(--display, inherit); }
+.seq-card small { font-size: 11px; font-weight: 800; text-align: center; overflow-wrap: anywhere; }
+.seq-card.open { background: var(--green, #8fd694); }
+.seq-card.locked { background: #d8d8de; color: #4a4c55; border-style: dashed; }
+.seq-arrow { font-weight: 900; font-size: 20px; }
+.seq-strip.compact { padding: 4px 6px; }
+.seq-strip.compact .seq-card b { font-size: 18px; }
+.seq-strip.compact .seq-card small { font-size: 10px; }
+.value-btn.seq-locked { opacity: .45; border-style: dashed; cursor: not-allowed; }
 </style>
 </head>
 <body>
@@ -2993,9 +3014,18 @@ const missionsFile = {
       "tier": "novice",
       "lesson": "Lesson 1: How to cut a wire?",
       "setup": {
-        "blue": { "values": [1, 6] },
-        "yellow": { "count": 0 },
-        "red": { "count": 0 },
+        "blue": {
+          "values": [
+            1,
+            6
+          ]
+        },
+        "yellow": {
+          "count": 0
+        },
+        "red": {
+          "count": 0
+        },
         "equipment": "none"
       },
       "twoPlayer": null,
@@ -3013,9 +3043,22 @@ const missionsFile = {
       "tier": "novice",
       "lesson": "Lesson 2: How to cut a YELLOW wire",
       "setup": {
-        "blue": { "values": [1, 8] },
-        "yellow": { "count": 2, "valueRange": [1, 7] },
-        "red": { "count": 0 },
+        "blue": {
+          "values": [
+            1,
+            8
+          ]
+        },
+        "yellow": {
+          "count": 2,
+          "valueRange": [
+            1,
+            7
+          ]
+        },
+        "red": {
+          "count": 0
+        },
         "equipment": "none"
       },
       "twoPlayer": null,
@@ -3034,11 +3077,27 @@ const missionsFile = {
       "tier": "novice",
       "lesson": "Lesson 3: How (NOT) to cut a RED wire",
       "setup": {
-        "blue": { "values": [1, 10] },
-        "yellow": { "count": 0 },
-        "red": { "count": 1, "valueRange": [1, 9] },
+        "blue": {
+          "values": [
+            1,
+            10
+          ]
+        },
+        "yellow": {
+          "count": 0
+        },
+        "red": {
+          "count": 1,
+          "valueRange": [
+            1,
+            9
+          ]
+        },
         "equipment": "players",
-        "reroll": [2, 12]
+        "reroll": [
+          2,
+          12
+        ]
       },
       "twoPlayer": null,
       "rules": [
@@ -3056,14 +3115,24 @@ const missionsFile = {
       "tier": "intermediate",
       "lesson": "Everything you learned, on one bomb.",
       "setup": {
-        "blue": { "values": "all" },
-        "yellow": { "count": 2 },
-        "red": { "count": 1 },
+        "blue": {
+          "values": "all"
+        },
+        "yellow": {
+          "count": 2
+        },
+        "red": {
+          "count": 1
+        },
         "equipment": "players"
       },
       "twoPlayer": {
-        "yellow": { "count": 4 },
-        "red": { "count": 1 }
+        "yellow": {
+          "count": 4
+        },
+        "red": {
+          "count": 1
+        }
       },
       "rules": [
         "This mission uses every blue wire.",
@@ -3072,7 +3141,9 @@ const missionsFile = {
       ],
       "success": "The field team clears its first real bomb.",
       "failure": "The red wire went off. Reset the wires and try again.",
-      "unverified": ["twoPlayer"]
+      "unverified": [
+        "twoPlayer"
+      ]
     },
     {
       "id": 5,
@@ -3080,14 +3151,28 @@ const missionsFile = {
       "tier": "intermediate",
       "lesson": "Two yellows, three possibilities.",
       "setup": {
-        "blue": { "values": "all" },
-        "yellow": { "count": 2, "candidates": 3, "hiddenDraw": true },
-        "red": { "count": 1 },
+        "blue": {
+          "values": "all"
+        },
+        "yellow": {
+          "count": 2,
+          "candidates": 3,
+          "hiddenDraw": true
+        },
+        "red": {
+          "count": 1
+        },
         "equipment": "players"
       },
       "twoPlayer": {
-        "yellow": { "count": 2, "candidates": 3, "hiddenDraw": true },
-        "red": { "count": 2 }
+        "yellow": {
+          "count": 2,
+          "candidates": 3,
+          "hiddenDraw": true
+        },
+        "red": {
+          "count": 2
+        }
       },
       "rules": [
         "Before dealing, draw three yellow wires and mark all three values with the question side up.",
@@ -3104,9 +3189,15 @@ const missionsFile = {
       "tier": "intermediate",
       "lesson": "Four yellow wires, one red wire.",
       "setup": {
-        "blue": { "values": "all" },
-        "yellow": { "count": 4 },
-        "red": { "count": 1 },
+        "blue": {
+          "values": "all"
+        },
+        "yellow": {
+          "count": 4
+        },
+        "red": {
+          "count": 1
+        },
         "equipment": "players"
       },
       "twoPlayer": null,
@@ -3115,7 +3206,13 @@ const missionsFile = {
       ],
       "success": "Four yellows cleared without touching the red.",
       "failure": "The bomb wins this round.",
-      "unverified": ["setup", "title", "lesson", "rules", "twoPlayer"]
+      "unverified": [
+        "setup",
+        "title",
+        "lesson",
+        "rules",
+        "twoPlayer"
+      ]
     },
     {
       "id": 7,
@@ -3123,9 +3220,17 @@ const missionsFile = {
       "tier": "intermediate",
       "lesson": "One red wire out of two.",
       "setup": {
-        "blue": { "values": "all" },
-        "yellow": { "count": 0 },
-        "red": { "count": 1, "candidates": 2, "hiddenDraw": true },
+        "blue": {
+          "values": "all"
+        },
+        "yellow": {
+          "count": 0
+        },
+        "red": {
+          "count": 1,
+          "candidates": 2,
+          "hiddenDraw": true
+        },
         "equipment": "players"
       },
       "twoPlayer": null,
@@ -3135,7 +3240,13 @@ const missionsFile = {
       ],
       "success": "Class dismissed with a clean board.",
       "failure": "One mistake too many. The final exam waits.",
-      "unverified": ["setup", "title", "lesson", "rules", "twoPlayer"]
+      "unverified": [
+        "setup",
+        "title",
+        "lesson",
+        "rules",
+        "twoPlayer"
+      ]
     },
     {
       "id": 8,
@@ -3143,14 +3254,30 @@ const missionsFile = {
       "tier": "expert",
       "lesson": "Everything the team has learned.",
       "setup": {
-        "blue": { "values": "all" },
-        "yellow": { "count": 2, "candidates": 3, "hiddenDraw": true },
-        "red": { "count": 1, "candidates": 2, "hiddenDraw": true },
+        "blue": {
+          "values": "all"
+        },
+        "yellow": {
+          "count": 2,
+          "candidates": 3,
+          "hiddenDraw": true
+        },
+        "red": {
+          "count": 1,
+          "candidates": 2,
+          "hiddenDraw": true
+        },
         "equipment": "players"
       },
       "twoPlayer": {
-        "yellow": { "count": 4 },
-        "red": { "count": 1, "candidates": 3, "hiddenDraw": true }
+        "yellow": {
+          "count": 4
+        },
+        "red": {
+          "count": 1,
+          "candidates": 3,
+          "hiddenDraw": true
+        }
       },
       "rules": [
         "Apply every rule learned so far.",
@@ -3158,7 +3285,51 @@ const missionsFile = {
       ],
       "success": "The team becomes an official BOMB BUSTERS squad. The first Surprise box is unlocked.",
       "failure": "Luckily it was a fake bomb. Study some more and retake the test.",
-      "unverified": ["twoPlayer"]
+      "unverified": [
+        "twoPlayer"
+      ]
+    },
+    {
+      "id": 9,
+      "title": "A Sense of Priorities",
+      "tier": "expert",
+      "lesson": "Some wires must be cut in a set order.",
+      "setup": {
+        "blue": {
+          "values": "all"
+        },
+        "yellow": {
+          "count": 2
+        },
+        "red": {
+          "count": 1
+        },
+        "equipment": "players"
+      },
+      "twoPlayer": {
+        "yellow": {
+          "count": 4
+        },
+        "red": {
+          "count": 2
+        }
+      },
+      "sequence": {
+        "cards": 3,
+        "required": 2
+      },
+      "rules": [
+        "Draw 3 Number cards and lay them face up in a row.",
+        "Cut 2 wires of the first card's value before any wire of the second card's value.",
+        "Cut 2 wires of the second card's value before any wire of the third card's value.",
+        "All other values can be cut in any order.",
+        "If a player holds only wires that are still locked, the bomb explodes."
+      ],
+      "success": "The wires are cut in the right order and the bomb is defused.",
+      "failure": "A red wire is cut, the dial reaches the skull, or a player is stuck with locked wires.",
+      "unverified": [
+        "setup"
+      ]
     }
   ]
 };
@@ -3380,6 +3551,42 @@ function  cutBlueCount(state, value) {
   return count;
 }
 
+// Mission 9 style ordering: Number card i+1 stays locked until enough wires of
+// card i are cut. Returns the blue values that cannot be named or cut yet.
+function  lockedValues(state) {
+  const seq = state.sequence;
+  if (!seq) return [];
+  const locked = [];
+  for (let index = 1; index < seq.cards.length; index += 1) {
+    const before = seq.cards[index - 1];
+    if (cutBlueCount(state, before) < seq.required || locked.includes(before)) {
+      locked.push(seq.cards[index]);
+    }
+  }
+  return locked;
+}
+
+function  isLockedWire(state, wire) {
+  return wire.kind === 'blue' && lockedValues(state).includes(wire.value);
+}
+
+// The player about to act holds nothing but locked blue wires (and maybe red
+// ones), so no cut is possible and the bomb goes off.
+function  checkStuck(state) {
+  if (!state.sequence || state.phase !== 'playing') return false;
+  const hand = handWires(state, state.activeIndex);
+  if (hand.length === 0) return false;
+  const locked = lockedValues(state);
+  const stuck = hand.some((wire) => wire.kind === 'blue' && locked.includes(wire.value))
+    && hand.every((wire) => wire.kind === 'red' || (wire.kind === 'blue' && locked.includes(wire.value)));
+  if (!stuck) return false;
+  state.phase = 'lost';
+  state.lossReason = 'locked';
+  state.pending = null;
+  logEvent(state, { type: 'lost', reason: 'locked', player: state.activeIndex });
+  return true;
+}
+
 function  sortStand(state, player, stand) {
   state.stands[player][stand].sort((a, b) => {
     const wa = state.wires[a];
@@ -3519,6 +3726,7 @@ function  advanceTurn(state) {
     if (playerHasWires(state, player)) {
       state.activeIndex = player;
       logEvent(state, { type: 'turn', player });
+      checkStuck(state);
       return;
     }
   }
@@ -3669,6 +3877,17 @@ function  newGame(options = {}) {
   const red = drawColour(rng, setup.red || { count: 0 });
   const blueValues = blueValuesFor(setup);
 
+  // Number cards come last so earlier missions keep their exact seeded deals.
+  let sequence = null;
+  if (mission.sequence) {
+    const deck = range(1, 12);
+    rng.shuffle(deck);
+    sequence = {
+      cards: deck.slice(0, mission.sequence.cards),
+      required: mission.sequence.required,
+    };
+  }
+
   const specs = [];
   for (const value of blueValues) {
     for (let copy = 0; copy < BLUE_COPIES; copy += 1) {
@@ -3714,6 +3933,7 @@ function  newGame(options = {}) {
       skullAt: DIAL.skullAt,
     },
     markers: { yellow: yellow.markers, red: red.markers },
+    sequence,
     equipment: [],
     infoSupply: {},
     tokens: [],
@@ -3943,6 +4163,10 @@ function applyDualCut(state, player, action) {
   if (detector === 'super') detectorCard = requireCard(state, 5);
   const rayCard = ray ? requireCard(state, 10) : null;
 
+  const locked = lockedValues(state);
+  for (const value of values) {
+    if (locked.includes(value)) illegal('that value is still locked by the Number cards');
+  }
   for (const value of values) {
     if (!ownsValue(state, player, value)) illegal('you must hold the value you announce');
   }
@@ -4042,6 +4266,7 @@ function applySoloCut(state, player, action) {
     if (!Number.isInteger(action.value) || action.value < 1 || action.value > 12) {
       illegal('solo cut needs a blue value');
     }
+    if (lockedValues(state).includes(action.value)) illegal('that value is still locked by the Number cards');
     group = [];
     for (let other = 0; other < state.playerCount; other += 1) {
       for (const wire of handWires(state, other)) {
@@ -4095,6 +4320,7 @@ function applyCoffeeMug(state, player, action) {
   state.turnNumber += 1;
   state.turn.stabilizer = null;
   logEvent(state, { type: 'coffeeMug', player, target });
+  checkStuck(state);
 }
 
 // ---------------------------------------------------------------------------
@@ -4327,7 +4553,9 @@ function  applyAction(state, action) {
 
 function collectSoloGroups(state, player) {
   const groups = [];
+  const locked = lockedValues(state);
   for (const value of ANY_VALUES) {
+    if (locked.includes(value)) continue;
     const wires = [];
     for (let seat = 0; seat < state.playerCount; seat += 1) {
       for (const wire of handWires(state, seat)) {
@@ -4405,7 +4633,9 @@ function pairs(values) {
 function pushDualCuts(state, player, out, limit) {
   const hand = handWires(state, player);
   const ownValues = [];
+  const locked = lockedValues(state);
   for (let value = 1; value <= 12; value += 1) {
+    if (locked.includes(value)) continue;
     if (hand.some((wire) => wire.kind === 'blue' && wire.value === value)) ownValues.push(value);
   }
   if (hand.some((wire) => wire.kind === 'yellow')) ownValues.push('yellow');
@@ -4766,6 +4996,14 @@ function  publicView(state, viewerId) {
     turnNumber: state.turnNumber,
     dial: clone(state.dial),
     markers: clone(state.markers),
+    sequence: state.sequence
+      ? {
+        cards: state.sequence.cards.slice(),
+        required: state.sequence.required,
+        locked: lockedValues(state),
+        cut: state.sequence.cards.map((value) => cutBlueCount(state, value)),
+      }
+      : null,
     equipment: state.equipment.map((card) => ({
       number: card.number,
       id: card.id,
@@ -5402,6 +5640,8 @@ const  STRINGS = {
   ordHigh: 'high',
   orderHintSetting: 'Show low to high hint',
   orderHintHint: 'A small arrow under each stand: the smallest numbers are on the left.',
+  missionTapHint: 'Tap the card for rules',
+  missionInfoOpen: 'Show mission details',
   swipeHint: 'Swipe sideways to see all your wires.',
   moreNote: 'Only actions you can do right now are listed.',
   moreEquipReady: 'Ready to play. Tap for details.',
@@ -5562,6 +5802,7 @@ const  STRINGS = {
   logDial: 'The dial is now at zone {zone}.',
   logLostRed: 'A red wire was pointed at. The bomb exploded.',
   logLostDial: 'The dial reached the skull.',
+  logLostLocked: 'A player was left holding only locked wires. The bomb exploded.',
   logWon: 'Every stand is empty. Mission complete!',
   logUnlocked: 'Equipment #{card} is unlocked.',
   logValidation: 'Validation token placed for value {value}.',
@@ -5584,6 +5825,11 @@ const  STRINGS = {
   won: 'Mission accomplished',
   lostRed: 'Bomb exploded',
   lostDial: 'The dial reached the skull',
+  lostLocked: 'A player was left with only locked wires',
+  seqTitle: 'Number cards',
+  seqLocked: 'locked',
+  seqOpen: 'open',
+  seqProgress: '{have}/{need} cut',
   wonText: 'Every wire is cut or revealed. The squad made it.',
   lostText: 'The mission failed. Deal a fresh game and try again.',
   openInfo: 'Under the hood: the hotseat demo shows every hand. Online play hides the opponents.',
@@ -5707,7 +5953,7 @@ const  STRINGS = {
   twoPlayerBox: 'With 2 players',
   twoPlayerNoChange: 'no change',
   twoPlayerTbd: 'not confirmed',
-  missionLockedNote: 'Missions 9 and up are coming later; the full campaign runs to 30.',
+  missionLockedNote: 'Missions 10 and up are coming later; the full campaign runs to 30.',
   connectionLost: 'Connection lost',
   tryingAgain: 'Trying again every 2 seconds. Your hand is safe on the server.',
   retryNow: 'Retry now',
@@ -6284,6 +6530,7 @@ const UI = {
   equipNeed: null,
   logOpen: false,
   phoneSheet: null,
+  missionInfo: false,
   stamp: null,
   leaveAsk: false,
   banners: [],
@@ -6717,6 +6964,10 @@ function missionSummary(mission) {
   return parts.join(' - ');
 }
 
+function lockedMissionIds() {
+  return [9, 10, 11, 12].filter((id) => !MISSIONS.some((mission) => mission.id === id));
+}
+
 function missionList() {
   return MISSIONS.map((mission) => {
     const selected = mission.id === UI.missionId;
@@ -6733,7 +6984,7 @@ function missionList() {
         </span>
         ${flags}
       </button>`;
-  }).join('') + [9, 10, 11, 12].map((id) => `
+  }).join('') + lockedMissionIds().map((id) => `
       <div class="mission-card locked" aria-disabled="true">
         <span class="mission-no">${id}</span>
         <span class="mission-body">
@@ -6741,6 +6992,25 @@ function missionList() {
           <span class="mission-meta">${esc(t('comingLater'))}</span>
         </span>
       </div>`).join('');
+}
+
+// The mission card is a button: tap it for the difficulty, rules and the
+// 2-player note, instead of showing that panel under the card all the time.
+function missionCardButton(mission) {
+  return `<button class="mc-tap" data-act="mission-info-open" aria-label="${esc(t('missionInfoOpen'))}">
+      <span class="mc-scale">${artMissionCard(mission)}</span>
+    </button>`;
+}
+
+function missionInfoModal(mission, playerCount) {
+  if (!UI.missionInfo) return '';
+  return `
+    <div class="modal" data-act="mission-info-close">
+      <div class="modal-card mission-info-card" data-act="noop">
+        <div class="sheet-head"><span></span><button class="btn small ghost" data-act="mission-info-close" aria-label="${esc(t('close'))}">X</button></div>
+        ${missionDetail(mission, playerCount)}
+      </div>
+    </div>`;
 }
 
 function setupScreen() {
@@ -6772,8 +7042,7 @@ function setupScreen() {
           ${missionGrid()}
         </section>
         <aside class="setup-side">
-          <div class="mc-scale">${artMissionCard(mission)}</div>
-          <div class="card2">${missionDetail(mission, UI.playerCount)}</div>
+          ${missionCardButton(mission)}
           <div class="card2 setup-crew">
             <div class="disp field-title">${esc(t('localCrewTitle'))}</div>
             <div class="seg seg-crew">${counts.join('')}</div>
@@ -6788,6 +7057,7 @@ function setupScreen() {
           </div>
         </aside>
       </main>
+      ${missionInfoModal(mission, UI.playerCount)}
     </div>`;
 }
 
@@ -6864,6 +7134,29 @@ function supplyStrip(view) {
   const yl = view.infoSupply.yellow;
   slots.push(slot(yl, 0, 'yellow', true), slot(yl, 1, 'yellow', true));
   return `<div class="supply tray-info"><span class="supply-title">${esc(t('infoSupply'))}</span><div class="tray-grid cols7">${slots.join('')}</div></div>`;
+}
+
+// Mission 9: the Number cards, in order, with the locked or open state of each.
+function sequenceStrip(view, compact = false) {
+  const seq = view.sequence;
+  if (!seq) return '';
+  const cards = seq.cards.map((value, index) => {
+    const locked = seq.locked.includes(value);
+    const have = Math.min(seq.cut[index], seq.required);
+    const note = locked
+      ? t('seqLocked')
+      : index === seq.cards.length - 1
+        ? t('seqOpen')
+        : t('seqProgress', { have, need: seq.required });
+    const next = index < seq.cards.length - 1 ? '<span class="seq-arrow" aria-hidden="true">›</span>' : '';
+    return `<span class="seq-card${locked ? ' locked' : ' open'}" title="${esc(note)}">
+        <b>${value}</b><small>${locked ? '🔒 ' : ''}${esc(note)}</small>
+      </span>${next}`;
+  }).join('');
+  return `<div class="seq-strip${compact ? ' compact' : ''}" role="group" aria-label="${esc(t('seqTitle'))}">
+      <span class="seq-title">${esc(t('seqTitle'))}</span>
+      <span class="seq-row">${cards}</span>
+    </div>`;
 }
 
 function validationStrip(view) {
@@ -7088,7 +7381,7 @@ function logText(view, entry) {
     case 'chooseCut': return t('logChooseCut', { name: who(entry.player) });
     case 'soloCut': return t('logSolo', { name: who(entry.player) });
     case 'revealRed': return t('logReveal', { name: who(entry.player), count: entry.count });
-    case 'lost': return entry.reason === 'red' ? t('logLostRed') : t('logLostDial');
+    case 'lost': return entry.reason === 'red' ? t('logLostRed') : entry.reason === 'locked' ? t('logLostLocked') : t('logLostDial');
     case 'won': return t('logWon');
     case 'equipmentUnlocked': return t('logUnlocked', { card: entry.card });
     case 'validation': return t('logValidation', { value: entry.value });
@@ -7175,7 +7468,7 @@ function missionGrid() {
       <span class="mm">${esc(mission.lesson || '')}</span>
     </button>`;
   }).join('');
-  const locked = [9, 10, 11, 12].map((id) => `
+  const locked = lockedMissionIds().map((id) => `
     <div class="mtile locked" aria-disabled="true">
       <span class="tn">#${id}</span>
       <span class="mm">${esc(t('comingLater'))}</span>
@@ -7372,11 +7665,11 @@ function missionPickerScreen() {
           ${missionGrid()}
         </section>
         <aside class="mission-side">
-          <div class="mc-scale">${artMissionCard(mission)}</div>
-          <div class="card2">${missionDetail(mission, onlineTargetPlayers())}</div>
+          ${missionCardButton(mission)}
           <button class="btn primary big" data-act="mission-pick">${esc(t('pickMission', { n: mission.id }))}</button>
         </aside>
       </main>
+      ${missionInfoModal(mission, onlineTargetPlayers())}
     </div>`;
 }
 
@@ -7637,12 +7930,14 @@ function draftPanel(view) {
     .map((player) => `<button class="target-btn${draft.targetId === player.id ? ' selected' : ''}" data-act="draft-target" data-id="${player.id}">${esc(player.name)}</button>`)
     .join('');
 
+  const lockedNow = view.sequence ? view.sequence.locked : [];
   const valueButtons = values.map((value) => {
-    const disabled = Boolean(draft.detector) && value === 'yellow';
+    const isLocked = lockedNow.includes(value);
+    const disabled = (Boolean(draft.detector) && value === 'yellow') || isLocked;
     const selected = draft.values.includes(value);
     // P10b value picker: 34 px chips, selected turns yellow, yellow value is a
     // small square so it can never read as a number.
-    return `<button class="value-btn chipv${selected ? ' on' : ''}${value === 'yellow' ? ' yellow' : ''}" data-act="draft-value" data-v="${value}" ${disabled ? 'disabled' : ''}>${value === 'yellow' ? '<span class="ysq" aria-hidden="true"></span>' : esc(valueLabel(value))}</button>`;
+    return `<button class="value-btn chipv${selected ? ' on' : ''}${value === 'yellow' ? ' yellow' : ''}${isLocked ? ' seq-locked' : ''}" data-act="draft-value" data-v="${value}" ${disabled ? 'disabled' : ''} ${isLocked ? `title="${esc(t('seqLocked'))}"` : ''}>${value === 'yellow' ? '<span class="ysq" aria-hidden="true"></span>' : esc(valueLabel(value))}</button>`;
   }).join('');
 
   const personal = view.players[seatOf(view, actorId)].personal;
@@ -9135,6 +9430,14 @@ async function onClick(event) {
   if (UI.phoneSheet && PHONE_CLOSE.has(act)) UI.phoneSheet = null;
 
   switch (act) {
+    case 'mission-info-open':
+      UI.missionInfo = true;
+      render();
+      break;
+    case 'mission-info-close':
+      UI.missionInfo = false;
+      render();
+      break;
     case 'psheet-open':
       UI.phoneSheet = el.dataset.v;
       render();
@@ -9829,7 +10132,8 @@ function overlay(view) {
   const red = !won && state.lossReason === 'red';
   const kind = won ? 'won' : red ? 'wrong' : 'boom';
   const title = won ? t('defused') : red ? t('wrongWire') : t('boom');
-  const sub = won ? t('wonText') : red ? t('redCutHint') : t('lostDial');
+  const stuck = !won && state.lossReason === 'locked';
+  const sub = won ? t('wonText') : red ? t('redCutHint') : stuck ? t('lostLocked') : t('lostDial');
   const cutCount = allWires(view).filter((wire) => wire.cut).length;
   const mistakes = Math.max(0, view.dial.zone - view.dial.startZone);
   const stats = won
@@ -9998,6 +10302,7 @@ function boardCenter(view) {
       ${view.equipment.length ? `<div class="board-slots-row">${boardSlots(view)}</div>` : ''}
       ${boardTrack(view)}
       <div class="board-col">
+        ${sequenceStrip(view)}
         ${supplyStrip(view)}
         ${validationStrip(view)}
       </div>
@@ -10173,6 +10478,7 @@ function tableSummary(view) {
   return `<div class="table-sum phone-only" role="button" tabindex="0" data-act="psheet-open" data-v="table" aria-label="${esc(t('openTable'))}">
       <span class="ts-head"><span>${esc(t('track'))}</span><span class="ts-open">${esc(t('openTable'))}${PHONE_ICON.chev}</span></span>
       ${boardTrack(view)}
+      ${sequenceStrip(view, true)}
       <span class="ts-head"><span>${esc(t('validation'))} <em>${esc(t('validatedCount', { done, total: 12 }))}</em></span></span>
       <span class="vm-row">${cells}</span>
     </div>`;

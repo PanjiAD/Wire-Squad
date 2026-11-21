@@ -2887,3 +2887,24 @@ html.colorblind .wire.yellow::after { background: radial-gradient(rgba(30,31,36,
   .opponents .player:not(.expanded) .ord { margin-top: 2px; font-size: 9px; }
   .me-seat .ord { margin: 1px 10px 0; }
 }
+
+/* Mission card as a button: details open in a popup */
+.mc-tap { all: unset; box-sizing: border-box; display: flex; flex-direction: column; align-items: flex-start; gap: 6px; cursor: pointer; border-radius: 16px; }
+.mc-tap:focus-visible { outline: 4px solid var(--blue); outline-offset: 3px; }
+.mc-tap-hint { display: inline-flex; align-items: center; min-height: 32px; padding: 0 12px; border: 3px solid var(--ink); border-radius: 999px; background: var(--cream); font: 800 12px system-ui, sans-serif; color: var(--ink); box-shadow: 2px 2px 0 var(--ink); }
+.mission-info-card { max-width: 520px; width: calc(100vw - 24px); max-height: 86dvh; overflow-y: auto; }
+
+/* Mission 9: Number cards strip */
+.seq-strip { display: flex; flex-direction: column; gap: 4px; padding: 8px 10px; border: 3px solid var(--ink); border-radius: 12px; background: #fff7d6; min-width: 0; }
+.seq-title { font-weight: 900; font-size: 12px; letter-spacing: .06em; text-transform: uppercase; }
+.seq-row { display: flex; align-items: center; gap: 4px; flex-wrap: nowrap; min-width: 0; }
+.seq-card { flex: 1 1 0; min-width: 0; display: flex; flex-direction: column; align-items: center; padding: 4px 4px; border: 2px solid var(--ink); border-radius: 8px; background: #fff; line-height: 1.1; }
+.seq-card b { font-size: 24px; font-family: var(--display, inherit); }
+.seq-card small { font-size: 11px; font-weight: 800; text-align: center; overflow-wrap: anywhere; }
+.seq-card.open { background: var(--green, #8fd694); }
+.seq-card.locked { background: #d8d8de; color: #4a4c55; border-style: dashed; }
+.seq-arrow { font-weight: 900; font-size: 20px; }
+.seq-strip.compact { padding: 4px 6px; }
+.seq-strip.compact .seq-card b { font-size: 18px; }
+.seq-strip.compact .seq-card small { font-size: 10px; }
+.value-btn.seq-locked { opacity: .45; border-style: dashed; cursor: not-allowed; }

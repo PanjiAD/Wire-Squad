@@ -147,6 +147,17 @@ export function newGame(options = {}) {
   const red = drawColour(rng, setup.red || { count: 0 });
   const blueValues = blueValuesFor(setup);
 
+  // Number cards come last so earlier missions keep their exact seeded deals.
+  let sequence = null;
+  if (mission.sequence) {
+    const deck = range(1, 12);
+    rng.shuffle(deck);
+    sequence = {
+      cards: deck.slice(0, mission.sequence.cards),
+      required: mission.sequence.required,
+    };
+  }
+
   const specs = [];
   for (const value of blueValues) {
     for (let copy = 0; copy < BLUE_COPIES; copy += 1) {
@@ -192,6 +203,7 @@ export function newGame(options = {}) {
       skullAt: DIAL.skullAt,
     },
     markers: { yellow: yellow.markers, red: red.markers },
+    sequence,
     equipment: [],
     infoSupply: {},
     tokens: [],

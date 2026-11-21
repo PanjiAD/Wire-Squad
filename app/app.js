@@ -91,6 +91,7 @@ const UI = {
   equipNeed: null,
   logOpen: false,
   phoneSheet: null,
+  missionInfo: false,
   stamp: null,
   leaveAsk: false,
   banners: [],
@@ -524,6 +525,10 @@ function missionSummary(mission) {
   return parts.join(' - ');
 }
 
+function lockedMissionIds() {
+  return [9, 10, 11, 12].filter((id) => !MISSIONS.some((mission) => mission.id === id));
+}
+
 function missionList() {
   return MISSIONS.map((mission) => {
     const selected = mission.id === UI.missionId;
@@ -540,7 +545,7 @@ function missionList() {
         </span>
         ${flags}
       </button>`;
-  }).join('') + [9, 10, 11, 12].map((id) => `
+  }).join('') + lockedMissionIds().map((id) => `
       <div class="mission-card locked" aria-disabled="true">
         <span class="mission-no">${id}</span>
         <span class="mission-body">
@@ -548,6 +553,25 @@ function missionList() {
           <span class="mission-meta">${esc(t('comingLater'))}</span>
         </span>
       </div>`).join('');
+}
+
+// The mission card is a button: tap it for the difficulty, rules and the
+// 2-player note, instead of showing that panel under the card all the time.
+function missionCardButton(mission) {
+  return `<button class="mc-tap" data-act="mission-info-open" aria-label="${esc(t('missionInfoOpen'))}">
+      <span class="mc-scale">${artMissionCard(mission)}</span>
+    </button>`;
+}
+
+function missionInfoModal(mission, playerCount) {
+  if (!UI.missionInfo) return '';
+  return `
+    <div class="modal" data-act="mission-info-close">
+      <div class="modal-card mission-info-card" data-act="noop">
+        <div class="sheet-head"><span></span><button class="btn small ghost" data-act="mission-info-close" aria-label="${esc(t('close'))}">X</button></div>
+        ${missionDetail(mission, playerCount)}
+      </div>
+    </div>`;
 }
 
 function setupScreen() {
@@ -579,8 +603,7 @@ function setupScreen() {
           ${missionGrid()}
         </section>
         <aside class="setup-side">
-          <div class="mc-scale">${artMissionCard(mission)}</div>
-          <div class="card2">${missionDetail(mission, UI.playerCount)}</div>
+          ${missionCardButton(mission)}
           <div class="card2 setup-crew">
             <div class="disp field-title">${esc(t('localCrewTitle'))}</div>
             <div class="seg seg-crew">${counts.join('')}</div>
@@ -595,6 +618,7 @@ function setupScreen() {
           </div>
         </aside>
       </main>
+      ${missionInfoModal(mission, UI.playerCount)}
     </div>`;
 }
 
@@ -671,6 +695,29 @@ function supplyStrip(view) {
   const yl = view.infoSupply.yellow;
   slots.push(slot(yl, 0, 'yellow', true), slot(yl, 1, 'yellow', true));
   return `<div class="supply tray-info"><span class="supply-title">${esc(t('infoSupply'))}</span><div class="tray-grid cols7">${slots.join('')}</div></div>`;
+}
+
+// Mission 9: the Number cards, in order, with the locked or open state of each.
+function sequenceStrip(view, compact = false) {
+  const seq = view.sequence;
+  if (!seq) return '';
+  const cards = seq.cards.map((value, index) => {
+    const locked = seq.locked.includes(value);
+    const have = Math.min(seq.cut[index], seq.required);
+    const note = locked
+      ? t('seqLocked')
+      : index === seq.cards.length - 1
+        ? t('seqOpen')
+        : t('seqProgress', { have, need: seq.required });
+    const next = index < seq.cards.length - 1 ? '<span class="seq-arrow" aria-hidden="true">›</span>' : '';
+    return `<span class="seq-card${locked ? ' locked' : ' open'}" title="${esc(note)}">
+        <b>${value}</b><small>${locked ? '🔒 ' : ''}${esc(note)}</small>
+      </span>${next}`;
+  }).join('');
+  return `<div class="seq-strip${compact ? ' compact' : ''}" role="group" aria-label="${esc(t('seqTitle'))}">
+      <span class="seq-title">${esc(t('seqTitle'))}</span>
+      <span class="seq-row">${cards}</span>
+    </div>`;
 }
 
 function validationStrip(view) {
@@ -895,7 +942,7 @@ function logText(view, entry) {
     case 'chooseCut': return t('logChooseCut', { name: who(entry.player) });
     case 'soloCut': return t('logSolo', { name: who(entry.player) });
     case 'revealRed': return t('logReveal', { name: who(entry.player), count: entry.count });
-    case 'lost': return entry.reason === 'red' ? t('logLostRed') : t('logLostDial');
+    case 'lost': return entry.reason === 'red' ? t('logLostRed') : entry.reason === 'locked' ? t('logLostLocked') : t('logLostDial');
     case 'won': return t('logWon');
     case 'equipmentUnlocked': return t('logUnlocked', { card: entry.card });
     case 'validation': return t('logValidation', { value: entry.value });
@@ -982,7 +1029,7 @@ function missionGrid() {
       <span class="mm">${esc(mission.lesson || '')}</span>
     </button>`;
   }).join('');
-  const locked = [9, 10, 11, 12].map((id) => `
+  const locked = lockedMissionIds().map((id) => `
     <div class="mtile locked" aria-disabled="true">
       <span class="tn">#${id}</span>
       <span class="mm">${esc(t('comingLater'))}</span>
@@ -1179,11 +1226,11 @@ function missionPickerScreen() {
           ${missionGrid()}
         </section>
         <aside class="mission-side">
-          <div class="mc-scale">${artMissionCard(mission)}</div>
-          <div class="card2">${missionDetail(mission, onlineTargetPlayers())}</div>
+          ${missionCardButton(mission)}
           <button class="btn primary big" data-act="mission-pick">${esc(t('pickMission', { n: mission.id }))}</button>
         </aside>
       </main>
+      ${missionInfoModal(mission, onlineTargetPlayers())}
     </div>`;
 }
 
@@ -1444,12 +1491,14 @@ function draftPanel(view) {
     .map((player) => `<button class="target-btn${draft.targetId === player.id ? ' selected' : ''}" data-act="draft-target" data-id="${player.id}">${esc(player.name)}</button>`)
     .join('');
 
+  const lockedNow = view.sequence ? view.sequence.locked : [];
   const valueButtons = values.map((value) => {
-    const disabled = Boolean(draft.detector) && value === 'yellow';
+    const isLocked = lockedNow.includes(value);
+    const disabled = (Boolean(draft.detector) && value === 'yellow') || isLocked;
     const selected = draft.values.includes(value);
     // P10b value picker: 34 px chips, selected turns yellow, yellow value is a
     // small square so it can never read as a number.
-    return `<button class="value-btn chipv${selected ? ' on' : ''}${value === 'yellow' ? ' yellow' : ''}" data-act="draft-value" data-v="${value}" ${disabled ? 'disabled' : ''}>${value === 'yellow' ? '<span class="ysq" aria-hidden="true"></span>' : esc(valueLabel(value))}</button>`;
+    return `<button class="value-btn chipv${selected ? ' on' : ''}${value === 'yellow' ? ' yellow' : ''}${isLocked ? ' seq-locked' : ''}" data-act="draft-value" data-v="${value}" ${disabled ? 'disabled' : ''} ${isLocked ? `title="${esc(t('seqLocked'))}"` : ''}>${value === 'yellow' ? '<span class="ysq" aria-hidden="true"></span>' : esc(valueLabel(value))}</button>`;
   }).join('');
 
   const personal = view.players[seatOf(view, actorId)].personal;
@@ -2942,6 +2991,14 @@ async function onClick(event) {
   if (UI.phoneSheet && PHONE_CLOSE.has(act)) UI.phoneSheet = null;
 
   switch (act) {
+    case 'mission-info-open':
+      UI.missionInfo = true;
+      render();
+      break;
+    case 'mission-info-close':
+      UI.missionInfo = false;
+      render();
+      break;
     case 'psheet-open':
       UI.phoneSheet = el.dataset.v;
       render();
@@ -3636,7 +3693,8 @@ function overlay(view) {
   const red = !won && state.lossReason === 'red';
   const kind = won ? 'won' : red ? 'wrong' : 'boom';
   const title = won ? t('defused') : red ? t('wrongWire') : t('boom');
-  const sub = won ? t('wonText') : red ? t('redCutHint') : t('lostDial');
+  const stuck = !won && state.lossReason === 'locked';
+  const sub = won ? t('wonText') : red ? t('redCutHint') : stuck ? t('lostLocked') : t('lostDial');
   const cutCount = allWires(view).filter((wire) => wire.cut).length;
   const mistakes = Math.max(0, view.dial.zone - view.dial.startZone);
   const stats = won
@@ -3805,6 +3863,7 @@ function boardCenter(view) {
       ${view.equipment.length ? `<div class="board-slots-row">${boardSlots(view)}</div>` : ''}
       ${boardTrack(view)}
       <div class="board-col">
+        ${sequenceStrip(view)}
         ${supplyStrip(view)}
         ${validationStrip(view)}
       </div>
@@ -3980,6 +4039,7 @@ function tableSummary(view) {
   return `<div class="table-sum phone-only" role="button" tabindex="0" data-act="psheet-open" data-v="table" aria-label="${esc(t('openTable'))}">
       <span class="ts-head"><span>${esc(t('track'))}</span><span class="ts-open">${esc(t('openTable'))}${PHONE_ICON.chev}</span></span>
       ${boardTrack(view)}
+      ${sequenceStrip(view, true)}
       <span class="ts-head"><span>${esc(t('validation'))} <em>${esc(t('validatedCount', { done, total: 12 }))}</em></span></span>
       <span class="vm-row">${cells}</span>
     </div>`;

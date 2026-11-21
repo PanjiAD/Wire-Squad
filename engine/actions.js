@@ -10,6 +10,8 @@ import {
   handWires,
   illegal,
   isOnStand,
+  checkStuck,
+  lockedValues,
   logEvent,
   matchesValue,
   ownWireForValue,
@@ -163,6 +165,10 @@ function applyDualCut(state, player, action) {
   if (detector === 'super') detectorCard = requireCard(state, 5);
   const rayCard = ray ? requireCard(state, 10) : null;
 
+  const locked = lockedValues(state);
+  for (const value of values) {
+    if (locked.includes(value)) illegal('that value is still locked by the Number cards');
+  }
   for (const value of values) {
     if (!ownsValue(state, player, value)) illegal('you must hold the value you announce');
   }
@@ -262,6 +268,7 @@ function applySoloCut(state, player, action) {
     if (!Number.isInteger(action.value) || action.value < 1 || action.value > 12) {
       illegal('solo cut needs a blue value');
     }
+    if (lockedValues(state).includes(action.value)) illegal('that value is still locked by the Number cards');
     group = [];
     for (let other = 0; other < state.playerCount; other += 1) {
       for (const wire of handWires(state, other)) {
@@ -315,6 +322,7 @@ function applyCoffeeMug(state, player, action) {
   state.turnNumber += 1;
   state.turn.stabilizer = null;
   logEvent(state, { type: 'coffeeMug', player, target });
+  checkStuck(state);
 }
 
 // ---------------------------------------------------------------------------
@@ -547,7 +555,9 @@ export function applyAction(state, action) {
 
 function collectSoloGroups(state, player) {
   const groups = [];
+  const locked = lockedValues(state);
   for (const value of ANY_VALUES) {
+    if (locked.includes(value)) continue;
     const wires = [];
     for (let seat = 0; seat < state.playerCount; seat += 1) {
       for (const wire of handWires(state, seat)) {
@@ -625,7 +635,9 @@ function pairs(values) {
 function pushDualCuts(state, player, out, limit) {
   const hand = handWires(state, player);
   const ownValues = [];
+  const locked = lockedValues(state);
   for (let value = 1; value <= 12; value += 1) {
+    if (locked.includes(value)) continue;
     if (hand.some((wire) => wire.kind === 'blue' && wire.value === value)) ownValues.push(value);
   }
   if (hand.some((wire) => wire.kind === 'yellow')) ownValues.push('yellow');

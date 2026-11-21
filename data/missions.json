@@ -8,9 +8,18 @@
       "tier": "novice",
       "lesson": "Lesson 1: How to cut a wire?",
       "setup": {
-        "blue": { "values": [1, 6] },
-        "yellow": { "count": 0 },
-        "red": { "count": 0 },
+        "blue": {
+          "values": [
+            1,
+            6
+          ]
+        },
+        "yellow": {
+          "count": 0
+        },
+        "red": {
+          "count": 0
+        },
         "equipment": "none"
       },
       "twoPlayer": null,
@@ -28,9 +37,22 @@
       "tier": "novice",
       "lesson": "Lesson 2: How to cut a YELLOW wire",
       "setup": {
-        "blue": { "values": [1, 8] },
-        "yellow": { "count": 2, "valueRange": [1, 7] },
-        "red": { "count": 0 },
+        "blue": {
+          "values": [
+            1,
+            8
+          ]
+        },
+        "yellow": {
+          "count": 2,
+          "valueRange": [
+            1,
+            7
+          ]
+        },
+        "red": {
+          "count": 0
+        },
         "equipment": "none"
       },
       "twoPlayer": null,
@@ -49,11 +71,27 @@
       "tier": "novice",
       "lesson": "Lesson 3: How (NOT) to cut a RED wire",
       "setup": {
-        "blue": { "values": [1, 10] },
-        "yellow": { "count": 0 },
-        "red": { "count": 1, "valueRange": [1, 9] },
+        "blue": {
+          "values": [
+            1,
+            10
+          ]
+        },
+        "yellow": {
+          "count": 0
+        },
+        "red": {
+          "count": 1,
+          "valueRange": [
+            1,
+            9
+          ]
+        },
         "equipment": "players",
-        "reroll": [2, 12]
+        "reroll": [
+          2,
+          12
+        ]
       },
       "twoPlayer": null,
       "rules": [
@@ -71,14 +109,24 @@
       "tier": "intermediate",
       "lesson": "Everything you learned, on one bomb.",
       "setup": {
-        "blue": { "values": "all" },
-        "yellow": { "count": 2 },
-        "red": { "count": 1 },
+        "blue": {
+          "values": "all"
+        },
+        "yellow": {
+          "count": 2
+        },
+        "red": {
+          "count": 1
+        },
         "equipment": "players"
       },
       "twoPlayer": {
-        "yellow": { "count": 4 },
-        "red": { "count": 1 }
+        "yellow": {
+          "count": 4
+        },
+        "red": {
+          "count": 1
+        }
       },
       "rules": [
         "This mission uses every blue wire.",
@@ -87,7 +135,9 @@
       ],
       "success": "The field team clears its first real bomb.",
       "failure": "The red wire went off. Reset the wires and try again.",
-      "unverified": ["twoPlayer"]
+      "unverified": [
+        "twoPlayer"
+      ]
     },
     {
       "id": 5,
@@ -95,14 +145,28 @@
       "tier": "intermediate",
       "lesson": "Two yellows, three possibilities.",
       "setup": {
-        "blue": { "values": "all" },
-        "yellow": { "count": 2, "candidates": 3, "hiddenDraw": true },
-        "red": { "count": 1 },
+        "blue": {
+          "values": "all"
+        },
+        "yellow": {
+          "count": 2,
+          "candidates": 3,
+          "hiddenDraw": true
+        },
+        "red": {
+          "count": 1
+        },
         "equipment": "players"
       },
       "twoPlayer": {
-        "yellow": { "count": 2, "candidates": 3, "hiddenDraw": true },
-        "red": { "count": 2 }
+        "yellow": {
+          "count": 2,
+          "candidates": 3,
+          "hiddenDraw": true
+        },
+        "red": {
+          "count": 2
+        }
       },
       "rules": [
         "Before dealing, draw three yellow wires and mark all three values with the question side up.",
@@ -119,9 +183,15 @@
       "tier": "intermediate",
       "lesson": "Four yellow wires, one red wire.",
       "setup": {
-        "blue": { "values": "all" },
-        "yellow": { "count": 4 },
-        "red": { "count": 1 },
+        "blue": {
+          "values": "all"
+        },
+        "yellow": {
+          "count": 4
+        },
+        "red": {
+          "count": 1
+        },
         "equipment": "players"
       },
       "twoPlayer": null,
@@ -130,7 +200,13 @@
       ],
       "success": "Four yellows cleared without touching the red.",
       "failure": "The bomb wins this round.",
-      "unverified": ["setup", "title", "lesson", "rules", "twoPlayer"]
+      "unverified": [
+        "setup",
+        "title",
+        "lesson",
+        "rules",
+        "twoPlayer"
+      ]
     },
     {
       "id": 7,
@@ -138,9 +214,17 @@
       "tier": "intermediate",
       "lesson": "One red wire out of two.",
       "setup": {
-        "blue": { "values": "all" },
-        "yellow": { "count": 0 },
-        "red": { "count": 1, "candidates": 2, "hiddenDraw": true },
+        "blue": {
+          "values": "all"
+        },
+        "yellow": {
+          "count": 0
+        },
+        "red": {
+          "count": 1,
+          "candidates": 2,
+          "hiddenDraw": true
+        },
         "equipment": "players"
       },
       "twoPlayer": null,
@@ -150,7 +234,13 @@
       ],
       "success": "Class dismissed with a clean board.",
       "failure": "One mistake too many. The final exam waits.",
-      "unverified": ["setup", "title", "lesson", "rules", "twoPlayer"]
+      "unverified": [
+        "setup",
+        "title",
+        "lesson",
+        "rules",
+        "twoPlayer"
+      ]
     },
     {
       "id": 8,
@@ -158,14 +248,30 @@
       "tier": "expert",
       "lesson": "Everything the team has learned.",
       "setup": {
-        "blue": { "values": "all" },
-        "yellow": { "count": 2, "candidates": 3, "hiddenDraw": true },
-        "red": { "count": 1, "candidates": 2, "hiddenDraw": true },
+        "blue": {
+          "values": "all"
+        },
+        "yellow": {
+          "count": 2,
+          "candidates": 3,
+          "hiddenDraw": true
+        },
+        "red": {
+          "count": 1,
+          "candidates": 2,
+          "hiddenDraw": true
+        },
         "equipment": "players"
       },
       "twoPlayer": {
-        "yellow": { "count": 4 },
-        "red": { "count": 1, "candidates": 3, "hiddenDraw": true }
+        "yellow": {
+          "count": 4
+        },
+        "red": {
+          "count": 1,
+          "candidates": 3,
+          "hiddenDraw": true
+        }
       },
       "rules": [
         "Apply every rule learned so far.",
@@ -173,7 +279,51 @@
       ],
       "success": "The team becomes an official BOMB BUSTERS squad. The first Surprise box is unlocked.",
       "failure": "Luckily it was a fake bomb. Study some more and retake the test.",
-      "unverified": ["twoPlayer"]
+      "unverified": [
+        "twoPlayer"
+      ]
+    },
+    {
+      "id": 9,
+      "title": "A Sense of Priorities",
+      "tier": "expert",
+      "lesson": "Some wires must be cut in a set order.",
+      "setup": {
+        "blue": {
+          "values": "all"
+        },
+        "yellow": {
+          "count": 2
+        },
+        "red": {
+          "count": 1
+        },
+        "equipment": "players"
+      },
+      "twoPlayer": {
+        "yellow": {
+          "count": 4
+        },
+        "red": {
+          "count": 2
+        }
+      },
+      "sequence": {
+        "cards": 3,
+        "required": 2
+      },
+      "rules": [
+        "Draw 3 Number cards and lay them face up in a row.",
+        "Cut 2 wires of the first card's value before any wire of the second card's value.",
+        "Cut 2 wires of the second card's value before any wire of the third card's value.",
+        "All other values can be cut in any order.",
+        "If a player holds only wires that are still locked, the bomb explodes."
+      ],
+      "success": "The wires are cut in the right order and the bomb is defused.",
+      "failure": "A red wire is cut, the dial reaches the skull, or a player is stuck with locked wires.",
+      "unverified": [
+        "setup"
+      ]
     }
   ]
 }

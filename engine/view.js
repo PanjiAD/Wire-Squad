@@ -1,5 +1,5 @@
 import { PERSONAL_ITEMS } from './data.js';
-import { clone } from './helpers.js';
+import { clone, cutBlueCount, lockedValues } from './helpers.js';
 
 function tokenSummary(state, wire) {
   return wire.info.map((id) => {
@@ -112,6 +112,14 @@ export function publicView(state, viewerId) {
     turnNumber: state.turnNumber,
     dial: clone(state.dial),
     markers: clone(state.markers),
+    sequence: state.sequence
+      ? {
+        cards: state.sequence.cards.slice(),
+        required: state.sequence.required,
+        locked: lockedValues(state),
+        cut: state.sequence.cards.map((value) => cutBlueCount(state, value)),
+      }
+      : null,
     equipment: state.equipment.map((card) => ({
       number: card.number,
       id: card.id,

@@ -58,6 +58,42 @@ export function cutBlueCount(state, value) {
   return count;
 }
 
+// Mission 9 style ordering: Number card i+1 stays locked until enough wires of
+// card i are cut. Returns the blue values that cannot be named or cut yet.
+export function lockedValues(state) {
+  const seq = state.sequence;
+  if (!seq) return [];
+  const locked = [];
+  for (let index = 1; index < seq.cards.length; index += 1) {
+    const before = seq.cards[index - 1];
+    if (cutBlueCount(state, before) < seq.required || locked.includes(before)) {
+      locked.push(seq.cards[index]);
+    }
+  }
+  return locked;
+}
+
+export function isLockedWire(state, wire) {
+  return wire.kind === 'blue' && lockedValues(state).includes(wire.value);
+}
+
+// The player about to act holds nothing but locked blue wires (and maybe red
+// ones), so no cut is possible and the bomb goes off.
+export function checkStuck(state) {
+  if (!state.sequence || state.phase !== 'playing') return false;
+  const hand = handWires(state, state.activeIndex);
+  if (hand.length === 0) return false;
+  const locked = lockedValues(state);
+  const stuck = hand.some((wire) => wire.kind === 'blue' && locked.includes(wire.value))
+    && hand.every((wire) => wire.kind === 'red' || (wire.kind === 'blue' && locked.includes(wire.value)));
+  if (!stuck) return false;
+  state.phase = 'lost';
+  state.lossReason = 'locked';
+  state.pending = null;
+  logEvent(state, { type: 'lost', reason: 'locked', player: state.activeIndex });
+  return true;
+}
+
 export function sortStand(state, player, stand) {
   state.stands[player][stand].sort((a, b) => {
     const wa = state.wires[a];
@@ -197,6 +233,7 @@ export function advanceTurn(state) {
     if (playerHasWires(state, player)) {
       state.activeIndex = player;
       logEvent(state, { type: 'turn', player });
+      checkStuck(state);
       return;
     }
   }
