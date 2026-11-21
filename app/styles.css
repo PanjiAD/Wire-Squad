@@ -2882,6 +2882,9 @@ html.colorblind .wire.yellow::after { background: radial-gradient(rgba(30,31,36,
 .ord i { position: relative; flex: 1 1 auto; height: 2px; border-radius: 1px; background: currentColor; opacity: .7; }
 .ord i::after { content: ''; position: absolute; right: -1px; top: -3px; border-left: 6px solid currentColor; border-top: 4px solid transparent; border-bottom: 4px solid transparent; }
 .no-ordhint .ord { display: none; }
+/* Opponent racks at the top are seen from their side (rotated 180deg): low is on the viewer's right. */
+.arena.facing [data-slot^="top"] .ord { flex-direction: row-reverse; }
+.arena.facing [data-slot^="top"] .ord i::after { right: auto; left: -1px; border-left: 0; border-right: 6px solid currentColor; }
 .side-seat .ord { display: none; }
 @media (max-width: 699px) {
   .opponents .player:not(.expanded) .ord { margin-top: 2px; font-size: 9px; }
