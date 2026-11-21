@@ -3887,8 +3887,10 @@ function gameScreen(view) {
             </div>
             ${boardCenter(view)}
           </div>
-          <div class="action-dock">${actionPanel(view)}</div>
-          <div class="me-seat">${playerPanel(view, view.players[me], me)}</div>
+          <div class="bottom-dock">
+            <div class="action-dock">${actionPanel(view)}</div>
+            <div class="me-seat">${playerPanel(view, view.players[me], me)}</div>
+          </div>
         </div>
         <aside class="side">
           ${logPanel(view)}

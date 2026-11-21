@@ -1781,6 +1781,802 @@ html.reduced-motion .tray-slot.stamp svg, html.reduced-motion .tray-slot.stamp::
     max-height: 44vh; overflow: auto; padding: 12px 14px calc(16px + env(safe-area-inset-bottom, 0px));
   }
 }
+
+/* ============================================================= P10a pregame */
+/* Ported from Spec/WireSquad_design_handoff/generators/ui.py + p9.py.
+   Components: welcome wordmark, create/join cards, lobby list, mission grid,
+   mission card, error cards, toast, step strip. */
+
+.pregame {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  color: var(--ink);
+  background-color: var(--desk);
+  background-image: radial-gradient(rgba(30, 31, 36, 0.13) 1.2px, transparent 1.5px);
+  background-size: 8px 8px;
+}
+
+.wm {
+  font-family: var(--bb-font-display);
+  text-transform: uppercase;
+  color: var(--cream);
+  letter-spacing: 0.04em;
+  line-height: 0.95;
+  transform: rotate(-2deg);
+  text-shadow:
+    4px 4px 0 var(--ink),
+    -2px -2px 0 var(--ink),
+    2px -2px 0 var(--ink),
+    -2px 2px 0 var(--ink),
+    2px 2px 0 var(--ink);
+}
+
+.wm-sm { font-size: 22px; }
+
+.disp {
+  font-family: var(--bb-font-display);
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  line-height: 1.1;
+}
+
+.cap {
+  margin: 8px 0 0;
+  font-size: 12px;
+  color: var(--muted);
+}
+
+.pregame-topbar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px clamp(14px, 3vw, 40px);
+  flex-wrap: wrap;
+}
+
+.pregame-topbar .topbar-title {
+  font-family: var(--bb-font-display);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  font-size: 20px;
+  margin-left: 6px;
+}
+
+.pregame-topbar .topbar-actions {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.pregame-main {
+  width: 100%;
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: 8px clamp(14px, 3vw, 40px) 48px;
+  display: grid;
+  gap: 20px;
+  align-items: start;
+}
+
+.setup-main,
+.mission-main,
+.create-main,
+.lobby-main {
+  grid-template-columns: minmax(0, 1.45fr) minmax(300px, 1fr);
+}
+
+.join-main {
+  grid-template-columns: minmax(0, 440px) minmax(260px, 1fr);
+  justify-content: center;
+}
+
+.card2 {
+  background: var(--cream);
+  border: 3px solid var(--ink);
+  border-radius: 16px;
+  box-shadow: 5px 5px 0 var(--ink);
+  padding: 20px;
+}
+
+.card2 h2,
+.card2 h3 { margin-top: 0; }
+
+.pregame-aside { display: flex; flex-direction: column; gap: 10px; }
+.pregame-aside .trust-note { margin-top: auto; }
+
+/* Welcome --------------------------------------------------------------- */
+.welcome-hero { flex: 1; }
+.welcome-name { width: min(360px, 100%); margin: 0 auto; }
+.welcome-center .btn.big { width: min(360px, 100%); margin-top: 0; }
+.welcome-center .btn.small { margin-top: 2px; }
+.welcome-links { display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; }
+
+/* Inputs ---------------------------------------------------------------- */
+.inp-field {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 48px;
+  padding: 0 14px;
+  border: 3px solid var(--ink);
+  border-radius: 12px;
+  background: #fff;
+  box-shadow: inset 0 3px 0 rgba(30, 31, 36, 0.08);
+  color: var(--ink);
+}
+
+.inp-field:focus-within { outline: 4px solid var(--blue); outline-offset: 2px; }
+
+.inp-field input {
+  flex: 1;
+  min-width: 0;
+  border: none;
+  background: transparent;
+  font: inherit;
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--ink);
+  min-height: 42px;
+}
+
+.inp-field input:focus { outline: none; }
+
+.field-block { display: flex; flex-direction: column; gap: 6px; margin-bottom: 14px; }
+
+.field-label {
+  font-size: 11px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--muted);
+}
+
+.field-title { font-size: 18px; margin-bottom: 8px; }
+
+.join-code {
+  width: 100%;
+  min-height: 58px;
+  border: 3px solid var(--ink);
+  border-radius: 12px;
+  background: #fff;
+  text-align: center;
+  font-family: var(--bb-font-display);
+  font-size: 30px;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  color: var(--ink);
+  box-shadow: inset 0 3px 0 rgba(30, 31, 36, 0.08);
+}
+
+.join-code:focus { outline: 4px solid var(--blue); outline-offset: 2px; }
+
+/* Segmented control ----------------------------------------------------- */
+.seg { display: flex; gap: 8px; flex-wrap: wrap; }
+
+.seg-btn {
+  flex: 1;
+  min-width: 56px;
+  min-height: 52px;
+  border: 3px solid var(--ink);
+  border-radius: 12px;
+  background: #fff;
+  color: var(--ink);
+  font-family: var(--bb-font-display);
+  font-size: 26px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  cursor: pointer;
+  box-shadow: 0 0 0 var(--ink);
+}
+
+.seg-btn span {
+  font-family: system-ui, "Segoe UI", Roboto, sans-serif;
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.seg-btn.on { background: var(--yellow); box-shadow: 3px 3px 0 var(--ink); }
+.seg-btn:hover:not(.on) { transform: translateY(-1px); }
+.seg-btn:active { transform: translate(2px, 2px); box-shadow: none; }
+
+.seg-sm .seg-btn { min-height: 40px; min-width: 44px; font-size: 18px; }
+
+/* Create / join --------------------------------------------------------- */
+.create-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 28px;
+  align-items: center;
+}
+
+.create-left { display: flex; flex-direction: column; gap: 20px; }
+.create-dial { text-align: center; }
+.create-dial svg { max-width: 100%; height: auto; }
+.create-actions { display: flex; gap: 10px; flex-wrap: wrap; }
+.create-bottom { display: flex; gap: 12px; margin-top: 18px; }
+.create-bottom .btn.primary { flex: 1; }
+
+.code-row { display: flex; gap: 6px; margin: 8px 0 12px; flex-wrap: wrap; }
+
+.code-tile {
+  width: 54px;
+  height: 68px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--ink);
+  color: var(--cream);
+  border: 3px solid #0b0b0e;
+  border-radius: 8px;
+  font-family: var(--bb-font-display);
+  font-size: 42px;
+  line-height: 1;
+}
+
+/* Lobby ----------------------------------------------------------------- */
+.share-bar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: var(--ink);
+  border-radius: 12px;
+  padding: 8px 12px;
+  color: var(--cream);
+  flex-wrap: wrap;
+}
+
+.share-bar .share-label { font-size: 14px; }
+.share-bar .btn { margin-left: auto; min-height: 40px; padding: 0 12px; font-size: 14px; }
+
+.code-big {
+  font-family: var(--bb-font-display);
+  font-size: 26px;
+  letter-spacing: 0.1em;
+}
+
+.lobby-head h2 { margin-bottom: 2px; }
+.lobby-target { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin: 12px 0; }
+.lobby-target .seg { flex: 0 0 auto; min-width: 220px; }
+
+.li-list { list-style: none; margin: 10px 0; padding: 0; display: flex; flex-direction: column; gap: 8px; }
+
+.li {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 56px;
+  padding: 6px 12px;
+  background: #fff;
+  border: 3px solid var(--ink);
+  border-radius: 12px;
+  font-weight: 700;
+  flex-wrap: wrap;
+}
+
+.li.me { background: #fff8dc; }
+.li.muted { color: var(--muted); font-weight: 500; }
+
+.av {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: 3px solid var(--ink);
+  background: var(--av, var(--yellow));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--bb-font-display);
+  font-size: 18px;
+  flex: none;
+}
+
+.li-name { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; flex: 1; min-width: 0; }
+.li-state { display: flex; align-items: center; gap: 6px; font-size: 12px; color: #3a3c45; }
+
+.cd {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  border: 2.5px solid var(--ink);
+  flex: none;
+}
+
+.cd.ok { background: var(--green); }
+.cd.bad { background: var(--red); }
+.cd.wait { background: var(--yellow); }
+
+.tg-btn {
+  border: none;
+  background: none;
+  padding: 0;
+  min-width: 56px;
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  cursor: pointer;
+}
+
+.tg {
+  width: 56px;
+  height: 30px;
+  border-radius: 16px;
+  border: 3px solid var(--ink);
+  background: #d9d6cc;
+  position: relative;
+  flex: none;
+}
+
+.tg::after {
+  content: "";
+  position: absolute;
+  left: 2px;
+  top: 2px;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: #fff;
+  border: 2.5px solid var(--ink);
+  transition: left 160ms var(--bb-ease-out);
+}
+
+.tg.on { background: var(--green); }
+.tg.on::after { left: 28px; }
+
+.pill.cap { background: var(--yellow); }
+.pill.you { background: var(--green); }
+.pill.host { background: #fff; }
+
+.captain-row { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; margin-top: 12px; }
+
+.ready-note {
+  margin: 8px 0;
+  background: #fff4c9;
+  border: 2px dashed #b8921c;
+  border-radius: 9px;
+  padding: 8px 10px;
+  font-size: 12px;
+}
+
+.mission-pick-box {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+  background: #fff;
+  border: 3px solid var(--ink);
+  border-radius: 12px;
+  padding: 10px 12px;
+  margin: 14px 0;
+}
+
+.mission-pick-box strong { display: block; }
+
+.start-box { margin: 14px 0; }
+.start-box .btn.big { margin-top: 0; }
+
+.lobby-foot {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  border-top: 2px dashed #c9c3b4;
+  padding-top: 10px;
+}
+
+.lobby-foot .conn { color: var(--ink); }
+.lobby-foot .conn::before { background: var(--green); }
+.lobby-foot .conn.offline::before { background: var(--red); }
+
+/* Mission picker -------------------------------------------------------- */
+.mission-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.mtile {
+  position: relative;
+  min-height: 76px;
+  border: 3px solid var(--ink);
+  border-radius: 12px;
+  background: var(--cream);
+  color: var(--ink);
+  padding: 6px 8px;
+  text-align: left;
+  cursor: pointer;
+  font: inherit;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.mtile .tn {
+  font-family: var(--bb-font-display);
+  font-size: 30px;
+  line-height: 1;
+}
+
+.mtile .mt { font-size: 12px; font-weight: 800; line-height: 1.2; }
+.mtile .mm { font-size: 10.5px; line-height: 1.25; color: #3a3c45; }
+.mtile.on { background: var(--yellow); box-shadow: 4px 4px 0 var(--ink); }
+.mtile:hover:not(.locked) { transform: translateY(-1px); }
+
+.mtile.locked {
+  background: #d9d6cc;
+  border-style: dashed;
+  border-color: #6b6d76;
+  color: #4a4c57;
+  cursor: not-allowed;
+}
+
+.mtile .mlock { position: absolute; top: 6px; right: 6px; color: #4a4c57; }
+
+.mission-side { display: flex; flex-direction: column; gap: 16px; }
+.mission-side .btn.big { margin-top: 0; }
+
+.mission-detail-title { font-size: 20px; margin-bottom: 8px; }
+.pillrow { display: flex; gap: 8px; flex-wrap: wrap; margin: 8px 0; }
+.pill.yellow { background: #ffe9a8; }
+
+.two-note {
+  background: var(--ink);
+  color: var(--cream);
+  border-radius: 8px;
+  padding: 8px 10px;
+  font-size: 12.5px;
+  line-height: 1.35;
+  margin: 8px 0;
+}
+
+.two-note b {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--bb-font-display);
+  font-weight: 400;
+  letter-spacing: 0.08em;
+  font-size: 13px;
+  margin-bottom: 2px;
+}
+
+.two-note.dim { opacity: 0.6; }
+
+.flag-note {
+  margin: 8px 0 0;
+  font-size: 11px;
+  font-weight: 700;
+  color: #7a1020;
+  background: #fdeaed;
+  border: 2px dashed #d7263d;
+  border-radius: 8px;
+  padding: 6px 8px;
+}
+
+/* Mission card (p9.py CSS9, unchanged geometry) ------------------------- */
+.mc {
+  position: relative;
+  width: 300px;
+  height: 440px;
+  border-radius: 18px;
+  border: 3px solid var(--ink);
+  overflow: hidden;
+  background: #cfdde6;
+  box-shadow: 4px 4px 0 var(--ink);
+  flex: none;
+  font-family: system-ui, "Segoe UI", Roboto, sans-serif;
+  color: var(--ink);
+}
+
+.mc::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image: radial-gradient(rgba(30, 31, 36, 0.1) 1.2px, transparent 1.5px);
+  background-size: 8px 8px;
+  pointer-events: none;
+}
+
+.mc > * { position: absolute; }
+.mc .num::before { content: "#" attr(data-n); }
+.mc .num { right: 16px; top: 6px; font-family: var(--bb-font-display); font-size: 58px; line-height: 1; color: var(--ink); }
+
+.mc .tab {
+  left: -10px;
+  top: 16px;
+  width: 200px;
+  background: var(--cream);
+  border: 3px solid var(--ink);
+  padding: 8px 14px 8px 24px;
+  transform: skewX(-10deg);
+  font-family: var(--bb-font-display);
+  font-size: 16px;
+  line-height: 1.1;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.mc .tab span { display: block; transform: skewX(10deg); }
+.mc .tag { left: 16px; right: 16px; top: 84px; font-style: italic; font-size: 13px; line-height: 1.35; }
+.mc .setup { left: 12px; right: 12px; top: 140px; height: 196px; background: var(--ink); border-radius: 12px; padding: 10px 12px; color: var(--cream); }
+.mc .setup h4 { margin: 0 0 6px; font-family: var(--bb-font-display); font-weight: 400; font-size: 15px; letter-spacing: 0.12em; color: var(--yellow); }
+.mc .rw { display: flex; align-items: center; gap: 10px; height: 34px; font-size: 15px; font-weight: 700; }
+.mc .rw .cnt { font-weight: 800; }
+.mc .rw .sub { font-weight: 500; font-size: 11px; opacity: 0.8; margin-left: auto; }
+.mc .two { left: 12px; right: 12px; bottom: 12px; height: 78px; background: var(--cream); border: 2.5px solid var(--ink); border-radius: 12px; padding: 8px 12px; font-size: 12.5px; line-height: 1.3; }
+.mc .two b { font-family: var(--bb-font-display); font-weight: 400; font-size: 13px; letter-spacing: 0.08em; display: flex; align-items: center; gap: 6px; }
+.mc .two.dim { opacity: 0.45; border-style: dashed; }
+
+.mc-scale {
+  --mc-s: 0.74;
+  width: calc(300px * var(--mc-s));
+  height: calc(440px * var(--mc-s));
+  flex: none;
+}
+
+.mc-scale .mc { transform: scale(var(--mc-s)); transform-origin: top left; }
+
+/* Error cards, toast, waiting ------------------------------------------- */
+.net-modal {
+  background: var(--cream);
+  border: 3px solid var(--ink);
+  border-radius: 16px;
+  box-shadow: 5px 5px 0 var(--ink);
+  padding: 18px 20px;
+  text-align: center;
+  max-width: 440px;
+  margin: 12px auto;
+}
+
+.net-modal h3 {
+  font-family: var(--bb-font-display);
+  font-weight: 400;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  font-size: 22px;
+  margin: 6px 0 4px;
+}
+
+.net-modal p { margin: 0 0 12px; font-size: 13.5px; color: #3a3c45; }
+.modal-actions { display: flex; gap: 8px; justify-content: center; flex-wrap: wrap; }
+
+.modal-badge {
+  display: inline-flex;
+  width: 54px;
+  height: 54px;
+  border-radius: 50%;
+  background: #d9d6cc;
+  border: 3px solid var(--ink);
+  align-items: center;
+  justify-content: center;
+}
+
+.modal-badge.wait { background: var(--yellow); }
+
+.net-overlay { z-index: 60; }
+
+.wait-modal {
+  background: #fff8dc;
+  border: 3px solid var(--ink);
+  border-radius: 16px;
+  box-shadow: 4px 4px 0 var(--ink);
+  padding: 14px 16px;
+  text-align: center;
+  margin: 14px 0;
+}
+
+.wait-modal h3 { font-family: var(--bb-font-display); font-weight: 400; text-transform: uppercase; font-size: 19px; margin: 6px 0 4px; }
+.wait-modal p { margin: 0 0 10px; font-size: 12.5px; color: #3a3c45; }
+
+.toast-wrap {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 24px;
+  display: flex;
+  justify-content: center;
+  padding: 0 16px;
+  z-index: 70;
+  pointer-events: none;
+}
+
+.toast {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  background: var(--ink);
+  color: var(--cream);
+  border-radius: 12px;
+  padding: 10px 16px;
+  font-weight: 700;
+  font-size: 14px;
+  box-shadow: 3px 3px 0 rgba(30, 31, 36, 0.4);
+  animation: bbtoast 180ms var(--bb-ease-out);
+}
+
+@keyframes bbtoast {
+  from { transform: translateY(10px); opacity: 0; }
+  to { transform: none; opacity: 1; }
+}
+
+/* Setup step strip (used by the deal screen) ---------------------------- */
+.stp { display: flex; align-items: center; }
+.stp div {
+  flex: 1;
+  padding: 8px 6px;
+  text-align: center;
+  font-weight: 800;
+  font-size: 12px;
+  border: 3px solid var(--ink);
+  background: #fff;
+  margin-left: -3px;
+}
+.stp div.done { background: var(--green); }
+.stp div.cur { background: var(--yellow); }
+
+.spin { animation: bbspin 1.2s linear infinite; transform-origin: 50% 50%; }
+@keyframes bbspin { to { transform: rotate(360deg); } }
+
+/* P10a responsive ------------------------------------------------------- */
+@media (max-width: 980px) {
+  .setup-main,
+  .mission-main,
+  .create-main,
+  .lobby-main,
+  .join-main {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .mission-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .mc-scale { --mc-s: 0.62; }
+}
+
+@media (max-width: 640px) {
+  .pregame-topbar { padding: 10px 14px; }
+  .pregame-main { padding: 4px 14px 40px; gap: 14px; }
+  .card2 { padding: 14px; box-shadow: 4px 4px 0 var(--ink); }
+  .create-layout { grid-template-columns: minmax(0, 1fr); gap: 18px; }
+  .code-tile { width: 44px; height: 56px; font-size: 34px; }
+  .mission-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .mtile { min-height: 62px; }
+  .mtile .tn { font-size: 24px; }
+  .mc-scale { --mc-s: 0.55; }
+  .seg-btn { min-height: 44px; }
+  .share-bar .btn { margin-left: 0; width: 100%; }
+  .li { gap: 8px; }
+  .li-name { flex-basis: 100%; }
+  .li-state { margin-left: auto; }
+  .lobby-target .seg { min-width: 0; width: 100%; }
+  .create-bottom { flex-direction: column-reverse; }
+  .create-bottom .btn { width: 100%; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .toast,
+  .spin,
+  .tg::after { animation: none; transition: none; }
+}
+
+.reduced-motion .toast,
+.reduced-motion .spin,
+.reduced-motion .tg::after { animation: none; transition: none; }
+
+
+
+/* ======================================================= P6b phone layout
+   Phone portrait: compact header, opponents strip, compact board, and a
+   bottom dock that pins the viewer's own stand above the action bar. The
+   dock wrapper does not exist on desktop (display: contents). */
+.bottom-dock { display: contents; }
+@media (max-width: 760px) {
+  /* header: one line of chips, one scrolling row of small buttons */
+  .game .topbar { padding: 6px 10px; gap: 4px 8px; border-bottom-width: 4px; }
+  .game .topbar .logo { font-size: 18px; }
+  .game .topbar .logo-sub { display: none; }
+  .game .topbar-chips { flex: 1 1 auto; flex-wrap: nowrap; overflow: hidden; gap: 4px; justify-content: flex-end; }
+  .game .topbar-chips span:nth-child(2), .game .topbar-chips span:nth-child(4) { display: none; }
+  .game .topbar-right { flex: 1 1 100%; flex-wrap: nowrap; overflow-x: auto; gap: 6px; padding-bottom: 2px; scrollbar-width: none; }
+  .game .topbar-right::-webkit-scrollbar { display: none; }
+  .game .topbar-right .btn { flex: 0 0 auto; min-height: 34px; padding: 4px 10px; font-size: 13px; }
+  .game .table { padding: 6px 8px 16px; }
+
+  /* opponents strip */
+  .opponents .player:not(.expanded) { flex-basis: min(150px, 42vw); padding: 6px 8px; }
+  .opponents .player:not(.expanded) .wire-count { font-size: 11px; padding: 1px 7px; }
+  .opponents .player:not(.expanded) .player-name { font-size: 14px; }
+  .opponents .player:not(.expanded) .avatar { width: 28px; height: 28px; }
+
+  /* compact board */
+  .board-center { padding: 8px; gap: 8px; }
+  .board-captain { font-size: 12px; padding: 3px 12px; }
+  .board-slots-row .eq-slot { padding: 3px; }
+  .board-slots-row .eq-slot .eq-art svg { max-height: 40px; }
+  .board-track { padding: 4px; gap: 3px; }
+  .tk-cell { min-height: 30px; }
+  .tray-grid { padding: 4px; gap: 3px; }
+  .tray-info .tray-grid { grid-template-columns: repeat(14, minmax(0, 1fr)); }
+  .tray-valid .tray-grid { grid-template-columns: repeat(12, minmax(0, 1fr)); }
+  .tray-slot, .tray-valid .tray-slot { min-height: 22px; border-width: 1px; }
+  .tray-slot .ghost-no { font-size: 11px; }
+  .board-dial { --dial-size: 76px; }
+  .board-dial .dial-svg-box { flex-basis: 76px; width: 76px; height: 76px; }
+
+  /* bottom dock: own stand above the action bar */
+  .bottom-dock {
+    display: flex; flex-direction: column; order: 3;
+    position: sticky; bottom: 0; z-index: 25;
+    margin: 0 -8px -16px; background: var(--cream);
+    border-top: 4px solid var(--ink); box-shadow: 0 -4px 0 rgba(30,31,36,.18);
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+  }
+  .bottom-dock .me-seat { order: 0; }
+  .bottom-dock .action-dock { order: 1; position: static; margin: 0; padding: 4px 8px 8px; background: none; }
+  .me-seat .player { border-width: 0; border-radius: 0; box-shadow: none; padding: 6px 8px 0; background: transparent; }
+  .me-seat .badges { display: none; }
+  .me-seat .player-head { gap: 6px; padding: 0; }
+  .me-seat .player-name { font-size: 15px; }
+  .me-seat .avatar { width: 26px; height: 26px; }
+  .me-seat .personal-pill { font-size: 10px; padding: 1px 6px; }
+  .me-seat .stands { gap: 2px; }
+  .me-seat .stand { --lab: 10px; --ww: min(23px, max(9px, calc((100cqw - var(--lab) - 4px * var(--u, 8)) / var(--u, 8)))); }
+  .me-seat .stand-label { display: none; }
+  .me-seat .stand .rk-row { min-height: 0; }
+  .me-seat .rack { padding: 0 4px; }
+  .me-seat .stand .rk-lip { height: 8px; }
+  .me-seat .cutstrip-live { margin-top: 3px; min-height: 16px; padding: 2px 6px; }
+
+  /* action bar: header chip, one row of big buttons, one row of equipment chips */
+  .bottom-dock .action-panel:not(.draft):not(.pending):not(.equip-bar) { border-width: 0; box-shadow: none; padding: 0; background: none; max-height: none; overflow: visible; display: block; }
+  .bottom-dock .action-panel:not(.draft):not(.pending):not(.equip-bar) > .muted,
+  .bottom-dock .action-panel:not(.draft):not(.pending):not(.equip-bar) > h4,
+  .bottom-dock .action-panel:not(.draft):not(.pending):not(.equip-bar) .muted.small { display: none; }
+  .bottom-dock .action-panel:not(.draft):not(.pending):not(.equip-bar) .action-head { display: none; }
+  .bottom-dock .action-buttons { flex-wrap: nowrap; gap: 6px; }
+  .bottom-dock .action-buttons .mb, .bottom-dock .action-buttons .btn { flex: 1 1 0; min-width: 0; min-height: 48px; padding: 4px 6px; font-size: 14px; }
+  .bottom-dock .equip-row { display: flex; flex-wrap: nowrap; overflow-x: auto; gap: 6px; margin-top: 6px; scrollbar-width: none; }
+  .bottom-dock .equip-row::-webkit-scrollbar { display: none; }
+  .bottom-dock .equip-card { flex: 0 0 auto; flex-direction: row; align-items: center; gap: 6px; min-height: 38px; padding: 4px 10px; }
+  .bottom-dock .equip-card .equip-state { font-size: 9px; }
+  .me-seat .stand .wire:not(.cut) { width: auto; height: auto; }
+  /* sheets: the base rule wraps flex items, which turned the 44vh column into several columns */
+  .bottom-dock .action-panel.draft, .bottom-dock .action-panel.pending, .bottom-dock .action-panel.equip-bar { flex-wrap: nowrap; display: flex; flex-direction: column; align-items: stretch; }
+
+  /* opponents stay readable when collapsed: a mini rack (tile backs, tokens) instead of hiding the stand */
+  .opponents .player:not(.expanded) { flex-basis: min(200px, 58vw); }
+  .opponents .player:not(.expanded) .stands { display: flex; gap: 3px; pointer-events: none; }
+  .opponents .player:not(.expanded) .stand { --lab: 8px; --ww: min(12px, max(7px, calc((100cqw - var(--lab) - 2px * var(--u, 8)) / var(--u, 8)))); }
+  .opponents .player:not(.expanded) .stand-label, .opponents .player:not(.expanded) .cutstrip-live { display: none; }
+  .opponents .player:not(.expanded) .stand .rk-row { min-height: 0; gap: 2px; }
+  .opponents .player:not(.expanded) .stand .rack { padding: 0 2px; }
+  .opponents .player:not(.expanded) .stand .rk-lip { height: 5px; border-width: 1.5px; }
+  .opponents .player:not(.expanded) .stand .wire { width: auto; height: auto; }
+  .opponents .player:not(.expanded) .stands.multi { padding-left: 8px; }
+  .opponents .player:not(.expanded) .stands.multi::before { width: 4px; border-width: 1.5px; }
+  .opponents .player:not(.expanded) .player-head { gap: 5px; flex-wrap: wrap; }
+
+  .opponents .player:not(.expanded) .player-head { flex-wrap: nowrap; }
+  .opponents .player:not(.expanded) .seat-tag { display: none; }
+  .opponents .player:not(.expanded) .wire-count { margin-left: auto; font-size: 10px; padding: 1px 6px; white-space: nowrap; }
+  .opponents .player:not(.expanded) .player-name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; min-width: 0; }
+  /* expanded opponent: wire width 26px, so two stands do not fill the screen */
+  .opponents .player.expanded .stand { --ww: min(26px, max(9px, calc((100cqw - var(--lab) - 4px * var(--u, 8)) / var(--u, 8)))); }
+  .opponents .player.expanded .stand .rk-row { min-height: 0; }
+  .opponents .player.expanded .stand .wire:not(.cut) { width: auto; height: auto; }
+  .opponents .player.expanded .stands { gap: 4px; }
+
+  .me-seat .stands.multi .stand { --ww: min(17px, max(9px, calc((100cqw - var(--lab) - 4px * var(--u, 8)) / var(--u, 8)))); }
+}
+/* landscape phones are too short to pin anything: the dock scrolls with the page */
+@media (max-width: 960px) and (max-height: 500px) {
+  .bottom-dock { position: static; margin-bottom: 0; }
+}
 </style>
 </head>
 <body>
@@ -3729,7 +4525,7 @@ const MAX_NAME = 24;
 const MIN_NAME = 1;
 
 const  ROOM_CODE_ALPHABET = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
-const  ROOM_CODE_LENGTH = 4;
+const  ROOM_CODE_LENGTH = 5;
 const  ROOM_MAX_PLAYERS = 5;
 
 // Room codes avoid I, O, 0 and 1 so they can be read over voice chat.
@@ -3990,6 +4786,36 @@ async function  touchPlayer(client, options) {
   });
 }
 
+// Ready is optional so an older schema keeps working. Callers catch the
+// missing-RPC error and fall back to presence (connected = ready).
+async function  setPlayerReady(client, options) {
+  const code = normalizeRoomCode(options.code);
+  assertRoomCode(code);
+  if (!options.playerId) throw new NetError('player id is required', { code: 'NO_PLAYER' });
+  if (typeof options.ready !== 'boolean') {
+    throw new NetError('ready must be a boolean', { code: 'INVALID_READY' });
+  }
+  return client.rpc('set_ready', {
+    p_code: code,
+    p_player_id: options.playerId,
+    p_ready: options.ready,
+  });
+}
+
+async function  setRoomMaxPlayers(client, options) {
+  const code = normalizeRoomCode(options.code);
+  assertRoomCode(code);
+  if (!options.playerId) throw new NetError('player id is required', { code: 'NO_PLAYER' });
+  if (!Number.isInteger(options.maxPlayers) || options.maxPlayers < 2 || options.maxPlayers > ROOM_MAX_PLAYERS) {
+    throw new NetError('player count must be 2-5', { code: 'INVALID_PLAYER_COUNT' });
+  }
+  return client.rpc('set_max_players', {
+    p_code: code,
+    p_player_id: options.playerId,
+    p_max_players: options.maxPlayers,
+  });
+}
+
 async function  leaveRoom(client, options) {
   const code = normalizeRoomCode(options.code);
   assertRoomCode(code);
@@ -4017,7 +4843,7 @@ async function  getRoom(client, code) {
   assertRoomCode(normalized);
   const rows = await client.select(
     'rooms',
-    `code=eq.${normalized}&select=code,host_id,status,mission_id,seed,state,action_seq,created_at,updated_at`,
+    `code=eq.${normalized}&select=*`,
   );
   return Array.isArray(rows) && rows.length > 0 ? rows[0] : null;
 }
@@ -4025,9 +4851,10 @@ async function  getRoom(client, code) {
 async function  listPlayers(client, code) {
   const normalized = normalizeRoomCode(code);
   assertRoomCode(normalized);
+  // select=* keeps older projects (without the optional ready column) working.
   const rows = await client.select(
     'players',
-    `room_code=eq.${normalized}&select=id,name,seat,is_host,last_seen&order=seat.asc`,
+    `room_code=eq.${normalized}&select=*&order=seat.asc`,
   );
   return Array.isArray(rows) ? rows : [];
 }
@@ -4235,6 +5062,13 @@ const  STRINGS = {
   helpDetectorTitle: 'Your Double Detector',
   helpDetector: 'Once per mission you may point at two wires on the same teammate stand and name one number. If one of them matches, the stand owner chooses which wire is cut. If neither matches, it counts as a miss and the owner places an Info token.',
   helpDetectorCaption: 'Pick it under Extras while building a Dual Cut. It is single use per mission, and it cannot be used with yellow.',
+  helpCaptainTitle: 'The captain',
+  helpCaptain: 'The captain is the player who starts the mission. The role gives no special power and the captain does not decide for the squad.',
+  helpCaptain1: 'Dealing: wires are dealt one at a time clockwise starting with the captain, so the captain is first in line for any extra wire.',
+  helpCaptain2: 'Setup: the first Info token is placed starting from the captain (or the next player clockwise who holds a blue wire). Then play starts with the captain, and goes clockwise.',
+  helpCaptain3: 'How it is chosen: in hotseat you pick Random or a specific player on the setup screen. Online, the host is the captain.',
+  helpCaptain4: 'After a loss: when you retry the same mission, the captain moves one seat to the next player, so the role is shared. In a 3-player game the captain holds two stands, so that seat changes too.',
+  helpCaptain5: 'Your own name is marked "Captain" on the setup screen, and a banner at the start of the mission tells you who it is.',
   helpOrderTitle: 'Turn order and the captain',
   helpOrder: 'The captain places the first Info token, then play goes clockwise. If a mission fails, play it again: the captain moves one seat to the left.',
   helpOrderCaption: 'A player who has no wires left is skipped.',
@@ -4412,7 +5246,7 @@ const  STRINGS = {
   localText: 'One screen, pass the device each turn. Only the player whose turn it is sees their wires.',
   playLocal: 'Play on this screen',
   onlineTitle: 'Online room',
-  onlineText: 'Share a four-letter code. Each player joins from their own device and only sees their own wires.',
+  onlineText: 'Share a five-letter code. Each player joins from their own device and only sees their own wires.',
   playOnline: 'Play online',
   onlineSubtitle: 'Bomb Busters - online room',
   resumeTitle: 'Continue room {code}',
@@ -4433,7 +5267,7 @@ const  STRINGS = {
   roomCode: 'Room code',
   joinRoom: 'Join room',
   onlineHowTitle: 'How online play works',
-  onlineHow1: 'The host creates a room and shares the four-letter code.',
+  onlineHow1: 'The host creates a room and shares the five-letter code.',
   onlineHow2: 'Everyone joins, picks a seat in arrival order, and waits in the lobby.',
   onlineHow3: 'The host picks a mission and starts once at least two players are in.',
   onlineHow4: 'If someone drops, the room pauses and waits for them. No bots fill in.',
@@ -4467,6 +5301,7 @@ const  STRINGS = {
   waitingHostLobby: 'Waiting for the host to open the lobby.',
   roomNotFound: 'No room with that code. Check the letters and try again.',
   roomClosedJoin: 'That room is already playing. Rejoin with the same browser, or ask the host for a new room.',
+  roomFullOrStarted: 'That room is full, or the mission has already started.',
   roomGone: 'The room no longer exists. It may have been closed by the host.',
   codeInvalid: 'A room code has 4-8 letters and numbers.',
   codeFailed: 'Could not find a free room code. Please try again.',
@@ -4477,6 +5312,78 @@ const  STRINGS = {
   leftRoom: 'You left the room.',
   setupWaiting: 'Setup: waiting for {name} to place their Info token.',
   pendingWaiting: 'Waiting for {name} to make the pending decision.',
+
+  // P10a pre-game screens (visual integration V7)
+  welcomeTagline: 'Defuse it together. Nobody may say the numbers out loud.',
+  nicknamePlaceholder: 'Your nickname',
+  createRoomTitle: 'Create room',
+  createRoomIntro: 'Pick the crew size. The dial preview shows where the crew starts.',
+  joinRoomTitle: 'Join a room',
+  joinRoomIntro: 'Enter the five-character code from your host.',
+  howManyPlayers: 'How many players?',
+  playersStartZone: '{count} players start on zone {zone}',
+  dialStartNote: '{zone} helmets on the dial = starting zone. {mistakes} mistakes are survivable; the next one goes boom.',
+  roomCodePreview: 'Room code',
+  createRoomCta: 'Create room',
+  back: 'Back',
+  copy: 'Copy',
+  share: 'Share',
+  lobbyPlayers: 'Players ({count} of {max})',
+  lobbyReadyHint: 'Everyone readies up before the host starts.',
+  readyLabel: 'Ready',
+  notReadyLabel: 'Not ready',
+  readyToggle: 'Ready to start',
+  readyUnsupported: 'Connected players count as ready in this build.',
+  captainRandom: 'Random captain',
+  captainChoose: 'Choose captain',
+  captainPickHint: 'Tap a player to make them captain.',
+  captainMake: 'Make captain',
+  chooseMission: 'Choose mission',
+  pickMission: 'Pick mission {n}',
+  missionTitle: 'Mission {n}: {title}',
+  missionDifficulty: 'Difficulty: {tier}',
+  missionEquipment: 'Equipment: {note}',
+  missionEquipmentPlayers: '{count} cards',
+  missionEquipmentNone: 'none',
+  equipmentPerPlayer: '1 card per player',
+  twoPlayerBox: 'With 2 players',
+  twoPlayerNoChange: 'no change',
+  twoPlayerTbd: 'not confirmed',
+  missionLockedNote: 'Missions 9 and up are coming later; the full campaign runs to 30.',
+  connectionLost: 'Connection lost',
+  tryingAgain: 'Trying again every 2 seconds. Your hand is safe on the server.',
+  retryNow: 'Retry now',
+  waitingTitle: 'Waiting for {name}',
+  waitingText: '{name} dropped out. The game resumes when they reconnect.',
+  wait: 'Wait',
+  roomNotFoundTitle: 'Room not found',
+  roomNotFoundText: 'Check the five-character code and try again.',
+  roomFullTitle: 'Room is full',
+  roomFullText: 'This room already has {max} players.',
+  playerBackOnline: '{name} is back online',
+  connectionLabel: 'Connection',
+  onlineWaiting: 'Waiting for the room server...',
+  readyWaitingName: 'Start (waiting for {name})',
+  startWhenReady: 'Start mission',
+  lobbyMissionHint: 'The host picks the mission before starting.',
+  noMissionPicked: 'No mission picked yet.',
+  missionPicked: 'Mission {n} picked.',
+  nameAndCode: 'Name and room code',
+  createAnother: 'Create another room',
+  joinOpen: 'Join room',
+  playerCountLabel: 'Crew size',
+  localCrewTitle: 'Crew on this screen',
+  startLocal: 'Start mission',
+  shareRoomCode: 'Share code',
+  roomCodeHelp: 'Read the code over voice chat, or use Copy and Share.',
+  readyOn: 'Ready',
+  readyOff: 'Not ready',
+  backToLobby: 'Back to lobby',
+  captainLabel: 'Captain',
+  seatLabel: 'Seat {n}',
+  joinedAs: 'You joined as {name}.',
+  onlineErrorTitle: 'Problem',
+
   playerNames: ['Ada', 'Bo', 'Cid', 'Dee', 'Eli'],
 };
 // ---- app/help-art.js ----
@@ -4516,6 +5423,9 @@ const ART_ICONS = {
   swap: '<path d="M4 8h14l-3-3M20 16H6l3 3"/>',
   play: '<path d="M7 4l13 8-13 8z"/>',
   wifi: '<path d="M2 9a15 15 0 0120 0M5 13a10 10 0 0114 0M8.5 16.5a5 5 0 017 0"/><path d="M12 20v.5"/>',
+  nowifi: '<path d="M2 9a15 15 0 0120 0M5 13a10 10 0 0114 0M8.5 16.5a5 5 0 017 0"/><path d="M12 20v.5M3 3l18 18"/>',
+  copy: '<rect x="8" y="8" width="12" height="13" rx="2"/><path d="M16 8V5a2 2 0 00-2-2H5a2 2 0 00-2 2v9a2 2 0 002 2h3"/>',
+  share: '<circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="M8.6 10.5l6.8-4M8.6 13.5l6.8 4"/>',
 };
 
 function artEsc(value) {
@@ -4818,6 +5728,86 @@ function artCharacter(id = 'owl', width = 110) {
   return `<svg width="${width}" height="${(width * 204 / 200).toFixed(0)}" viewBox="0 0 200 204" fill="none" stroke="${ART_INK}" stroke-width="3.5" stroke-linejoin="round" stroke-linecap="round" aria-hidden="true" focusable="false">${draw()}</svg>`;
 }
 
+// -------------------------------------------------------------- mission card
+
+// Exact 300 x 440 front from generators/p9.py: slanted title tab, big #N, one
+// italic tagline, a black SETUP panel with wire-icon rows, and the 2-player
+// adjustment box at the bottom. All text comes from data/missions.json.
+function artMissionWire(kind, w = 26) {
+  if (kind === 'blue') {
+    return `<svg width="${w}" height="${w}" viewBox="0 0 26 26" aria-hidden="true"><rect x="2" y="2" width="22" height="22" rx="4" fill="#2B2D35" stroke="${ART_CREAM}" stroke-width="2"/><path d="M13 4C7 8 19 12 13 15S7 20 13 22" fill="none" stroke="${ART_BLUE}" stroke-width="3.2" stroke-linecap="round"/></svg>`;
+  }
+  if (kind === 'yellow') {
+    return `<svg width="${w}" height="${w}" viewBox="0 0 26 26" aria-hidden="true"><rect x="2" y="2" width="22" height="22" rx="4" fill="#2B2D35" stroke="${ART_CREAM}" stroke-width="2"/><path d="M13 4V22" stroke="#B8921C" stroke-width="3"/><rect x="8" y="9" width="10" height="9" rx="1.5" fill="${ART_YELLOW}" stroke="${ART_INK}" stroke-width="1.5"/></svg>`;
+  }
+  if (kind === 'red') {
+    return `<svg width="${w}" height="${w}" viewBox="0 0 26 26" aria-hidden="true"><rect x="2" y="2" width="22" height="22" rx="4" fill="#2B2D35" stroke="${ART_CREAM}" stroke-width="2"/><path d="M13 4V22" stroke="#8e1a2a" stroke-width="3"/><circle cx="13" cy="14" r="5" fill="${ART_RED}" stroke="${ART_INK}" stroke-width="1.5"/></svg>`;
+  }
+  return `<svg width="${w}" height="${w}" viewBox="0 0 26 26" aria-hidden="true"><rect x="5" y="2" width="16" height="22" rx="3" fill="${ART_EQUIP}" stroke="${ART_CREAM}" stroke-width="2"/><rect x="8" y="5" width="6" height="5" rx="1" fill="${ART_INK}"/><path d="M8 15h10M8 19h7" stroke="${ART_INK}" stroke-width="2"/></svg>`;
+}
+
+function missionBlueRange(mission) {
+  const setup = mission && mission.setup;
+  const values = setup && setup.blue ? setup.blue.values : null;
+  if (values === 'all') return { label: '1 to 12', count: 48 };
+  if (Array.isArray(values) && values.length >= 2) {
+    const from = values[0];
+    const to = values[1];
+    return { label: `${from} to ${to}`, count: (to - from + 1) * 4 };
+  }
+  return { label: '?', count: 0 };
+}
+
+function missionColourLabel(spec) {
+  if (!spec || !spec.count) return '';
+  const suffix = spec.candidates ? ` out of ${spec.candidates}` : '';
+  return `x${spec.count}${suffix}`;
+}
+
+function missionTwoPlayerText(mission) {
+  const two = mission && mission.twoPlayer;
+  if (!two) {
+    return mission && mission.unverified && mission.unverified.includes('twoPlayer')
+      ? { text: 'not confirmed', dim: true }
+      : { text: 'no change', dim: true };
+  }
+  const parts = [];
+  if (two.yellow && two.yellow.count) {
+    parts.push(`yellow ${missionColourLabel(two.yellow)}`);
+  }
+  if (two.red && two.red.count) {
+    parts.push(`red ${missionColourLabel(two.red)}`);
+  }
+  return { text: parts.join(', ') || 'no change', dim: false };
+}
+
+function artMissionCard(mission) {
+  if (!mission) return '';
+  const blue = missionBlueRange(mission);
+  const setup = mission.setup || {};
+  const rows = [];
+  rows.push(`<div class="rw">${artMissionWire('blue')}<span>Blue wires: <span class="cnt">${artEsc(blue.label)}</span></span><span class="sub">${blue.count} wires</span></div>`);
+  if (setup.yellow && setup.yellow.count) {
+    rows.push(`<div class="rw">${artMissionWire('yellow')}<span>Yellow wires: <span class="cnt">${artEsc(missionColourLabel(setup.yellow))}</span></span></div>`);
+  }
+  if (setup.red && setup.red.count) {
+    rows.push(`<div class="rw">${artMissionWire('red')}<span>Red wires: <span class="cnt">${artEsc(missionColourLabel(setup.red))}</span></span></div>`);
+  }
+  const equip = setup.equipment === 'players' ? 'x players' : 'none';
+  rows.push(`<div class="rw">${artMissionWire('equip')}<span>Equipment: <span class="cnt">${artEsc(equip)}</span></span></div>`);
+
+  const two = missionTwoPlayerText(mission);
+  const title = artEsc(mission.title || '');
+  const tagline = artEsc(mission.lesson || '');
+  return `<div class="mc" role="img" aria-label="${artEsc(`Mission ${mission.id}, ${mission.title}, setup side`)}" data-n="${mission.id}">`
+    + `<div class="tab"><span>${title}</span></div>`
+    + `<div class="num" data-n="${mission.id}"></div>`
+    + `<div class="tag">${tagline}</div>`
+    + `<div class="setup"><h4>SETUP</h4>${rows.join('')}</div>`
+    + `<div class="two${two.dim ? ' dim' : ''}"><b>${artIcon('users', 18, ART_INK, 2.2)}2 PLAYERS</b>${artEsc(two.text)}</div>`
+    + '</div>';
+}
+
 // --------------------------------------------------------------- stand rack
 
 // Exact layout from generators/rack.py. The CSS lives in styles.css under
@@ -4885,6 +5875,8 @@ const SESSION_KEY = 'wireSquad.session.v1';
 const ONLINE_STALE_MS = 45000;
 const POLL_MS = 2000;
 const HEARTBEAT_MS = 10000;
+const START_ZONE = { 2: 4, 3: 3, 4: 2, 5: 1 };
+const SKULL_ZONE = 6;
 
 const SETTINGS_KEY = 'wiresquad.settings';
 function loadSettings() {
@@ -4950,6 +5942,12 @@ const UI = {
   onlineName: '',
   onlineCode: '',
   savedSession: null,
+  // P10a pre-game screens
+  pendingCode: '',
+  targetPlayers: 4,
+  joinFocus: false,
+  toast: '',
+  toastTimer: null,
 };
 
 function isOnline() {
@@ -5009,6 +6007,177 @@ const ESCAPES = {
 function esc(value) {
   return String(value).replace(/[&<>"']/g, (char) => ESCAPES[char]);
 }
+
+// ---------------------------------------------------------------------------
+// P10a pre-game helpers
+
+function startZoneFor(count) {
+  return START_ZONE[count] || START_ZONE[4];
+}
+
+function mistakesBeforeSkull(zone) {
+  return Math.max(1, SKULL_ZONE - zone - 1);
+}
+
+function seatColor(seat) {
+  return SEAT_COLORS[seat % SEAT_COLORS.length];
+}
+
+function initialFor(name) {
+  const clean = String(name || '?').trim();
+  return (clean[0] || '?').toUpperCase();
+}
+
+async function copyText(text) {
+  const value = String(text || '');
+  if (!value) return false;
+  try {
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      await navigator.clipboard.writeText(value);
+      return true;
+    }
+  } catch {
+    // Fall through to the manual prompt.
+  }
+  return false;
+}
+
+function showToast(text) {
+  UI.toast = text;
+  if (UI.toastTimer) clearTimeout(UI.toastTimer);
+  UI.toastTimer = setTimeout(() => {
+    UI.toast = '';
+    UI.toastTimer = null;
+    render();
+  }, 4200);
+}
+
+function toastMarkup() {
+  if (!UI.toast) return '';
+  return `<div class="toast-wrap"><span class="toast" role="status" aria-live="polite">${artIcon('wifi', 18, '#3FBF5E')}${esc(UI.toast)}</span></div>`;
+}
+
+function onlineReadySupport() {
+  const online = UI.online;
+  if (!online || online.readyMissing) return false;
+  const players = online.players || [];
+  return players.some((player) => typeof player.ready === 'boolean');
+}
+
+function onlineTargetPlayers() {
+  const online = UI.online;
+  const remote = online && online.room ? Number(online.room.max_players) : 0;
+  const local = Number(UI.targetPlayers) || 0;
+  if (online && online.isHost) return local || remote || 4;
+  return remote || local || 4;
+}
+
+function onlinePlayersSorted() {
+  return ((UI.online && UI.online.players) || []).slice().sort((a, b) => a.seat - b.seat);
+}
+
+function missionTier(mission) {
+  const tier = mission && mission.tier ? String(mission.tier) : 'standard';
+  return tier.charAt(0).toUpperCase() + tier.slice(1);
+}
+
+function equipmentNote(mission) {
+  return mission && mission.setup && mission.setup.equipment === 'players'
+    ? t('equipmentPerPlayer')
+    : t('missionEquipmentNone');
+}
+
+function twoPlayerSummary(mission) {
+  if (!mission || !mission.twoPlayer) {
+    return mission && (mission.unverified || []).includes('twoPlayer')
+      ? t('twoPlayerTbd')
+      : t('twoPlayerNoChange');
+  }
+  const parts = [];
+  const two = mission.twoPlayer;
+  if (two.yellow && two.yellow.count) {
+    parts.push(`yellow x${two.yellow.count}${two.yellow.candidates ? ` out of ${two.yellow.candidates}` : ''}`);
+  }
+  if (two.red && two.red.count) {
+    parts.push(`red x${two.red.count}${two.red.candidates ? ` out of ${two.red.candidates}` : ''}`);
+  }
+  return parts.join(', ') || t('twoPlayerNoChange');
+}
+
+function findMission(id) {
+  return MISSIONS.find((mission) => mission.id === Number(id)) || MISSIONS[0];
+}
+
+function pregameTopbar(title, extra = '') {
+  return `
+    <header class="pregame-topbar">
+      <span class="wm wm-sm">${esc(t('appTitle'))}</span>
+      <span class="topbar-title">${esc(title)}</span>
+      <span class="topbar-actions">
+        ${extra}
+        <button class="btn ghost small" data-act="help-open">${esc(t('howToPlay'))}</button>
+      </span>
+    </header>`;
+}
+
+function onlineErrorModal() {
+  if (!UI.error) return '';
+  const known = [
+    t('roomNotFound'),
+    t('roomClosedJoin'),
+    t('nameRequired'),
+    t('codeInvalid'),
+    t('roomFullOrStarted'),
+  ];
+  if (!known.includes(UI.error)) return '';
+  const notFound = UI.error === t('roomNotFound');
+  const full = UI.error === t('roomClosedJoin') || UI.error === t('roomFullOrStarted');
+  const title = notFound ? t('roomNotFoundTitle') : full ? t('roomFullTitle') : t('onlineErrorTitle');
+  const text = notFound
+    ? t('roomNotFoundText')
+    : full
+      ? t('roomFullText', { max: onlineTargetPlayers() })
+      : UI.error;
+  return `
+    <div class="net-modal" role="alertdialog" aria-labelledby="net-error-title">
+      <span class="modal-badge">${artIcon(notFound || full ? 'cross' : 'warn', 26, 'var(--ink)')}</span>
+      <h3 id="net-error-title">${esc(title)}</h3>
+      <p>${esc(text)}</p>
+      <button class="btn" data-act="error-dismiss">${esc(t('back'))}</button>
+    </div>`;
+}
+
+function onlineStatusModal() {
+  if (!isOnline()) return '';
+  const online = UI.online;
+  if (online.connection === 'offline') {
+    return `
+      <div class="overlay net-overlay">
+        <div class="net-modal" role="alertdialog" aria-labelledby="net-lost-title">
+          <span class="modal-badge">${artIcon('nowifi', 26, 'var(--ink)')}</span>
+          <h3 id="net-lost-title">${esc(t('connectionLost'))}</h3>
+          <p>${esc(t('tryingAgain'))}</p>
+          <div class="modal-actions">
+            <button class="btn" data-act="retry-online">${esc(t('retryNow'))}</button>
+            <button class="btn ghost" data-act="leave-ask">${esc(t('leaveRoom'))}</button>
+          </div>
+        </div>
+      </div>`;
+  }
+  return '';
+}
+
+function waitingForModal(players) {
+  if (!players.length) return '';
+  return `
+    <div class="wait-modal" role="status">
+      <span class="modal-badge wait">${artIcon('clock', 26, 'var(--ink)')}</span>
+      <h3>${esc(t('waitingTitle', { name: players.map((player) => player.name).join(', ') }))}</h3>
+      <p>${esc(t('waitingText', { name: players.map((player) => player.name).join(', ') }))}</p>
+      <button class="btn ghost small" data-act="retry-online">${esc(t('wait'))}</button>
+    </div>`;
+}
+
 
 function valueLabel(value) {
   return value === 'yellow' ? t('yellowValue') : String(value);
@@ -5196,12 +6365,12 @@ function missionList() {
 }
 
 function setupScreen() {
-  const missions = missionList();
+  const mission = findMission(UI.missionId);
 
   const counts = [];
   for (let count = MIN_PLAYERS; count <= MAX_PLAYERS; count += 1) {
     counts.push(`
-      <button class="crew-btn${UI.playerCount === count ? ' selected' : ''}" data-act="count" data-n="${count}">
+      <button class="seg-btn${UI.playerCount === count ? ' on' : ''}" data-act="count" data-n="${count}" aria-pressed="${UI.playerCount === count}">
         ${count}<span>${esc(t('players'))}</span>
       </button>`);
   }
@@ -5216,38 +6385,29 @@ function setupScreen() {
   }
 
   return `
-    <div class="setup">
-      <header class="hero">
-        <div class="brand-mark">
-          <span class="logo">${esc(t('appTitle'))}</span>
-          <span class="logo-sub">${esc(t('appSubtitle'))}</span>
-        </div>
-        <p class="hero-note">${esc(t('openInfo'))}</p>
-        <div class="hero-actions">
-          <button class="btn ghost small" data-act="help-open">${esc(t('howToPlay'))}</button>
-          <button class="btn ghost small" data-act="home">${esc(t('home'))}</button>
-        </div>
-      </header>
-      <main class="setup-main">
-        <section class="panel">
+    <div class="pregame">
+      ${pregameTopbar(t('setupTitle'), `<button class="btn ghost small" data-act="home">${esc(t('home'))}</button>`)}
+      <main class="pregame-main setup-main">
+        <section class="card2 setup-missions">
           <h2>${esc(t('setupTitle'))}</h2>
           <p class="muted">${esc(t('setupIntro'))}</p>
-          <h3 class="section-title">${esc(t('mission'))}</h3>
-          <div class="mission-list">${missions}</div>
-          <h3 class="section-title">${esc(t('crew'))}</h3>
-          <div class="crew-row">${counts.join('')}</div>
-          <div class="names">${names.join('')}</div>
-          <h3 class="section-title">${esc(t('captain'))}</h3>
-          <div class="crew-row captain-row">
-            <button class="crew-btn${UI.captainPick === 'random' ? ' selected' : ''}" data-act="captain-pick" data-c="random">${esc(t('captainRandom'))}</button>
-            ${Array.from({ length: UI.playerCount }, (_, index) => `<button class="crew-btn${UI.captainPick === index ? ' selected' : ''}" data-act="captain-pick" data-c="${index}">${esc(UI.names[index] || `${t('player')} ${index + 1}`)}</button>`).join('')}
-          </div>
-          ${errorBox()}
-          <button class="btn big" data-act="start">${esc(t('start'))}</button>
+          ${missionGrid()}
         </section>
-        <aside class="panel setup-help">
-          <h3>${esc(t('missionRules'))}</h3>
-          ${selectedMissionHelp()}
+        <aside class="setup-side">
+          <div class="mc-scale">${artMissionCard(mission)}</div>
+          <div class="card2">${missionDetail(mission, UI.playerCount)}</div>
+          <div class="card2 setup-crew">
+            <div class="disp field-title">${esc(t('localCrewTitle'))}</div>
+            <div class="seg seg-crew">${counts.join('')}</div>
+            <div class="names">${names.join('')}</div>
+            <div class="disp field-title">${esc(t('captain'))}</div>
+            <div class="crew-row captain-row">
+              <button class="crew-btn${UI.captainPick === 'random' ? ' selected' : ''}" data-act="captain-pick" data-c="random">${esc(t('captainRandom'))}</button>
+              ${Array.from({ length: UI.playerCount }, (_, index) => `<button class="crew-btn${UI.captainPick === index ? ' selected' : ''}" data-act="captain-pick" data-c="${index}">${esc(UI.names[index] || `${t('player')} ${index + 1}`)}</button>`).join('')}
+            </div>
+            ${errorBox()}
+            <button class="btn primary big" data-act="start">${artIcon('bomb', 22, 'currentColor', 2.2)} ${esc(t('startLocal'))}</button>
+          </div>
         </aside>
       </main>
     </div>`;
@@ -5624,6 +6784,45 @@ function noticeBox() {
 // ---------------------------------------------------------------------------
 // Home / online lobby
 
+function missionGrid() {
+  const tiles = MISSIONS.map((mission) => {
+    const selected = mission.id === UI.missionId;
+    return `<button class="mtile${selected ? ' on' : ''}" data-act="mission" data-id="${mission.id}" aria-pressed="${selected}">
+      <span class="tn">#${mission.id}</span>
+      <span class="mt">${esc(mission.title)}</span>
+      <span class="mm">${esc(mission.lesson || '')}</span>
+    </button>`;
+  }).join('');
+  const locked = [9, 10, 11, 12].map((id) => `
+    <div class="mtile locked" aria-disabled="true">
+      <span class="tn">#${id}</span>
+      <span class="mm">${esc(t('comingLater'))}</span>
+      <span class="mlock">${artIcon('lock', 15, 'currentColor')}</span>
+    </div>`).join('');
+  return `<div class="mission-grid">${tiles}${locked}</div>
+    <p class="cap">${esc(t('missionLockedNote'))}</p>`;
+}
+
+function missionDetail(mission, playerCount) {
+  if (!mission) return '';
+  const rules = (mission.rules || []).map((rule) => `<li>${esc(rule)}</li>`).join('');
+  const two = twoPlayerSummary(mission);
+  const dim = !mission.twoPlayer;
+  return `
+    <div class="mission-detail">
+      <div class="disp mission-detail-title">${esc(t('missionTitle', { n: mission.id, title: mission.title }))}</div>
+      <div class="pillrow">
+        <span class="pill yellow">${esc(t('missionDifficulty', { tier: missionTier(mission) }))}</span>
+        <span class="pill">${esc(t('missionEquipment', { note: equipmentNote(mission) }))}</span>
+      </div>
+      <div class="two-note${dim ? ' dim' : ''}"><b>${artIcon('users', 16, 'currentColor', 2.2)}${esc(t('twoPlayerBox'))}</b>${esc(two)}</div>
+      <ul class="rules">${rules || `<li>${esc(t('missionRules'))}</li>`}</ul>
+      ${playerCount === 2 ? `<p class="muted small">${esc(t('twoPlayerBox'))}: ${esc(two)}</p>` : ''}
+      <p class="muted small">${esc(mission.success || '')}</p>
+      ${(mission.unverified || []).length ? `<p class="flag-note">${esc(t('unverified'))}</p>` : ''}
+    </div>`;
+}
+
 function homeScreen() {
   const session = UI.savedSession;
   const resuming = UI.busyAction === 'resume';
@@ -5642,20 +6841,24 @@ function homeScreen() {
     <div class="welcome">
       <div class="welcome-hero">
         <div class="welcome-decor left" aria-hidden="true">
-          <span class="tilt a">${artWire('blue', 7, { width: 58 })}</span>
-          <span class="tilt b">${artWire('blue', 3, { width: 58 })}</span>
+          <span class="tilt a">${artWire('blue', 7, { width: 76 })}</span>
+          <span class="tilt b">${artWire('blue', 3, { width: 76 })}</span>
         </div>
         <div class="welcome-center">
-          <h1 class="wordmark">${esc(t('appTitle')).replace(' ', '<br>')}</h1>
-          <p class="tagline">${esc(t('homeIntro'))}</p>
-          <button class="btn big primary" data-act="play-online">${esc(t('playOnline'))}</button>
-          <button class="btn big ghost" data-act="play-local">${esc(t('playLocal'))}</button>
+          <h1 class="wordmark wm">Wire<br>Squad</h1>
+          <p class="tagline">${esc(t('welcomeTagline'))}</p>
+          <label class="inp-field welcome-name">
+            <input data-online-name value="${esc(UI.onlineName)}" maxlength="24" spellcheck="false" autocomplete="nickname" placeholder="${esc(t('nicknamePlaceholder'))}" aria-label="${esc(t('yourName'))}">
+            ${artIcon('user', 22, 'currentColor')}
+          </label>
+          <button class="btn big primary" data-act="create-open">${artIcon('bomb', 24, 'currentColor', 2.2)} ${esc(t('createRoom'))}</button>
+          <button class="btn big ghost" data-act="join-open">${artIcon('users', 24, 'currentColor', 2.2)} ${esc(t('joinOpen'))}</button>
+          <button class="btn small ghost" data-act="play-local">${esc(t('playLocal'))}</button>
           <p class="mode-notes"><span>${esc(t('onlineText'))}</span><span>${esc(t('localText'))}</span></p>
-          <button class="btn small ghost" data-act="help-open">${esc(t('howToPlay'))}</button>
         </div>
         <div class="welcome-decor right" aria-hidden="true">
-          ${artDial(3, 190)}
-          <span class="tilt c">${artWire('red', 'R', { width: 46 })}</span>
+          ${artDial(2, 230)}
+          <span class="tilt c">${artWire('red', 'R', { width: 54 })}</span>
         </div>
       </div>
       <div class="welcome-foot">
@@ -5663,48 +6866,70 @@ function homeScreen() {
         ${noticeBox()}
         ${errorBox()}
         <p class="trust-note">${esc(t('trustNote'))}</p>
-        <button class="btn small ghost" data-act="settings-open">${esc(t('settings'))}</button>
+        <div class="welcome-links">
+          <button class="btn small ghost" data-act="help-open">${esc(t('howToPlay'))}</button>
+          <button class="btn small ghost" data-act="settings-open">${esc(t('settings'))}</button>
+        </div>
       </div>
       ${settingsSheet()}
     </div>`;
 }
 
-function onlineEntryScreen() {
+function createRoomScreen() {
+  const code = UI.pendingCode || makeRoomCode();
+  UI.pendingCode = code;
+  const target = Number(UI.targetPlayers) || 4;
+  const zone = startZoneFor(target);
   const busy = Boolean(UI.busyAction);
   const creating = UI.busyAction === 'create';
-  const joining = UI.busyAction === 'join' || UI.busyAction === 'resume';
+  const counts = [];
+  for (let count = MIN_PLAYERS; count <= MAX_PLAYERS; count += 1) {
+    counts.push(`<button class="seg-btn${target === count ? ' on' : ''}" data-act="target-count" data-n="${count}" aria-pressed="${target === count}">${count}</button>`);
+  }
+  const tiles = code.split('').map((letter) => `<span class="code-tile">${esc(letter)}</span>`).join('');
   return `
-    <div class="setup">
-      <header class="hero">
-        <div class="brand-mark">
-          <span class="logo">${esc(t('appTitle'))}</span>
-          <span class="logo-sub">${esc(t('onlineSubtitle'))}</span>
-        </div>
-        <div class="hero-actions">
-          <button class="btn ghost small" data-act="help-open">${esc(t('howToPlay'))}</button>
-          <button class="btn ghost small" data-act="home">${esc(t('home'))}</button>
-        </div>
-      </header>
-      <main class="online-main">
-        <section class="panel online-panel">
-          <h2>${esc(t('onlineTitle'))}</h2>
-          <p class="muted">${esc(t('onlineIntro'))}</p>
-          <label class="name-field">
-            <span>${esc(t('yourName'))}</span>
-            <input data-online-name class="${UI.error === t('nameRequired') ? 'invalid' : ''}" aria-invalid="${UI.error === t('nameRequired')}" value="${esc(UI.onlineName)}" maxlength="24" spellcheck="false" placeholder="${esc(t('namePlaceholder'))}" ${busy ? 'disabled' : ''}>
-          </label>
-          <button class="btn big" data-act="create-room" ${busy ? 'disabled' : ''}>${esc(creating ? t('creatingRoom') : t('createRoom'))}</button>
-          <div class="or-rule"><span>${esc(t('orJoin'))}</span></div>
-          <label class="name-field">
-            <span>${esc(t('roomCode'))}</span>
-            <input data-online-code value="${esc(UI.onlineCode)}" maxlength="8" spellcheck="false" autocapitalize="characters" placeholder="ABCD" ${busy ? 'disabled' : ''}>
-          </label>
-          <button class="btn ghost big" data-act="join-room" ${busy ? 'disabled' : ''}>${esc(joining ? t('joiningRoom') : t('joinRoom'))}</button>
-          ${busy ? `<p class="muted small" role="status" aria-live="polite">${esc(t('onlineBusyHint'))}</p>` : ''}
+    <div class="pregame">
+      ${pregameTopbar(t('createRoomTitle'), `<button class="btn ghost small" data-act="home">${esc(t('home'))}</button>`)}
+      <main class="pregame-main create-main">
+        <section class="card2 create-card">
+          <div class="create-layout">
+            <div class="create-left">
+              <div>
+                <div class="disp field-title">${esc(t('howManyPlayers'))}</div>
+                <div class="seg">${counts.join('')}</div>
+              </div>
+              <label class="field-block">
+                <span class="field-label">${esc(t('yourName'))}</span>
+                <span class="inp-field">
+                  <input data-online-name value="${esc(UI.onlineName)}" maxlength="24" spellcheck="false" placeholder="${esc(t('nicknamePlaceholder'))}" ${busy ? 'disabled' : ''}>
+                  ${artIcon('user', 20, 'currentColor')}
+                </span>
+              </label>
+              <div>
+                <div class="disp field-title">${esc(t('roomCodePreview'))}</div>
+                <div class="code-row">${tiles}</div>
+                <p class="muted small">${esc(t('roomCodeHelp'))}</p>
+                <div class="create-actions">
+                  <button class="btn ghost" data-act="copy-pending">${artIcon('copy', 20, 'currentColor', 2)} ${esc(t('copy'))}</button>
+                  <button class="btn ghost" data-act="share-pending">${artIcon('share', 20, 'currentColor', 2)} ${esc(t('share'))}</button>
+                </div>
+              </div>
+            </div>
+            <div class="create-dial">
+              ${artDial(zone, 220)}
+              <div class="disp">${esc(t('playersStartZone', { count: target, zone }))}</div>
+              <p class="muted small">${esc(t('dialStartNote', { zone, mistakes: mistakesBeforeSkull(zone) }))}</p>
+            </div>
+          </div>
+          ${busy ? `<p class="muted small" role="status">${esc(t('onlineBusyHint'))}</p>` : ''}
           ${noticeBox()}
           ${errorBox()}
+          <div class="create-bottom">
+            <button class="btn ghost" data-act="home" ${busy ? 'disabled' : ''}>${esc(t('back'))}</button>
+            <button class="btn primary" data-act="create-room" ${busy ? 'disabled' : ''}>${artIcon('bomb', 22, 'currentColor', 2.2)} ${esc(creating ? t('creatingRoom') : t('createRoomCta'))}</button>
+          </div>
         </section>
-        <aside class="panel setup-help">
+        <aside class="card2 pregame-aside">
           <h3>${esc(t('onlineHowTitle'))}</h3>
           <ol class="rules online-how">
             <li>${esc(t('onlineHow1'))}</li>
@@ -5718,69 +6943,198 @@ function onlineEntryScreen() {
     </div>`;
 }
 
-function lobbyScreen() {
-  const online = UI.online;
-  if (!online) return homeScreen();
-  const players = (online.players || []).slice().sort((a, b) => a.seat - b.seat);
-  const me = players.find((player) => player.id === online.playerId);
-  const isHost = Boolean(online.room && online.room.host_id === online.playerId);
-  const stale = new Set(onlineStale().map((player) => player.id));
-  const seats = players.map((player) => `
-    <li class="lobby-seat${player.id === online.playerId ? ' me' : ''}">
-      <span class="avatar sm" style="--av:${SEAT_COLORS[player.seat % 5]}">${artCharacter(SEAT_AVATARS[player.seat % 5], 34)}</span>
-      <strong>${esc(player.name)}</strong>
-      <span class="conn ${stale.has(player.id) ? 'connecting' : 'ok'}">${esc(t(stale.has(player.id) ? 'away' : 'connected'))}</span>
-      ${player.id === online.playerId ? `<span class="badge active">${esc(t('you'))}</span>` : ''}
-      ${online.room && online.room.host_id === player.id ? `<span class="badge captain">${esc(t('host'))}</span>` : ''}
-      ${stale.has(player.id) ? `<span class="badge pending">${esc(t('away'))}</span>` : ''}
-    </li>`).join('');
-
-  const start = isHost
-    ? `<button class="btn big" data-act="start-online" ${players.length < MIN_PLAYERS ? 'disabled' : ''}>
-        ${esc(t('start'))}
-      </button>
-      <p class="muted small">${esc(players.length < MIN_PLAYERS ? t('needTwo') : t('lobbyStartHint'))}</p>`
-    : `<p class="waiting-box">${esc(t('waitingHost'))}</p>`;
-
+function joinRoomScreen() {
+  const busy = Boolean(UI.busyAction);
+  const joining = UI.busyAction === 'join' || UI.busyAction === 'resume';
   return `
-    <div class="setup">
-      <header class="hero">
-        <div class="brand-mark">
-          <span class="logo">${esc(t('appTitle'))}</span>
-          <span class="logo-sub">${esc(t('lobbySubtitle'))}</span>
-        </div>
-        <div class="lobby-code">
-          <span>${esc(t('roomCode'))}</span>
-          <strong>${esc(online.code)}</strong>
-          <button class="btn ghost small" data-act="copy-code">${esc(t('copyCode'))}</button>
-          <button class="btn ghost small" data-act="share-code">${esc(t('shareCode'))}</button>
-        </div>
-      </header>
-      <main class="setup-main">
-        <section class="panel">
-          <h2>${esc(t('lobbyTitle'))}</h2>
-          <p class="muted">${esc(t('lobbyHint', { code: online.code }))}</p>
-          <ul class="lobby-list">${seats || `<li class="muted">-</li>`}</ul>
-          <h3 class="section-title">${esc(t('mission'))}</h3>
-          ${isHost
-            ? `<div class="mission-list compact">${missionList()}</div>`
-            : `<p class="muted">${esc(t('hostPicksMission'))}</p>`}
-          ${start}
+    <div class="pregame">
+      ${pregameTopbar(t('joinRoomTitle'), `<button class="btn ghost small" data-act="home">${esc(t('home'))}</button>`)}
+      <main class="pregame-main join-main">
+        <section class="card2 join-card">
+          <h2>${esc(t('joinRoomTitle'))}</h2>
+          <p class="muted">${esc(t('joinRoomIntro'))}</p>
+          ${onlineErrorModal()}
+          <label class="field-block">
+            <span class="field-label">${esc(t('yourName'))}</span>
+            <span class="inp-field">
+              <input data-online-name value="${esc(UI.onlineName)}" maxlength="24" spellcheck="false" placeholder="${esc(t('nicknamePlaceholder'))}" ${busy ? 'disabled' : ''}>
+              ${artIcon('user', 20, 'currentColor')}
+            </span>
+          </label>
+          <label class="field-block">
+            <span class="field-label">${esc(t('roomCode'))}</span>
+            <input class="join-code" data-online-code value="${esc(UI.onlineCode)}" maxlength="8" spellcheck="false" autocapitalize="characters" autocomplete="off" inputmode="text" placeholder="ABCDE" ${UI.joinFocus ? 'autofocus' : ''} ${busy ? 'disabled' : ''}>
+          </label>
+          <button class="btn primary big" data-act="join-room" ${busy ? 'disabled' : ''}>${artIcon('users', 22, 'currentColor', 2.2)} ${esc(joining ? t('joiningRoom') : t('joinRoom'))}</button>
+          ${busy ? `<p class="muted small" role="status" aria-live="polite">${esc(t('onlineBusyHint'))}</p>` : ''}
           ${noticeBox()}
           ${errorBox()}
-          <div class="lobby-foot">
-            <span class="conn ${online.connection || 'connecting'}">${esc(t(online.connection === 'offline' ? 'offline' : 'connected'))}</span>
-            <button class="btn ghost small" data-act="leave-ask">${esc(t('leaveRoom'))}</button>
-          </div>
+          <button class="btn ghost" data-act="home" ${busy ? 'disabled' : ''}>${esc(t('back'))}</button>
         </section>
-        <aside class="panel setup-help">
-          <h3>${esc(t('crew'))}</h3>
-          <p class="muted">${esc(t('lobbyCrewHint'))}</p>
-          <p class="muted small">${esc(t('youAre', { name: me ? me.name : online.name }))}</p>
-          ${stale.size ? `<p class="waiting-box">${esc(t('staleNames', { names: onlineStale().map((player) => player.name).join(', ') }))}</p>` : ''}
+        <aside class="card2 pregame-aside">
+          <h3>${esc(t('onlineHowTitle'))}</h3>
+          <ol class="rules online-how">
+            <li>${esc(t('onlineHow1'))}</li>
+            <li>${esc(t('onlineHow2'))}</li>
+            <li>${esc(t('onlineHow3'))}</li>
+            <li>${esc(t('onlineHow4'))}</li>
+          </ol>
           <p class="trust-note small">${esc(t('trustNote'))}</p>
         </aside>
       </main>
+    </div>`;
+}
+
+function onlineEntryScreen() {
+  return joinRoomScreen();
+}
+
+function missionPickerScreen() {
+  const online = UI.online;
+  if (!online || !online.isHost) return lobbyScreen();
+  const mission = findMission(UI.missionId);
+  return `
+    <div class="pregame">
+      ${pregameTopbar(t('chooseMission'), `<button class="btn ghost small" data-act="lobby-back">${esc(t('backToLobby'))}</button>`)}
+      <main class="pregame-main mission-main">
+        <section class="card2 mission-grid-card">
+          <h2>${esc(t('chooseMission'))}</h2>
+          ${missionGrid()}
+        </section>
+        <aside class="mission-side">
+          <div class="mc-scale">${artMissionCard(mission)}</div>
+          <div class="card2">${missionDetail(mission, onlineTargetPlayers())}</div>
+          <button class="btn primary big" data-act="mission-pick">${esc(t('pickMission', { n: mission.id }))}</button>
+        </aside>
+      </main>
+    </div>`;
+}
+
+function lobbyScreen() {
+  const online = UI.online;
+  if (!online) return homeScreen();
+  const players = onlinePlayersSorted();
+  const me = players.find((player) => player.id === online.playerId);
+  const isHost = Boolean(online.room && online.room.host_id === online.playerId);
+  const stale = new Set(onlineStale().map((player) => player.id));
+  const staleList = onlineStale();
+  const readyData = onlineReadySupport();
+  const target = onlineTargetPlayers();
+  const captainSeat = Number.isInteger(online.captainSeat) ? online.captainSeat : (players[0] ? players[0].seat : 0);
+  const mission = findMission(UI.missionId);
+  const readyOf = (player) => (readyData ? Boolean(player.ready) : !stale.has(player.id));
+  const missingReady = readyData ? players.filter((player) => !player.ready) : [];
+  const tooMany = players.length > target;
+  const allPresent = stale.size === 0;
+  const canStart = isHost && players.length >= MIN_PLAYERS && !tooMany && allPresent && missingReady.length === 0;
+  const waitingName = staleList[0] ? staleList[0].name : missingReady[0] ? missingReady[0].name : '';
+  const startLabel = !isHost
+    ? t('waitingHost')
+    : players.length < MIN_PLAYERS
+      ? t('needTwo')
+      : tooMany
+        ? t('roomFullText', { max: target })
+        : waitingName
+          ? t('readyWaitingName', { name: waitingName })
+          : t('startWhenReady');
+
+  const rows = players.map((player) => {
+    const mine = player.id === online.playerId;
+    const isCaptain = isHost && player.seat === captainSeat;
+    const ready = readyOf(player);
+    const away = stale.has(player.id);
+    const stateClass = away ? 'bad' : ready ? 'ok' : 'wait';
+    const stateLabel = readyData
+      ? (ready ? t('readyLabel') : t('notReadyLabel'))
+      : (away ? t('away') : t('connected'));
+    const toggle = mine
+      ? `<button class="tg-btn" data-act="ready-toggle" aria-pressed="${readyData ? ready : Boolean(online.localReady)}" aria-label="${esc(t('readyToggle'))}"><span class="tg${readyData ? (ready ? ' on' : '') : (online.localReady ? ' on' : '')}" aria-hidden="true"></span></button>`
+      : `<span class="tg${ready ? ' on' : ''}" role="img" aria-label="${esc(stateLabel)}"></span>`;
+    const makeCaptain = isHost && online.captainPickMode && !isCaptain
+      ? `<button class="btn small ghost" data-act="captain-set" data-seat="${player.seat}">${esc(t('captainMake'))}</button>`
+      : '';
+    return `<li class="li${mine ? ' me' : ''}">
+      <span class="av" style="--av:${seatColor(player.seat)}">${esc(initialFor(player.name))}</span>
+      <span class="li-name">${esc(player.name)}
+        ${isCaptain ? `<span class="pill cap">${esc(t('captainLabel'))}</span>` : ''}
+        ${mine ? `<span class="pill you">${esc(t('you'))}</span>` : ''}
+        ${player.is_host ? `<span class="pill host">${esc(t('host'))}</span>` : ''}
+      </span>
+      ${makeCaptain}
+      <span class="li-state"><span class="cd ${stateClass}" aria-hidden="true"></span><span class="cd-label">${esc(stateLabel)}</span></span>
+      ${toggle}
+    </li>`;
+  }).join('');
+
+  const captainControls = isHost
+    ? `<div class="captain-row">
+        <button class="btn ghost" data-act="captain-random">${artIcon('swap', 18, 'currentColor', 2)} ${esc(t('captainRandom'))}</button>
+        <button class="btn ghost${online.captainPickMode ? ' primary' : ''}" data-act="captain-choose">${artIcon('crown', 18, 'currentColor', 2)} ${esc(t('captainChoose'))}</button>
+        ${online.captainPickMode ? `<span class="muted small">${esc(t('captainPickHint'))}</span>` : ''}
+      </div>`
+    : '';
+
+  const targetControls = isHost
+    ? `<div class="lobby-target">
+        <span class="muted small">${esc(t('playerCountLabel'))}</span>
+        <div class="seg seg-sm">
+          ${[2, 3, 4, 5].map((count) => `<button class="seg-btn${target === count ? ' on' : ''}" data-act="target-count" data-n="${count}" aria-pressed="${target === count}">${count}</button>`).join('')}
+        </div>
+      </div>`
+    : '';
+
+  return `
+    <div class="pregame lobby-screen">
+      ${pregameTopbar(t('lobbyTitle'), `<button class="btn ghost small" data-act="help-open">${esc(t('howToPlay'))}</button>`)}
+      <main class="pregame-main lobby-main">
+        <section class="card2 lobby-card">
+          <div class="share-bar">
+            <span class="disp share-label">${esc(t('room'))}</span>
+            <b class="code-big">${esc(online.code)}</b>
+            <button class="btn" data-act="share-code">${artIcon('share', 18, 'currentColor', 2)} ${esc(t('shareRoomCode'))}</button>
+          </div>
+          <div class="lobby-head">
+            <h2>${esc(t('lobbyPlayers', { count: players.length, max: target }))}</h2>
+            <p class="muted">${esc(t('lobbyReadyHint'))}</p>
+          </div>
+          <ul class="li-list">${rows || `<li class="li muted">-</li>`}</ul>
+          ${targetControls}
+          ${captainControls}
+          ${!readyData ? `<p class="ready-note">${esc(t('readyUnsupported'))}</p>` : ''}
+          ${waitingForModal(staleList)}
+          <div class="mission-pick-box">
+            <div>
+              <span class="muted small">${esc(t('mission'))}</span>
+              <strong>${esc(t('missionTitle', { n: mission.id, title: mission.title }))}</strong>
+            </div>
+            ${isHost
+              ? `<button class="btn ghost" data-act="choose-mission">${esc(t('chooseMission'))}</button>`
+              : `<span class="muted small">${esc(t('hostPicksMission'))}</span>`}
+          </div>
+          <div class="start-box">
+            ${isHost
+              ? `<button class="btn primary big" data-act="start-online" ${canStart ? '' : 'disabled'}>${esc(startLabel)}</button>
+                 <p class="muted small">${esc(canStart ? t('lobbyStartHint') : tooMany ? t('roomFullText', { max: target }) : t('lobbyStartHint'))}</p>`
+              : `<p class="waiting-box">${esc(t('waitingHost'))}</p>`}
+          </div>
+          ${noticeBox()}
+          ${errorBox()}
+          <div class="lobby-foot">
+            <span class="conn ${online.connection === 'offline' ? 'offline' : 'online'}">${esc(t(online.connection === 'offline' ? 'offline' : 'connected'))}</span>
+            <span class="muted small">${esc(t('youAre', { name: me ? me.name : online.name }))}</span>
+            <button class="btn ghost small" data-act="leave-ask">${esc(t('leaveRoom'))}</button>
+          </div>
+        </section>
+        <aside class="card2 pregame-aside">
+          <h3>${esc(t('crew'))}</h3>
+          <p class="muted">${esc(t('lobbyCrewHint'))}</p>
+          <p class="muted small">${esc(t('lobbyMissionHint'))}</p>
+          ${staleList.length ? `<p class="waiting-box">${esc(t('staleNames', { names: staleList.map((player) => player.name).join(', ') }))}</p>` : ''}
+          <p class="trust-note small">${esc(t('trustNote'))}</p>
+        </aside>
+      </main>
+      ${toastMarkup()}
+      ${onlineStatusModal()}
     </div>`;
 }
 
@@ -6645,7 +7999,12 @@ function netErrorText(error) {
       case 'INVALID_NAME': return t('nameRequired');
       case 'INVALID_CODE': return t('codeInvalid');
       case 'P0002': return t('roomNotFound');
-      case '55000': return t('roomClosedJoin');
+      case '55000': {
+        const message = String(error.message || '');
+        if (/full/i.test(message)) return t('roomFullOrStarted');
+        if (/started/i.test(message)) return t('roomClosedJoin');
+        return message || t('roomClosedJoin');
+      }
       case 'NOT_FOUND': return t('roomGone');
       case 'STALE': return t('staleAction');
       case '23505': return t('codeFailed');
@@ -6676,7 +8035,14 @@ function beginOnline(options) {
     heartbeat: null,
     playerSig: '',
     staleSig: '',
+    staleSet: new Set(),
+    captainSeat: 0,
+    captainPickMode: false,
+    localReady: false,
+    readyMissing: false,
+    maxMissing: false,
   };
+  UI.missionId = 1;
   writeSession({ code: options.code, playerId: options.playerId, name: options.name });
   UI.screen = 'lobby';
   startPolling();
@@ -6709,8 +8075,10 @@ async function createOnlineRoom() {
       try {
         await createRoom(client, { code, hostId: playerId, hostName: name });
         UI.onlineName = name;
+        UI.pendingCode = code;
         UI.busyAction = null;
         beginOnline({ client, code, playerId, name });
+        await applyTargetPlayers(client, code, playerId);
         return;
       } catch (error) {
         // 23505 is the primary-key collision when a generated code is taken.
@@ -6723,6 +8091,21 @@ async function createOnlineRoom() {
   } finally {
     UI.busyAction = null;
     render();
+  }
+}
+
+// The optional max_players column keeps the lobby size in sync for everyone.
+// Older projects without the P10a SQL simply keep the default of five.
+async function applyTargetPlayers(client, code, playerId) {
+  const target = Number(UI.targetPlayers) || 4;
+  try {
+    await setRoomMaxPlayers(client, { code, playerId, maxPlayers: target });
+  } catch (error) {
+    if (error && (error.code === 'PGRST202' || error.status === 404)) {
+      if (UI.online) UI.online.maxMissing = true;
+      return;
+    }
+    // Any other error is non-fatal: the room still works with five seats.
   }
 }
 
@@ -6752,6 +8135,8 @@ async function joinOnlineRoom(session = null) {
   }
   UI.error = '';
   UI.notice = '';
+  UI.onlineCode = code;
+  UI.joinFocus = false;
   UI.busyAction = fromSession ? 'resume' : 'join';
   render();
   try {
@@ -6828,17 +8213,23 @@ function applySnapshot(snapshot, force = false) {
   const room = snapshot.room;
   const players = Array.isArray(snapshot.players) ? snapshot.players : [];
   const playerSig = players
-    .map((player) => `${player.id}:${player.seat}:${player.name}:${player.is_host}`)
+    .map((player) => `${player.id}:${player.seat}:${player.name}:${player.is_host}:${player.ready === true ? 1 : 0}`)
     .join('|');
-  const staleSig = stalePlayers(players, Date.now(), ONLINE_STALE_MS)
-    .map((player) => player.id)
-    .join('|');
+  const staleList = stalePlayers(players, Date.now(), ONLINE_STALE_MS);
+  const staleSig = staleList.map((player) => player.id).join('|');
+  const staleSet = new Set(staleList.map((player) => player.id));
   const changed = force
     || online.seq !== room.action_seq
     || online.status !== room.status
     || online.playerSig !== playerSig
     || online.staleSig !== staleSig
+    || online.maxPlayers !== Number(room.max_players)
     || (online.room && online.room.host_id) !== room.host_id;
+
+  const previousStale = online.staleSet || new Set();
+  const returned = players.filter((player) => previousStale.has(player.id) && !staleSet.has(player.id));
+  online.staleSet = staleSet;
+  online.maxPlayers = Number(room.max_players) || null;
 
   online.room = room;
   online.players = players;
@@ -6848,10 +8239,18 @@ function applySnapshot(snapshot, force = false) {
   online.staleSig = staleSig;
   online.isHost = room.host_id === online.playerId;
   online.connection = 'online';
+  if (Number.isInteger(room.mission_id)) UI.missionId = room.mission_id;
+  if (online.isHost && Number.isInteger(Number(room.max_players))) {
+    UI.targetPlayers = Number(room.max_players);
+  }
+  if (!players.some((player) => player.seat === online.captainSeat)) online.captainSeat = 0;
+  if (returned.length) {
+    showToast(t('playerBackOnline', { name: returned.map((player) => player.name).join(', ') }));
+  }
 
   if (room.status === 'lobby' || !room.state) {
     UI.state = null;
-    UI.screen = 'lobby';
+    if (UI.screen !== 'mission') UI.screen = 'lobby';
     online.stateSeq = -1;
   } else {
     const stateChanged = online.stateSeq !== room.action_seq;
@@ -6866,6 +8265,7 @@ function applySnapshot(snapshot, force = false) {
       UI.inspect = null;
       UI.coffeeOpen = false;
       UI.soloConfirm = null;
+      online.captainPickMode = false;
     }
   }
   if (changed) render();
@@ -6928,11 +8328,21 @@ async function startOnlineGame() {
   const online = UI.online;
   if (!online || !online.isHost) return;
   const seats = (online.players || []).slice().sort((a, b) => a.seat - b.seat);
+  const target = onlineTargetPlayers();
   if (seats.length < MIN_PLAYERS) {
     UI.error = t('needTwo');
     render();
     return;
   }
+  if (seats.length > target) {
+    UI.error = t('roomFullText', { max: target });
+    render();
+    return;
+  }
+  const captainSeat = seats.some((player) => player.seat === online.captainSeat)
+    ? online.captainSeat
+    : seats[0].seat;
+  const captainIndex = Math.max(0, seats.findIndex((player) => player.seat === captainSeat));
   const seed = (Date.now() ^ Math.floor(Math.random() * 0xffffffff)) >>> 0;
   let state;
   try {
@@ -6940,7 +8350,7 @@ async function startOnlineGame() {
       missionId: UI.missionId,
       players: seats.map((player) => ({ id: player.id, name: player.name })),
       seed: seed || 1,
-      captainIndex: 0,
+      captainIndex,
     });
   } catch (error) {
     UI.error = error.message || String(error);
@@ -6961,6 +8371,7 @@ async function startOnlineGame() {
     online.busy = false;
     online.seq = 0;
     online.stateSeq = 0;
+    online.captainPickMode = false;
     UI.state = state;
     UI.screen = 'game';
     UI.draft = null;
@@ -6992,6 +8403,90 @@ async function changeOnlineStatus(status) {
     UI.error = netErrorText(error);
     render();
   }
+}
+
+// Lobby ready toggle. Without the optional P10a SQL the room has no ready
+// column, so the click only updates the local indicator and a note explains
+// that connected players count as ready.
+async function toggleReadyOnline() {
+  const online = UI.online;
+  if (!online) return;
+  const me = (online.players || []).find((player) => player.id === online.playerId);
+  const next = !(me && me.ready === true);
+  online.localReady = next;
+  if (!onlineReadySupport()) {
+    render();
+    return;
+  }
+  try {
+    await setPlayerReady(online.client, {
+      code: online.code,
+      playerId: online.playerId,
+      ready: next,
+    });
+    await refreshOnline(true);
+  } catch (error) {
+    if (error && (error.code === 'PGRST202' || error.status === 404)) {
+      online.readyMissing = true;
+      showToast(t('readyUnsupported'));
+      render();
+      return;
+    }
+    UI.error = netErrorText(error);
+    render();
+  }
+}
+
+async function setTargetPlayersOnline(count) {
+  const value = Math.min(MAX_PLAYERS, Math.max(MIN_PLAYERS, Number(count) || 4));
+  UI.targetPlayers = value;
+  const online = UI.online;
+  if (!online || !online.isHost) {
+    render();
+    return;
+  }
+  try {
+    await setRoomMaxPlayers(online.client, {
+      code: online.code,
+      playerId: online.playerId,
+      maxPlayers: value,
+    });
+    await refreshOnline(true);
+  } catch (error) {
+    if (error && (error.code === 'PGRST202' || error.status === 404)) {
+      online.maxMissing = true;
+      render();
+      return;
+    }
+    UI.error = netErrorText(error);
+    render();
+  }
+}
+
+function captainRandomOnline() {
+  const online = UI.online;
+  if (!online) return;
+  const players = onlinePlayersSorted();
+  if (!players.length) return;
+  const pick = players[Math.floor(Math.random() * players.length)];
+  online.captainSeat = pick.seat;
+  online.captainPickMode = false;
+  render();
+}
+
+function captainChooseOnline() {
+  const online = UI.online;
+  if (!online) return;
+  online.captainPickMode = !online.captainPickMode;
+  render();
+}
+
+function captainSetOnline(seat) {
+  const online = UI.online;
+  if (!online || !online.isHost) return;
+  online.captainSeat = Number(seat) || 0;
+  online.captainPickMode = false;
+  render();
 }
 
 async function resetOnlineRoom() {
@@ -7234,7 +8729,7 @@ function onDraftConfirm() {
   });
 }
 
-function onClick(event) {
+async function onClick(event) {
   const el = event.target.closest('[data-act]');
   if (!el) return;
   const act = el.dataset.act;
@@ -7273,13 +8768,56 @@ function onClick(event) {
       break;
     case 'play-online':
       UI.mode = 'local';
-      UI.screen = 'online';
+      UI.screen = 'join';
+      UI.joinFocus = true;
       UI.soloConfirm = null;
       UI.error = '';
       UI.notice = '';
       if (!UI.onlineName) UI.onlineName = UI.names[0] || '';
       render();
       break;
+    case 'create-open':
+      UI.mode = 'local';
+      UI.screen = 'create';
+      UI.pendingCode = makeRoomCode();
+      UI.soloConfirm = null;
+      UI.error = '';
+      UI.notice = '';
+      if (!UI.onlineName) UI.onlineName = UI.names[0] || '';
+      render();
+      break;
+    case 'join-open':
+      UI.mode = 'local';
+      UI.screen = 'join';
+      UI.joinFocus = true;
+      UI.soloConfirm = null;
+      UI.error = '';
+      UI.notice = '';
+      if (!UI.onlineName) UI.onlineName = UI.names[0] || '';
+      render();
+      break;
+    case 'target-count':
+      setTargetPlayersOnline(Number(el.dataset.n));
+      break;
+    case 'copy-pending': {
+      const code = UI.pendingCode || '';
+      const ok = await copyText(code);
+      showToast(ok ? t('copied') : t('copyManual', { code }));
+      render();
+      break;
+    }
+    case 'share-pending': {
+      const code = UI.pendingCode || '';
+      const text = t('shareText', { code });
+      if (navigator.share) {
+        navigator.share({ title: t('appTitle'), text }).catch(() => {});
+      } else {
+        const ok = await copyText(code);
+        showToast(ok ? t('copied') : t('copyManual', { code }));
+      }
+      render();
+      break;
+    }
     case 'create-room':
       createOnlineRoom();
       break;
@@ -7291,6 +8829,40 @@ function onClick(event) {
       break;
     case 'start-online':
       startOnlineGame();
+      break;
+    case 'ready-toggle':
+      toggleReadyOnline();
+      break;
+    case 'captain-random':
+      captainRandomOnline();
+      break;
+    case 'captain-choose':
+      captainChooseOnline();
+      break;
+    case 'captain-set':
+      captainSetOnline(el.dataset.seat);
+      break;
+    case 'choose-mission':
+      UI.screen = 'mission';
+      UI.error = '';
+      render();
+      break;
+    case 'mission-pick':
+      UI.screen = 'lobby';
+      showToast(t('missionPicked', { n: UI.missionId }));
+      render();
+      break;
+    case 'lobby-back':
+      UI.screen = 'lobby';
+      render();
+      break;
+    case 'retry-online':
+      UI.error = '';
+      refreshOnline(true);
+      break;
+    case 'error-dismiss':
+      UI.error = '';
+      render();
       break;
     case 'leave-room':
       leaveOnline();
@@ -7748,6 +9320,9 @@ function helpSheet() {
             <p>${esc(t('helpDetector'))}</p>
             <p class="help-caption">${esc(t('helpDetectorCaption'))}</p>`)}
 
+          ${block('helpCaptainTitle', `
+            <p>${esc(t('helpCaptain'))}</p>
+            <ul class="help-list">${[1,2,3,4,5].map((n) => `<li>${esc(t('helpCaptain' + n))}</li>`).join('')}</ul>`)}
           ${block('helpOrderTitle', `
             <p>${esc(t('helpOrder'))}</p>
             <p class="help-caption">${esc(t('helpOrderCaption'))}</p>`)}
@@ -8130,8 +9705,10 @@ function gameScreen(view) {
             </div>
             ${boardCenter(view)}
           </div>
-          <div class="action-dock">${actionPanel(view)}</div>
-          <div class="me-seat">${playerPanel(view, view.players[me], me)}</div>
+          <div class="bottom-dock">
+            <div class="action-dock">${actionPanel(view)}</div>
+            <div class="me-seat">${playerPanel(view, view.players[me], me)}</div>
+          </div>
         </div>
         <aside class="side">
           ${logPanel(view)}
@@ -8181,8 +9758,16 @@ function render() {
     paint(homeScreen() + helpSheet());
     return;
   }
-  if (UI.screen === 'online') {
-    paint(onlineEntryScreen() + helpSheet());
+  if (UI.screen === 'create') {
+    paint(createRoomScreen() + helpSheet() + toastMarkup());
+    return;
+  }
+  if (UI.screen === 'join' || UI.screen === 'online') {
+    paint(joinRoomScreen() + helpSheet());
+    return;
+  }
+  if (UI.screen === 'mission') {
+    paint(missionPickerScreen() + helpSheet() + toastMarkup());
     return;
   }
   if (UI.screen === 'lobby') {
@@ -8190,7 +9775,7 @@ function render() {
     return;
   }
   if (UI.screen === 'setup' || !UI.state) {
-    paint(setupScreen() + helpSheet());
+    paint(setupScreen() + helpSheet() + toastMarkup());
     return;
   }
   const view = openView(UI.state);
@@ -8204,7 +9789,7 @@ function render() {
     : '';
   UI.selectedText = selected;
   if (!curtainNeeded(view)) collectBanners(view);
-  paint(gameScreen(view) + bannerStack() + leaveModal() + helpSheet());
+  paint(gameScreen(view) + bannerStack() + leaveModal() + helpSheet() + toastMarkup() + onlineStatusModal());
   if (UI.draft && UI.draft.targetId && window.innerWidth <= 760 && UI.draftScrolled !== UI.draft.targetId) {
     UI.draftScrolled = UI.draft.targetId;
     const seat = root.querySelector('.player.is-target');
@@ -8240,9 +9825,13 @@ function boot() {
   root.addEventListener('keydown', (event) => {
     if (event.key !== 'Enter') return;
     if (event.target.closest('[data-online-code]')) joinOnlineRoom();
-    else if (event.target.closest('[data-online-name]') && UI.screen === 'online') {
-      if (UI.onlineCode) joinOnlineRoom();
-      else createOnlineRoom();
+    else if (event.target.closest('[data-online-name]')) {
+      if (UI.screen === 'join' && UI.onlineCode) joinOnlineRoom();
+      else if (UI.screen === 'create') createOnlineRoom();
+      else if (UI.screen === 'online') {
+        if (UI.onlineCode) joinOnlineRoom();
+        else createOnlineRoom();
+      }
     }
   });
   document.addEventListener('keydown', (event) => {

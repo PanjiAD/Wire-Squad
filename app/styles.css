@@ -2461,3 +2461,112 @@ html.reduced-motion .tray-slot.stamp svg, html.reduced-motion .tray-slot.stamp::
 .reduced-motion .spin,
 .reduced-motion .tg::after { animation: none; transition: none; }
 
+
+
+/* ======================================================= P6b phone layout
+   Phone portrait: compact header, opponents strip, compact board, and a
+   bottom dock that pins the viewer's own stand above the action bar. The
+   dock wrapper does not exist on desktop (display: contents). */
+.bottom-dock { display: contents; }
+@media (max-width: 760px) {
+  /* header: one line of chips, one scrolling row of small buttons */
+  .game .topbar { padding: 6px 10px; gap: 4px 8px; border-bottom-width: 4px; }
+  .game .topbar .logo { font-size: 18px; }
+  .game .topbar .logo-sub { display: none; }
+  .game .topbar-chips { flex: 1 1 auto; flex-wrap: nowrap; overflow: hidden; gap: 4px; justify-content: flex-end; }
+  .game .topbar-chips span:nth-child(2), .game .topbar-chips span:nth-child(4) { display: none; }
+  .game .topbar-right { flex: 1 1 100%; flex-wrap: nowrap; overflow-x: auto; gap: 6px; padding-bottom: 2px; scrollbar-width: none; }
+  .game .topbar-right::-webkit-scrollbar { display: none; }
+  .game .topbar-right .btn { flex: 0 0 auto; min-height: 34px; padding: 4px 10px; font-size: 13px; }
+  .game .table { padding: 6px 8px 16px; }
+
+  /* opponents strip */
+  .opponents .player:not(.expanded) { flex-basis: min(150px, 42vw); padding: 6px 8px; }
+  .opponents .player:not(.expanded) .wire-count { font-size: 11px; padding: 1px 7px; }
+  .opponents .player:not(.expanded) .player-name { font-size: 14px; }
+  .opponents .player:not(.expanded) .avatar { width: 28px; height: 28px; }
+
+  /* compact board */
+  .board-center { padding: 8px; gap: 8px; }
+  .board-captain { font-size: 12px; padding: 3px 12px; }
+  .board-slots-row .eq-slot { padding: 3px; }
+  .board-slots-row .eq-slot .eq-art svg { max-height: 40px; }
+  .board-track { padding: 4px; gap: 3px; }
+  .tk-cell { min-height: 30px; }
+  .tray-grid { padding: 4px; gap: 3px; }
+  .tray-info .tray-grid { grid-template-columns: repeat(14, minmax(0, 1fr)); }
+  .tray-valid .tray-grid { grid-template-columns: repeat(12, minmax(0, 1fr)); }
+  .tray-slot, .tray-valid .tray-slot { min-height: 22px; border-width: 1px; }
+  .tray-slot .ghost-no { font-size: 11px; }
+  .board-dial { --dial-size: 76px; }
+  .board-dial .dial-svg-box { flex-basis: 76px; width: 76px; height: 76px; }
+
+  /* bottom dock: own stand above the action bar */
+  .bottom-dock {
+    display: flex; flex-direction: column; order: 3;
+    position: sticky; bottom: 0; z-index: 25;
+    margin: 0 -8px -16px; background: var(--cream);
+    border-top: 4px solid var(--ink); box-shadow: 0 -4px 0 rgba(30,31,36,.18);
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+  }
+  .bottom-dock .me-seat { order: 0; }
+  .bottom-dock .action-dock { order: 1; position: static; margin: 0; padding: 4px 8px 8px; background: none; }
+  .me-seat .player { border-width: 0; border-radius: 0; box-shadow: none; padding: 6px 8px 0; background: transparent; }
+  .me-seat .badges { display: none; }
+  .me-seat .player-head { gap: 6px; padding: 0; }
+  .me-seat .player-name { font-size: 15px; }
+  .me-seat .avatar { width: 26px; height: 26px; }
+  .me-seat .personal-pill { font-size: 10px; padding: 1px 6px; }
+  .me-seat .stands { gap: 2px; }
+  .me-seat .stand { --lab: 10px; --ww: min(23px, max(9px, calc((100cqw - var(--lab) - 4px * var(--u, 8)) / var(--u, 8)))); }
+  .me-seat .stand-label { display: none; }
+  .me-seat .stand .rk-row { min-height: 0; }
+  .me-seat .rack { padding: 0 4px; }
+  .me-seat .stand .rk-lip { height: 8px; }
+  .me-seat .cutstrip-live { margin-top: 3px; min-height: 16px; padding: 2px 6px; }
+
+  /* action bar: header chip, one row of big buttons, one row of equipment chips */
+  .bottom-dock .action-panel:not(.draft):not(.pending):not(.equip-bar) { border-width: 0; box-shadow: none; padding: 0; background: none; max-height: none; overflow: visible; display: block; }
+  .bottom-dock .action-panel:not(.draft):not(.pending):not(.equip-bar) > .muted,
+  .bottom-dock .action-panel:not(.draft):not(.pending):not(.equip-bar) > h4,
+  .bottom-dock .action-panel:not(.draft):not(.pending):not(.equip-bar) .muted.small { display: none; }
+  .bottom-dock .action-panel:not(.draft):not(.pending):not(.equip-bar) .action-head { display: none; }
+  .bottom-dock .action-buttons { flex-wrap: nowrap; gap: 6px; }
+  .bottom-dock .action-buttons .mb, .bottom-dock .action-buttons .btn { flex: 1 1 0; min-width: 0; min-height: 48px; padding: 4px 6px; font-size: 14px; }
+  .bottom-dock .equip-row { display: flex; flex-wrap: nowrap; overflow-x: auto; gap: 6px; margin-top: 6px; scrollbar-width: none; }
+  .bottom-dock .equip-row::-webkit-scrollbar { display: none; }
+  .bottom-dock .equip-card { flex: 0 0 auto; flex-direction: row; align-items: center; gap: 6px; min-height: 38px; padding: 4px 10px; }
+  .bottom-dock .equip-card .equip-state { font-size: 9px; }
+  .me-seat .stand .wire:not(.cut) { width: auto; height: auto; }
+  /* sheets: the base rule wraps flex items, which turned the 44vh column into several columns */
+  .bottom-dock .action-panel.draft, .bottom-dock .action-panel.pending, .bottom-dock .action-panel.equip-bar { flex-wrap: nowrap; display: flex; flex-direction: column; align-items: stretch; }
+
+  /* opponents stay readable when collapsed: a mini rack (tile backs, tokens) instead of hiding the stand */
+  .opponents .player:not(.expanded) { flex-basis: min(200px, 58vw); }
+  .opponents .player:not(.expanded) .stands { display: flex; gap: 3px; pointer-events: none; }
+  .opponents .player:not(.expanded) .stand { --lab: 8px; --ww: min(12px, max(7px, calc((100cqw - var(--lab) - 2px * var(--u, 8)) / var(--u, 8)))); }
+  .opponents .player:not(.expanded) .stand-label, .opponents .player:not(.expanded) .cutstrip-live { display: none; }
+  .opponents .player:not(.expanded) .stand .rk-row { min-height: 0; gap: 2px; }
+  .opponents .player:not(.expanded) .stand .rack { padding: 0 2px; }
+  .opponents .player:not(.expanded) .stand .rk-lip { height: 5px; border-width: 1.5px; }
+  .opponents .player:not(.expanded) .stand .wire { width: auto; height: auto; }
+  .opponents .player:not(.expanded) .stands.multi { padding-left: 8px; }
+  .opponents .player:not(.expanded) .stands.multi::before { width: 4px; border-width: 1.5px; }
+  .opponents .player:not(.expanded) .player-head { gap: 5px; flex-wrap: wrap; }
+
+  .opponents .player:not(.expanded) .player-head { flex-wrap: nowrap; }
+  .opponents .player:not(.expanded) .seat-tag { display: none; }
+  .opponents .player:not(.expanded) .wire-count { margin-left: auto; font-size: 10px; padding: 1px 6px; white-space: nowrap; }
+  .opponents .player:not(.expanded) .player-name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; min-width: 0; }
+  /* expanded opponent: wire width 26px, so two stands do not fill the screen */
+  .opponents .player.expanded .stand { --ww: min(26px, max(9px, calc((100cqw - var(--lab) - 4px * var(--u, 8)) / var(--u, 8)))); }
+  .opponents .player.expanded .stand .rk-row { min-height: 0; }
+  .opponents .player.expanded .stand .wire:not(.cut) { width: auto; height: auto; }
+  .opponents .player.expanded .stands { gap: 4px; }
+
+  .me-seat .stands.multi .stand { --ww: min(17px, max(9px, calc((100cqw - var(--lab) - 4px * var(--u, 8)) / var(--u, 8)))); }
+}
+/* landscape phones are too short to pin anything: the dock scrolls with the page */
+@media (max-width: 960px) and (max-height: 500px) {
+  .bottom-dock { position: static; margin-bottom: 0; }
+}
