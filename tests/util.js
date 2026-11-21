@@ -212,7 +212,8 @@ export function checkInvariants(state) {
   }
   for (const card of state.equipment) {
     if (card.used && card.usable) throw new Error('used card still usable');
-    if (!card.used && card.usable !== (cutCount(state, card.number) >= 2)) {
+    const needs = card.tape ? [card.number, card.tape] : [card.number];
+    if (!card.used && card.usable !== needs.every((value) => cutCount(state, value) >= 2)) {
       throw new Error(`card ${card.number} unlock mismatch`);
     }
   }

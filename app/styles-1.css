@@ -2908,3 +2908,26 @@ html.colorblind .wire.yellow::after { background: radial-gradient(rgba(30,31,36,
 .seq-strip.compact .seq-card b { font-size: 18px; }
 .seq-strip.compact .seq-card small { font-size: 10px; }
 .value-btn.seq-locked { opacity: .45; border-style: dashed; cursor: not-allowed; }
+
+/* Missions 10-46: rule strips, oxygen, timer, snip, forced final cut */
+.seq-strip.special { margin-top: 6px; }
+.seq-strip.special .seq-title em { font-style: normal; font-weight: 600; opacity: .75; margin-left: 4px; }
+.ox-row { display: inline-flex; flex-wrap: wrap; gap: 4px; align-items: center; }
+.ox-dot { width: 16px; height: 16px; border-radius: 50%; border: 2px solid #1E1F24; background: transparent; display: inline-block; opacity: .45; }
+.ox-dot.full { background: #7CC8F0; opacity: 1; box-shadow: inset -2px -2px 0 rgba(30,31,36,.25); }
+.timer-clock { font-family: var(--bb-font-display); font-size: 26px; font-weight: 800; letter-spacing: .04em; font-variant-numeric: tabular-nums; }
+.seq-strip.timer.hurry { background: #f6c9c2; border-color: #b4321f; }
+.seq-strip.timer.hurry .timer-clock { color: #b4321f; animation: timer-pulse 1s steps(2) infinite; }
+@keyframes timer-pulse { 50% { opacity: .55; } }
+.ox-cost { font-style: normal; font-size: 10px; font-weight: 800; margin-left: 4px; padding: 0 4px; border-radius: 8px; background: #7CC8F0; color: #1E1F24; vertical-align: super; }
+.value-btn:disabled .ox-cost { opacity: .5; }
+.turn-banner.open { background: #F2C230; color: #1E1F24; }
+.snip-btn { width: 100%; min-height: 64px; font-size: 22px; }
+.snip-target { margin: 4px; }
+.open-turn .target-row { flex-wrap: wrap; }
+.snip-screen .curtain-card { gap: 12px; }
+.agent .picked { font-weight: 700; margin: 6px 0; }
+.eq-slot { position: relative; }
+.eq-tape { position: absolute; left: 2px; top: 2px; min-width: 18px; height: 18px; line-height: 18px; text-align: center; font-size: 11px; font-weight: 800; border-radius: 4px; background: #F2C230; color: #1E1F24; border: 2px solid #1E1F24; }
+.tape-note { font-style: normal; font-weight: 600; opacity: .8; }
+.mission-card .mlock { margin-left: auto; align-self: center; color: #4a4c57; }

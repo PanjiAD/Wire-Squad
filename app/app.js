@@ -89,6 +89,8 @@ const UI = {
   retryKind: null,
   equip: null,
   equipNeed: null,
+  agent: null,
+  timeUpSentFor: null,
   logOpen: false,
   phoneSheet: null,
   missionInfo: false,
@@ -414,6 +416,7 @@ function meId(view) {
 }
 
 function canAct(view) {
+  if (view.openTurn) return false;
   return !isOnline() || view.you === view.activeId;
 }
 
@@ -525,8 +528,26 @@ function missionSummary(mission) {
   return parts.join(' - ');
 }
 
-function lockedMissionIds() {
-  return [9, 10, 11, 12].filter((id) => !MISSIONS.some((mission) => mission.id === id));
+// Missions we have identified from the campaign but not built yet. They stay
+// in the picker, locked, so the roadmap is visible.
+const KNOWN_LOCKED = [
+  { id: 13, title: 'Red Alert' },
+  { id: 14, title: '' },
+  { id: 15, title: 'Cyrillic Station' },
+  { id: 17, title: 'Red Herrings' },
+  { id: 18, title: '' },
+  { id: 19, title: 'Belly of the Beast' },
+  { id: 21, title: '' },
+  { id: 29, title: 'The Guessing Game' },
+  { id: 30, title: '' },
+  { id: 32, title: '' },
+  { id: 43, title: 'Nano, the Robot' },
+  { id: 45, title: 'Seeking Volunteers' },
+  { id: 47, title: 'Calculate the Odds' },
+];
+
+function lockedMissionList() {
+  return KNOWN_LOCKED.filter((entry) => !MISSIONS.some((mission) => mission.id === entry.id));
 }
 
 function missionList() {
@@ -545,13 +566,14 @@ function missionList() {
         </span>
         ${flags}
       </button>`;
-  }).join('') + lockedMissionIds().map((id) => `
-      <div class="mission-card locked" aria-disabled="true">
-        <span class="mission-no">${id}</span>
+  }).join('') + lockedMissionList().map((entry) => `
+      <div class="mission-card locked" aria-disabled="true" title="${esc(t('lockedKnown'))}">
+        <span class="mission-no">${entry.id}</span>
         <span class="mission-body">
-          <strong>#${id}</strong>
+          <strong>${esc(entry.title || `#${entry.id}`)}</strong>
           <span class="mission-meta">${esc(t('comingLater'))}</span>
         </span>
+        <span class="mlock">${artIcon('lock', 16, 'currentColor')}</span>
       </div>`).join('');
 }
 
@@ -720,6 +742,102 @@ function sequenceStrip(view, compact = false) {
     </div>`;
 }
 
+// ---------------------------------------------------------------------------
+// Missions 10-46: rule strips (dangerous value, final value, oxygen, timer)
+
+const TIMER_MEMORY = new Map();
+
+function timerStartFor(view) {
+  const key = `wireSquad.timer.${view.gameId}`;
+  if (TIMER_MEMORY.has(key)) return TIMER_MEMORY.get(key);
+  let start = 0;
+  try { start = Number(window.localStorage.getItem(key)) || 0; } catch (error) { start = 0; }
+  if (!start) {
+    start = Date.now();
+    try { window.localStorage.setItem(key, String(start)); } catch (error) { /* private mode */ }
+  }
+  TIMER_MEMORY.set(key, start);
+  return start;
+}
+
+function timerRemaining(view) {
+  const minutes = view.mission && view.mission.timerMinutes;
+  if (!minutes || view.phase !== 'playing') return null;
+  return minutes * 60000 - (Date.now() - timerStartFor(view));
+}
+
+function clockText(ms) {
+  const total = Math.max(0, Math.ceil(ms / 1000));
+  return `${Math.floor(total / 60)}:${String(total % 60).padStart(2, '0')}`;
+}
+
+function stripCard(title, big, note, locked) {
+  return `<div class="seq-strip special">
+      <span class="seq-title">${esc(title)}</span>
+      <span class="seq-row"><span class="seq-card${locked ? ' locked' : ' open'}">
+        <b>${big}</b><small>${locked ? '\u{1F512} ' : ''}${esc(note)}</small>
+      </span></span>
+    </div>`;
+}
+
+function missionStrip(view, compact = false) {
+  const parts = [];
+  if (view.deadlyValue) {
+    parts.push(stripCard(t('deadlyTitle'), view.deadlyValue, t('deadlyNote'), true));
+  }
+  if (view.finalValue) {
+    const locked = (view.locked || []).includes(view.finalValue);
+    parts.push(stripCard(t('finalTitle'), view.finalValue, locked ? t('seqLocked') : t('finalOpen'), locked));
+  }
+  if (view.oxygen) {
+    const dots = Array.from({ length: view.oxygen.total }, (_, index) => (
+      `<i class="ox-dot${index < view.oxygen.supply ? ' full' : ''}"></i>`
+    )).join('');
+    parts.push(`<div class="seq-strip special oxygen${compact ? ' compact' : ''}" role="group" aria-label="${esc(t('oxygenTitle'))}">
+        <span class="seq-title">${esc(t('oxygenTitle'))} <em>${esc(t('oxygenLeft', { have: view.oxygen.supply, total: view.oxygen.total }))}</em></span>
+        <span class="ox-row">${dots}</span>
+      </div>`);
+  }
+  const remaining = timerRemaining(view);
+  if (remaining !== null) {
+    parts.push(`<div class="seq-strip special timer${compact ? ' compact' : ''}${remaining < 60000 ? ' hurry' : ''}" role="timer" aria-label="${esc(t('timerTitle'))}">
+        <span class="seq-title">${esc(t('timerTitle'))}</span>
+        <span class="timer-clock" data-timer>${esc(clockText(remaining))}</span>
+      </div>`);
+  }
+  return parts.join('');
+}
+
+function tickTimer() {
+  if (UI.screen !== 'game' || !UI.state || UI.state.phase !== 'playing') return;
+  const view = UI.view || openView(UI.state);
+  const remaining = timerRemaining(view);
+  if (remaining === null) return;
+  document.querySelectorAll('[data-timer]').forEach((node) => {
+    node.textContent = clockText(remaining);
+    const box = node.closest('.timer');
+    if (box) box.classList.toggle('hurry', remaining < 60000);
+  });
+  if (remaining <= 0 && UI.timeUpSentFor !== view.gameId) {
+    UI.timeUpSentFor = view.gameId;
+    apply({ type: 'timeUp', playerId: UI.state.players[0].id });
+  }
+}
+
+// Mission 46: hands that hold only the final wires must point at them all.
+function holdsOnlyFinalView(view) {
+  if (!view.finalValue) return false;
+  const seat = meSeat(view);
+  const live = handWiresOf(view, seat).filter((wire) => !wire.cut && !wire.revealed);
+  return live.length > 0 && live.every((wire) => wire.kind === 'blue' && wire.value === view.finalValue);
+}
+
+function finalWiresLeft(view) {
+  return allWires(view).filter(
+    (wire) => !wire.cut && !wire.revealed && wire.kind === 'blue' && wire.value === view.finalValue,
+  ).length;
+}
+
 function validationStrip(view) {
   // Green tray, 12 slots, one per number. A finished number gets its glass disc.
   const stamped = UI.stamp || new Set();
@@ -863,6 +981,7 @@ function wireTile(view, wire, options) {
   if (draft && draft.wireIds.includes(wire.id)) classes.push('selected');
   if (state.phase === 'setup' && UI.setupPick === wire.id) classes.push('selected');
   if (UI.inspect === wire.id) classes.push('inspected');
+  if (UI.agent && UI.agent.ids.includes(wire.id)) classes.push('selected');
   if (UI.equip && UI.equipNeed) {
     if (UI.equipNeed.wires.has(wire.id)) classes.push('candidate');
     if (UI.equip.picks.includes(wire.id)) classes.push('selected');
@@ -942,7 +1061,18 @@ function logText(view, entry) {
     case 'chooseCut': return t('logChooseCut', { name: who(entry.player) });
     case 'soloCut': return t('logSolo', { name: who(entry.player) });
     case 'revealRed': return t('logReveal', { name: who(entry.player), count: entry.count });
-    case 'lost': return entry.reason === 'red' ? t('logLostRed') : entry.reason === 'locked' ? t('logLostLocked') : t('logLostDial');
+    case 'lost': {
+      if (entry.reason === 'red') return t('logLostRed');
+      if (entry.reason === 'locked') return t('logLostLocked');
+      if (entry.reason === 'time') return t('logLostTime');
+      if (entry.reason === 'secret') return t('logLostSecret');
+      return t('logLostDial');
+    }
+    case 'snip': return t('logSnip', { name: who(entry.player) });
+    case 'turnOpen': return t('logTurnOpen');
+    case 'passTurn': return t('logPass', { name: who(entry.player) });
+    case 'secretCut': return t('logSecretCut', { name: who(entry.player) });
+    case 'secretCutSuccess': return t('logSecretCutOk');
     case 'won': return t('logWon');
     case 'equipmentUnlocked': return t('logUnlocked', { card: entry.card });
     case 'validation': return t('logValidation', { value: entry.value });
@@ -1029,9 +1159,10 @@ function missionGrid() {
       <span class="mm">${esc(mission.lesson || '')}</span>
     </button>`;
   }).join('');
-  const locked = lockedMissionIds().map((id) => `
-    <div class="mtile locked" aria-disabled="true">
-      <span class="tn">#${id}</span>
+  const locked = lockedMissionList().map((entry) => `
+    <div class="mtile locked" aria-disabled="true" title="${esc(t('lockedKnown'))}">
+      <span class="tn">#${entry.id}</span>
+      ${entry.title ? `<span class="mt">${esc(entry.title)}</span>` : ''}
       <span class="mm">${esc(t('comingLater'))}</span>
       <span class="mlock">${artIcon('lock', 15, 'currentColor')}</span>
     </div>`).join('');
@@ -1491,14 +1622,16 @@ function draftPanel(view) {
     .map((player) => `<button class="target-btn${draft.targetId === player.id ? ' selected' : ''}" data-act="draft-target" data-id="${player.id}">${esc(player.name)}</button>`)
     .join('');
 
-  const lockedNow = view.sequence ? view.sequence.locked : [];
+  const lockedNow = view.locked || (view.sequence ? view.sequence.locked : []);
   const valueButtons = values.map((value) => {
     const isLocked = lockedNow.includes(value);
-    const disabled = (Boolean(draft.detector) && value === 'yellow') || isLocked;
+    const cost = view.oxygen ? (value === 'yellow' || value <= 4 ? 1 : value <= 8 ? 2 : 3) : 0;
+    const noAir = view.oxygen && cost > view.oxygen.supply;
+    const disabled = (Boolean(draft.detector) && value === 'yellow') || isLocked || Boolean(noAir);
     const selected = draft.values.includes(value);
     // P10b value picker: 34 px chips, selected turns yellow, yellow value is a
     // small square so it can never read as a number.
-    return `<button class="value-btn chipv${selected ? ' on' : ''}${value === 'yellow' ? ' yellow' : ''}${isLocked ? ' seq-locked' : ''}" data-act="draft-value" data-v="${value}" ${disabled ? 'disabled' : ''} ${isLocked ? `title="${esc(t('seqLocked'))}"` : ''}>${value === 'yellow' ? '<span class="ysq" aria-hidden="true"></span>' : esc(valueLabel(value))}</button>`;
+    return `<button class="value-btn chipv${selected ? ' on' : ''}${value === 'yellow' ? ' yellow' : ''}${isLocked ? ' seq-locked' : ''}" data-act="draft-value" data-v="${value}" ${disabled ? 'disabled' : ''} ${isLocked ? `title="${esc(t('seqLocked'))}"` : ''}>${value === 'yellow' ? '<span class="ysq" aria-hidden="true"></span>' : esc(valueLabel(value))}${cost ? `<i class="ox-cost" title="${esc(t('oxygenCost', { n: cost }))}">${cost}</i>` : ''}</button>`;
   }).join('');
 
   const personal = view.players[seatOf(view, actorId)].personal;
@@ -1586,7 +1719,7 @@ function normalActions(view) {
     const status = card.used ? t('used') : card.usable ? t('ready') : t('locked');
     return `<button class="equip-card${card.usable && !card.used ? ' ready' : ''}${card.used ? ' used' : ''}" data-act="equip" data-card="${card.number}">
       <span class="equip-no">#${card.number}</span>
-      <span class="equip-name">${esc(card.name)}</span>
+      <span class="equip-name">${esc(card.name)}${card.tape ? ` <em class="tape-note">(${esc(t('tapeNeeds', { n: card.tape }))})</em>` : ''}</span>
       <span class="equip-state">${esc(status)}</span>
     </button>`;
   }).join('');
@@ -1609,6 +1742,13 @@ function normalActions(view) {
     ? `<button class="mb sel${canCoffee ? '' : ' off'}" data-act="coffee" ${canCoffee ? '' : 'disabled'} title="${esc(t('coffeeMugHint'))}">${esc(t('coffeeMug'))}</button>`
     : '';
 
+  const passButton = view.oxygen
+    ? `<button class="mb" data-act="pass-turn" title="${esc(t('passTurnHint'))}">${esc(t('passTurn'))}</button>`
+    : '';
+  const forcedFinal = holdsOnlyFinalView(view);
+  const agentButton = forcedFinal
+    ? `<button class="mb sel" data-act="agent-start" title="${esc(t('agentHint'))}">${esc(t('agentStart'))}</button>`
+    : '';
   const soloIdle = solo.length
     ? ''
     : `<button class="btn ghost" disabled title="${esc(t('soloCutHint'))}">${esc(t('soloCut'))}</button>`;
@@ -1628,6 +1768,8 @@ function normalActions(view) {
       ` data-kind="${action.kind}" data-v="${action.value ?? ''}" data-count="${count}"`));
   });
   if (reveal) moreRows.push(moreRow('reveal', 'eye', t('revealRed'), t('revealRedShort')));
+  if (view.oxygen) moreRows.push(moreRow('pass-turn', 'cut', t('passTurn'), t('passTurnShort')));
+  if (forcedFinal) moreRows.push(moreRow('agent-start', 'cut', t('agentStart'), t('agentHint')));
   if (canCoffee) moreRows.push(moreRow('coffee', 'cup', t('coffeeMug'), t('coffeeMugHint'), '', ' equip'));
   view.equipment.filter((card) => card.usable && !card.used && card.number !== 11).forEach((card) => {
     moreRows.push(moreRow('equip', 'tool', `#${card.number} ${card.name}`, t('moreEquipReady'), ` data-card="${card.number}"`, ' equip'));
@@ -1639,15 +1781,19 @@ function normalActions(view) {
       ? `<h4>${esc(t('chooseTarget'))}</h4><div class="target-row">${coffeeButtons || '<span class="muted">-</span>'}</div>`
       : `<div class="more-list">${moreRows.join('')}</div><p class="more-note">${esc(t('moreNote'))}</p>`;
   const phoneActions = `<div class="phone-actions phone-only">
-      <button class="mb dual-big" data-act="dual">${PHONE_ICON.cut}${esc(t('dualCut'))}</button>
+      ${forcedFinal
+        ? `<button class="mb dual-big" data-act="agent-start">${PHONE_ICON.cut}${esc(t('agentStart'))}</button>`
+        : `<button class="mb dual-big" data-act="dual">${PHONE_ICON.cut}${esc(t('dualCut'))}</button>`}
       ${UI.cache.moreCount ? `<button class="more-btn" data-act="psheet-open" data-v="more">${esc(t('moreButton'))}<i class="more-badge">${UI.cache.moreCount}</i></button>` : ''}
     </div>`;
   const turnControls = myTurn
     ? `<div class="action-buttons desk-only">
-        <button class="mb" data-act="dual">${esc(t('dualCut'))}</button>
+        ${forcedFinal ? '' : `<button class="mb" data-act="dual">${esc(t('dualCut'))}</button>`}
+        ${agentButton}
         ${soloIdle}
         ${revealButton}
         ${coffeeButton}
+        ${passButton}
       </div>
       ${phoneActions}
       ${soloButtons ? `<div class="desk-only"><h4>${esc(t('soloCut'))}</h4>${soloConfirmBox}${soloConfirm ? '' : `<div class="choices">${soloButtons}</div>`}</div>` : ''}
@@ -1839,10 +1985,53 @@ function equipPanel(view) {
     </section>`;
 }
 
+// Mission 10: after every turn the next player is whoever says "Snip!".
+function openTurnPanel(view) {
+  const me = meId(view);
+  const last = view.lastActiveId;
+  const eligible = view.players.filter((player, seat) => (
+    player.id !== last && handWiresOf(view, seat).some((wire) => !wire.cut && !wire.revealed)
+  ));
+  const mine = eligible.some((player) => player.id === me);
+  const body = isOnline()
+    ? (mine
+      ? `<button class="btn big primary snip-btn" data-act="snip" data-id="${esc(me)}">${esc(t('snipButton'))}</button>`
+      : `<p class="waiting-box">${esc(t('openTurnWait', { name: playerName(view, last || view.activeId) }))}</p>`)
+    : `<div class="target-row">${eligible.map((player) => `<button class="target-btn snip-target" data-act="snip" data-id="${esc(player.id)}">${esc(t('snipButton'))} ${esc(player.name)}</button>`).join('')}</div>`;
+  return `
+    <section class="panel action-panel open-turn">
+      <div class="action-head"><h3>${esc(t('openTurnTitle'))}</h3></div>
+      <p class="muted small">${esc(t('openTurnHelp'))}</p>
+      ${body}
+      ${errorBox()}
+    </section>`;
+}
+
+// Mission 46: pick the final wires on any stand and cut them together.
+function agentPanel(view) {
+  const need = finalWiresLeft(view);
+  const have = UI.agent.ids.length;
+  const ready = have === need;
+  return `
+    <section class="panel action-panel agent">
+      ${actionHeader(view)}
+      <h4>${esc(t('agentTitle'))}</h4>
+      <p class="muted small">${esc(t('agentHelp'))}</p>
+      <p class="picked">${esc(t('agentPicked', { have, need }))}</p>
+      ${errorBox()}
+      <div class="draft-actions">
+        <button class="btn ghost" data-act="agent-cancel">${esc(t('cancel'))}</button>
+        <button class="btn${ready ? '' : ' off'}" data-act="agent-confirm" ${ready ? '' : 'disabled'}>${esc(t('agentConfirm'))}</button>
+      </div>
+    </section>`;
+}
+
 function actionPanel(view) {
   UI.cache.moreCount = 0;
   if (UI.state.phase === 'setup') return setupPanel(view);
+  if (view.openTurn) return openTurnPanel(view);
   if (view.pending) return pendingPanel(view);
+  if (UI.agent && canAct(view) && holdsOnlyFinalView(view)) return agentPanel(view);
   if (UI.equip) return equipPanel(view);
   if (UI.draft && canAct(view)) return draftPanel(view);
   return normalActions(view);
@@ -1853,7 +2042,11 @@ function actionPanel(view) {
 
 function equipmentEmptyMessage(view, card) {
   if (card.used) return t('equipAlreadyUsed');
-  if (!card.usable) return t('equipStillLocked');
+  if (!card.usable) {
+    return card.tape && card.tape !== card.number
+      ? t('equipTapeLocked', { n: card.number, tape: card.tape })
+      : t('equipStillLocked');
+  }
   if (UI.state.phase !== 'playing') return t('equipNotPlaying');
   if (UI.state.pending) return t('equipPending');
   if (isOnline() && view.you !== view.activeId
@@ -2208,6 +2401,7 @@ function noteFx(before, after) {
 }
 
 function apply(action) {
+  UI.agent = null;
   if (isOnline()) {
     submitOnline(action);
     return;
@@ -2528,6 +2722,7 @@ function applySnapshot(snapshot, force = false) {
 async function submitOnline(action) {
   const online = UI.online;
   if (!online || online.busy) return;
+  UI.agent = null;
   let next;
   try {
     next = applyAction(UI.state, action);
@@ -2856,6 +3051,8 @@ function startHotseatGame(retry = false) {
     UI.banners = [];
     UI.seenLog = 0;
     UI.fx = null;
+    UI.agent = null;
+    UI.timeUpSentFor = null;
     UI.retryNote = UI.captain;
     UI.retryKind = rotate ? 'retry' : 'start';
     UI.screen = 'game';
@@ -2940,12 +3137,22 @@ function onWire(wireId) {
     return;
   }
 
+  if (UI.agent) {
+    if (wire.cut || wire.revealed) return;
+    const at = UI.agent.ids.indexOf(wireId);
+    if (at >= 0) UI.agent.ids.splice(at, 1);
+    else UI.agent.ids.push(wireId);
+    render();
+    return;
+  }
+
   if (UI.draft) {
     toggleDraftWire(wire);
     render();
     return;
   }
 
+  if (state.openTurn) return;
   if (isOnline() && state.players[state.activeIndex].id !== UI.online.playerId) return;
 
   if (wire.owner === state.activeIndex) {
@@ -3281,6 +3488,35 @@ async function onClick(event) {
         playerId: isOnline() ? UI.online.playerId : state.players[state.activeIndex].id,
         kind: confirm.kind,
         ...(confirm.kind === 'blue' ? { value: Number(confirm.value) } : {}),
+      });
+      break;
+    }
+    case 'pass-turn':
+      apply({
+        type: 'passTurn',
+        playerId: isOnline() ? UI.online.playerId : state.players[state.activeIndex].id,
+      });
+      break;
+    case 'snip':
+      apply({ type: 'snip', playerId: el.dataset.id });
+      break;
+    case 'agent-start':
+      UI.agent = { ids: [] };
+      UI.draft = null;
+      UI.error = '';
+      render();
+      break;
+    case 'agent-cancel':
+      UI.agent = null;
+      render();
+      break;
+    case 'agent-confirm': {
+      const ids = UI.agent ? UI.agent.ids.slice() : [];
+      UI.agent = null;
+      apply({
+        type: 'secretCut',
+        playerId: isOnline() ? UI.online.playerId : state.players[state.activeIndex].id,
+        wireIds: ids,
       });
       break;
     }
@@ -3694,7 +3930,17 @@ function overlay(view) {
   const kind = won ? 'won' : red ? 'wrong' : 'boom';
   const title = won ? t('defused') : red ? t('wrongWire') : t('boom');
   const stuck = !won && state.lossReason === 'locked';
-  const sub = won ? t('wonText') : red ? t('redCutHint') : stuck ? t('lostLocked') : t('lostDial');
+  const sub = won
+    ? t('wonText')
+    : red
+      ? t('redCutHint')
+      : stuck
+        ? t('lostLocked')
+        : state.lossReason === 'time'
+          ? t('lostTime')
+          : state.lossReason === 'secret'
+            ? t('lostSecret')
+            : t('lostDial');
   const cutCount = allWires(view).filter((wire) => wire.cut).length;
   const mistakes = Math.max(0, view.dial.zone - view.dial.startZone);
   const stats = won
@@ -3802,6 +4048,8 @@ function turnBanner(view) {
     key = 'setup';
   } else if (state.phase !== 'playing') {
     return '';
+  } else if (state.openTurn) {
+    return `<div class="turn-banner mine open">${esc(t('turnOpenBanner'))}</div>`;
   } else {
     actorId = state.pending ? view.pending.actorId : state.players[state.activeIndex].id;
     key = 'play';
@@ -3828,6 +4076,7 @@ function boardSlots(view) {
     slots.push(`<button class="eq-slot ${state}" data-act="equip" data-card="${card.number}" title="${esc(card.name)} - ${esc(status)}">
       <span class="eq-art">${artEquipment(card.number, 60)}</span>
       <span class="eq-no">#${card.number}</span>
+      ${card.tape ? `<span class="eq-tape" title="${esc(t('tapeNeeds', { n: card.tape }))}">${card.tape}</span>` : ''}
       <span class="eq-flag" aria-hidden="true">${state === 'unlocked' ? '\u2713' : state === 'locked' ? '\u2715' : ''}</span>
     </button>`);
   }
@@ -3864,6 +4113,7 @@ function boardCenter(view) {
       ${boardTrack(view)}
       <div class="board-col">
         ${sequenceStrip(view)}
+        ${missionStrip(view)}
         ${supplyStrip(view)}
         ${validationStrip(view)}
       </div>
@@ -4000,6 +4250,7 @@ function turnInfo(view) {
   const state = UI.state;
   if (state.phase === 'setup' && state.setupSeat !== null) return { mine: canSetup(view), text: t('phoneSetup') };
   if (state.phase !== 'playing') return { mine: false, text: '' };
+  if (state.openTurn) return { mine: true, text: t('turnOpenShort') };
   const actorId = state.pending ? view.pending.actorId : state.players[state.activeIndex].id;
   const mine = actorId === view.you;
   return { mine, text: mine ? t('yourTurnShort') : t('turnOf', { name: playerName(view, actorId) }) };
@@ -4040,6 +4291,7 @@ function tableSummary(view) {
       <span class="ts-head"><span>${esc(t('track'))}</span><span class="ts-open">${esc(t('openTable'))}${PHONE_ICON.chev}</span></span>
       ${boardTrack(view)}
       ${sequenceStrip(view, true)}
+      ${missionStrip(view, true)}
       <span class="ts-head"><span>${esc(t('validation'))} <em>${esc(t('validatedCount', { done, total: 12 }))}</em></span></span>
       <span class="vm-row">${cells}</span>
     </div>`;
@@ -4111,7 +4363,29 @@ function zoomSheet(view, seat) {
     </div>`;
 }
 
+// Mission 10 on one device: pass the phone to whoever says Snip first.
+function snipScreen(view) {
+  const eligible = view.players.filter((player, seat) => (
+    player.id !== view.lastActiveId
+    && UI.state.stands[seat].flat().some((id) => !UI.state.wires[id].cut && !UI.state.wires[id].revealed)
+  ));
+  const remaining = timerRemaining(view);
+  return `
+    <div class="game curtain snip-screen">
+      <div class="curtain-card">
+        <h2>${esc(t('snipWho'))}</h2>
+        <p class="curtain-why">${esc(t('openTurnHelp'))}</p>
+        ${remaining !== null ? `<div class="seq-strip special timer${remaining < 60000 ? ' hurry' : ''}"><span class="seq-title">${esc(t('timerTitle'))}</span><span class="timer-clock" data-timer>${esc(clockText(remaining))}</span></div>` : ''}
+        <div class="target-row">${eligible.map((player) => `<button class="btn big primary snip-target" data-act="snip" data-id="${esc(player.id)}">${esc(t('snipButton'))} ${esc(player.name)}</button>`).join('')}</div>
+        <p class="muted small">${esc(t('snipWhoHelp'))}</p>
+        ${errorBox()}
+      </div>
+      ${overlay(view)}
+    </div>`;
+}
+
 function gameScreen(view) {
+  if (!isOnline() && view.openTurn && view.phase === 'playing') return snipScreen(view);
   if (curtainNeeded(view)) { UI.zoom = false; return curtainScreen(view); }
   if (UI.state.phase === 'setup') return setupDealScreen(view);
   const me = meSeat(view);
@@ -4279,6 +4553,7 @@ function boot() {
   UI.savedSession = readSession();
   if (UI.savedSession && !UI.onlineName) UI.onlineName = UI.savedSession.name;
   root.addEventListener('click', onClick);
+  setInterval(tickTimer, 1000);
   root.addEventListener('dblclick', (event) => {
     if (window.innerWidth >= 700 || UI.zoom || !UI.state || UI.screen !== 'game') return;
     if (event.target.closest('.me-seat .stands')) { UI.zoom = true; render(); }

@@ -324,6 +324,265 @@
       "unverified": [
         "setup"
       ]
+    },
+    {
+      "id": 10,
+      "title": "A Rough Patch",
+      "tier": "expert",
+      "lesson": "No turn order, no coffee, and 15 minutes.",
+      "setup": {
+        "blue": {
+          "values": "all"
+        },
+        "yellow": {
+          "count": 4
+        },
+        "red": {
+          "count": 1
+        },
+        "equipment": "players",
+        "reroll": [
+          11
+        ]
+      },
+      "twoPlayer": null,
+      "freeTurns": true,
+      "timer": {
+        "minutes": 15
+      },
+      "rules": [
+        "A 15-minute timer starts as soon as setup is done. If it runs out, the bomb explodes.",
+        "There is no turn order. After each turn anyone except the player who just played can say \"Snip!\" and take the next turn.",
+        "Nobody may play two turns in a row. If two players claim at once, the one who did not just play wins the claim; otherwise decide it fairly.",
+        "Equipment 11 (Coffee Mug) is not used in this mission."
+      ],
+      "success": "The bomb is defused before the timer runs out.",
+      "failure": "A red wire is cut, the dial reaches the skull, or the timer runs out.",
+      "unverified": [
+        "twoPlayer",
+        "setup"
+      ]
+    },
+    {
+      "id": 11,
+      "title": "Blue on Red",
+      "tier": "expert",
+      "lesson": "One blue number is secretly dangerous.",
+      "setup": {
+        "blue": {
+          "values": "all"
+        },
+        "yellow": {
+          "count": 2
+        },
+        "red": {
+          "count": 0
+        },
+        "equipment": "players"
+      },
+      "twoPlayer": null,
+      "deadlyValue": true,
+      "rules": [
+        "Turn over one Number card. All four blue wires of that value count as red wires.",
+        "Never point at them. They cannot get Info tokens and they cannot be cut.",
+        "A player may reveal them (Reveal Your Red Wires) only when every wire left in their hand is one of them.",
+        "There are no other red wires."
+      ],
+      "success": "All safe wires are cut and the dangerous wires are revealed.",
+      "failure": "A dangerous wire is pointed at, or the dial reaches the skull.",
+      "unverified": [
+        "title",
+        "twoPlayer"
+      ]
+    },
+    {
+      "id": 12,
+      "title": "Wrapped in Red Tape",
+      "tier": "expert",
+      "lesson": "Equipment needs paperwork first.",
+      "setup": {
+        "blue": {
+          "values": "all"
+        },
+        "yellow": {
+          "count": 4
+        },
+        "red": {
+          "count": 1
+        },
+        "equipment": "players"
+      },
+      "twoPlayer": null,
+      "redTape": true,
+      "rules": [
+        "Place a Number card face up on every Equipment card in play.",
+        "An Equipment card unlocks only after two wires of its own number AND two wires of its Number card's value have been cut, in any order.",
+        "If both numbers are the same, two cut wires of that value are enough."
+      ],
+      "success": "The paperwork is filed and the bomb is defused.",
+      "failure": "A red wire is cut or the dial reaches the skull.",
+      "unverified": [
+        "twoPlayer",
+        "rules"
+      ]
+    },
+    {
+      "id": 16,
+      "title": "Priorities Revisited",
+      "tier": "expert",
+      "lesson": "Same order as before, but all four wires each time.",
+      "setup": {
+        "blue": {
+          "values": "all"
+        },
+        "yellow": {
+          "count": 2,
+          "candidates": 3,
+          "hiddenDraw": true
+        },
+        "red": {
+          "count": 1
+        },
+        "equipment": "players"
+      },
+      "twoPlayer": {
+        "yellow": {
+          "count": 4
+        },
+        "red": {
+          "count": 2
+        }
+      },
+      "sequence": {
+        "cards": 3,
+        "required": 4
+      },
+      "rules": [
+        "Draw 3 Number cards and lay them face up in a row.",
+        "Cut all 4 wires of the first card's value before any wire of the second card's value.",
+        "Cut all 4 wires of the second card's value before any wire of the third card's value.",
+        "All other values can be cut in any order.",
+        "If a player holds only wires that are still locked, the bomb explodes."
+      ],
+      "success": "Every group is cut in order and the bomb is defused.",
+      "failure": "A red wire is cut, the dial reaches the skull, or a player is stuck with locked wires.",
+      "unverified": [
+        "title",
+        "twoPlayer"
+      ]
+    },
+    {
+      "id": 20,
+      "title": "Smooth Operator",
+      "tier": "expert",
+      "lesson": "A full bomb with the usual rules.",
+      "setup": {
+        "blue": {
+          "values": "all"
+        },
+        "yellow": {
+          "count": 2
+        },
+        "red": {
+          "count": 2
+        },
+        "equipment": "players",
+        "reroll": [
+          2
+        ]
+      },
+      "twoPlayer": null,
+      "rules": [
+        "Standard rules, with two red wires and two yellow wires.",
+        "If Equipment 2 (Walkie-Talkies) is drawn, discard it and draw a replacement."
+      ],
+      "success": "A clean defusal.",
+      "failure": "A red wire is cut or the dial reaches the skull.",
+      "unverified": [
+        "title",
+        "twoPlayer"
+      ]
+    },
+    {
+      "id": 44,
+      "title": "Underwater Pressure",
+      "tier": "expert",
+      "lesson": "Deeper wires cost more oxygen.",
+      "setup": {
+        "blue": {
+          "values": "all"
+        },
+        "yellow": {
+          "count": 2
+        },
+        "red": {
+          "count": 1
+        },
+        "equipment": "players",
+        "reroll": [
+          10
+        ]
+      },
+      "twoPlayer": null,
+      "oxygen": {
+        "perPlayer": 2
+      },
+      "rules": [
+        "Put 2 Oxygen tokens per player in the shared supply.",
+        "To cut, take Oxygen by depth: wires 1-4 cost 1, 5-8 cost 2, 9-12 cost 3 (yellow costs 1).",
+        "At the start of the Captain's turn all Oxygen goes back to the supply.",
+        "A player who cannot or will not cut skips their turn and the dial moves one step.",
+        "Table rule: no talking. Only a thumbs-up to ask for more oxygen.",
+        "Equipment 10 (X or Y Ray) is not used in this mission."
+      ],
+      "success": "The bomb is defused before the pressure wins.",
+      "failure": "A red wire is cut or the dial reaches the skull.",
+      "unverified": [
+        "setup",
+        "twoPlayer",
+        "rules"
+      ]
+    },
+    {
+      "id": 46,
+      "title": "Secret Agent",
+      "tier": "expert",
+      "lesson": "The agent's wires go last, all at once.",
+      "setup": {
+        "blue": {
+          "values": "all"
+        },
+        "yellow": {
+          "count": 4,
+          "valueRange": [
+            5,
+            8
+          ]
+        },
+        "red": {
+          "count": 0
+        },
+        "equipment": "players",
+        "reroll": [
+          7
+        ]
+      },
+      "twoPlayer": null,
+      "secretAgent": {
+        "finalValue": 7
+      },
+      "rules": [
+        "Four yellow wires sit at 5, 6, 7 and 8. There are no red wires.",
+        "All wires of value 7 must be cut last. Until every other wire is gone, 7 cannot be announced.",
+        "If a player holds only 7s at the start of their turn they must cut all four 7s at once by pointing at four wires. If one of the four is not a 7 the bomb explodes.",
+        "Equipment 7 (Emergency Batteries) is not used in this mission."
+      ],
+      "success": "Every wire is cut and the agent's 7s go down together.",
+      "failure": "A wrong group of four is cut, or the dial reaches the skull.",
+      "unverified": [
+        "twoPlayer",
+        "rules"
+      ]
     }
   ]
 }

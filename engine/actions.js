@@ -8,12 +8,14 @@ import {
   finishTurnAction,
   getWire,
   handWires,
+  holdsOnlyFinal,
   illegal,
   isOnStand,
   checkStuck,
   lockedValues,
   logEvent,
   matchesValue,
+  oxygenCost,
   ownWireForValue,
   ownsValue,
   placeInfoToken,
@@ -91,6 +93,8 @@ function finishSetup(state) {
   state.setupSeat = null;
   state.activeIndex = state.captainIndex;
   state.turnNumber = 1;
+  state.openTurn = Boolean(state.mission.freeTurns);
+  state.lastActive = null;
   // Store the starter on the log entry. The log must not be re-rendered from
   // the live active player, or older entries change as turns pass.
   logEvent(state, { type: 'playing', player: state.activeIndex });
@@ -183,7 +187,10 @@ function applyDualCut(state, player, action) {
     if (all.length !== wires.length) illegal('Super Detector points at the whole stand');
   }
 
+  const oxygenSpent = checkOxygen(state, values);
+
   // Pay for the action only after every check passed.
+  if (state.oxygen) state.oxygen.supply -= oxygenSpent;
   if (detector === 'personal') state.players[player].personal.used = true;
   if (detectorCard) useCard(state, detectorCard);
   if (rayCard) useCard(state, rayCard);
@@ -287,6 +294,9 @@ function applySoloCut(state, player, action) {
   if (group.length !== 2 && group.length !== 4) illegal('solo cut needs exactly 2 or 4 wires');
   if (group.some((wire) => wire.owner !== player)) illegal('not every matching wire is yours');
 
+  const soloCost = checkOxygen(state, [kind === 'blue' ? action.value : 'yellow']);
+  if (state.oxygen) state.oxygen.supply -= soloCost;
+
   group.sort((a, b) => a.order - b.order || (a.id < b.id ? -1 : 1));
   for (const wire of group) cutWire(state, wire.id);
   logEvent(state, {
@@ -306,6 +316,81 @@ function applyRevealRed(state, player) {
   if (!hand.every((wire) => wire.kind === 'red')) illegal('only red wires can be revealed');
   for (const wire of hand) wire.revealed = true;
   logEvent(state, { type: 'revealRed', player, count: hand.length });
+  finishTurnAction(state);
+}
+
+// ---------------------------------------------------------------------------
+// Mission 44: Oxygen
+
+function oxygenCostOf(values) {
+  return values.reduce((sum, value) => sum + oxygenCost(value), 0);
+}
+
+function checkOxygen(state, values) {
+  if (!state.oxygen) return 0;
+  const cost = oxygenCostOf(values);
+  if (cost > state.oxygen.supply) illegal('not enough Oxygen for that depth');
+  return cost;
+}
+
+function applyPassTurn(state, player) {
+  if (!state.oxygen) illegal('skipping a turn is only used in the Oxygen mission');
+  if (player !== state.activeIndex) illegal('not your turn');
+  logEvent(state, { type: 'passTurn', player });
+  if (advanceDial(state, 1)) {
+    logEvent(state, { type: 'lost', reason: 'dial' });
+    return;
+  }
+  finishTurnAction(state);
+}
+
+// ---------------------------------------------------------------------------
+// Mission 10: free turns and the timer
+
+function applySnip(state, player) {
+  if (!state.openTurn) illegal('the turn is not open');
+  if (player === state.lastActive) illegal('nobody plays two turns in a row');
+  if (!playerHasWires(state, player)) illegal('you have no wires left');
+  state.openTurn = false;
+  state.activeIndex = player;
+  state.turn.stabilizer = null;
+  logEvent(state, { type: 'snip', player });
+}
+
+function applyTimeUp(state) {
+  if (!state.mission.timerMinutes) illegal('this mission has no timer');
+  state.phase = 'lost';
+  state.lossReason = 'time';
+  state.pending = null;
+  logEvent(state, { type: 'lost', reason: 'time' });
+}
+
+// ---------------------------------------------------------------------------
+// Mission 46: all the final wires at once
+
+function applySecretCut(state, player, action) {
+  if (!state.finalValue) illegal('this mission has no final wires');
+  if (player !== state.activeIndex) illegal('not your turn');
+  if (!holdsOnlyFinal(state, player)) illegal('you still hold other wires');
+  const need = Object.values(state.wires).filter(
+    (wire) => isOnStand(wire) && wire.kind === 'blue' && wire.value === state.finalValue,
+  ).length;
+  const ids = action.wireIds;
+  if (!Array.isArray(ids) || ids.length !== need) illegal(`point at exactly ${need} wires`);
+  if (new Set(ids).size !== ids.length) illegal('wireIds must be distinct');
+  const wires = ids.map((id) => getWire(state, id));
+  if (wires.some((wire) => !isOnStand(wire))) illegal('wire is already gone');
+  logEvent(state, { type: 'secretCut', player, wires: ids.slice() });
+  const right = wires.every((wire) => wire.kind === 'blue' && wire.value === state.finalValue);
+  if (!right) {
+    state.phase = 'lost';
+    state.lossReason = 'secret';
+    state.pending = null;
+    logEvent(state, { type: 'lost', reason: 'secret' });
+    return;
+  }
+  for (const wire of wires) cutWire(state, wire.id);
+  logEvent(state, { type: 'secretCutSuccess', player });
   finishTurnAction(state);
 }
 
@@ -515,6 +600,10 @@ function applyInPlace(state, action) {
     return;
   }
   if (state.phase === 'setup') illegal('place the setup info tokens first');
+  if (action.type === 'timeUp') {
+    applyTimeUp(state);
+    return;
+  }
   if (action.type === 'resolve') {
     applyResolve(state, action);
     return;
@@ -522,7 +611,24 @@ function applyInPlace(state, action) {
   if (state.pending) illegal('resolve the pending decision first');
 
   const player = playerIndex(state, action.playerId);
+  if (action.type === 'snip') {
+    applySnip(state, player);
+    return;
+  }
+  if (state.openTurn && action.type !== 'playEquipment') {
+    illegal('say Snip to take the turn first');
+  }
+  if (holdsOnlyFinal(state, player)
+    && ['dualCut', 'revealRed', 'coffeeMug'].includes(action.type)) {
+    illegal('you hold only the last wires: cut them all at once');
+  }
   switch (action.type) {
+    case 'passTurn':
+      applyPassTurn(state, player);
+      return;
+    case 'secretCut':
+      applySecretCut(state, player, action);
+      return;
     case 'dualCut':
       applyDualCut(state, player, action);
       return;
@@ -558,6 +664,7 @@ function collectSoloGroups(state, player) {
   const locked = lockedValues(state);
   for (const value of ANY_VALUES) {
     if (locked.includes(value)) continue;
+    if (state.oxygen && oxygenCost(value) > state.oxygen.supply) continue;
     const wires = [];
     for (let seat = 0; seat < state.playerCount; seat += 1) {
       for (const wire of handWires(state, seat)) {
@@ -574,7 +681,8 @@ function collectSoloGroups(state, player) {
       if (wire.kind === 'yellow') yellow.push(wire);
     }
   }
-  if ((yellow.length === 2 || yellow.length === 4) && yellow.every((wire) => wire.owner === player)) {
+  const yellowOk = !state.oxygen || oxygenCost('yellow') <= state.oxygen.supply;
+  if (yellowOk && (yellow.length === 2 || yellow.length === 4) && yellow.every((wire) => wire.owner === player)) {
     groups.push({ type: 'soloCut', playerId: state.players[player].id, kind: 'yellow' });
   }
   return groups;
@@ -636,11 +744,13 @@ function pushDualCuts(state, player, out, limit) {
   const hand = handWires(state, player);
   const ownValues = [];
   const locked = lockedValues(state);
+  const affordable = (value) => !state.oxygen || oxygenCost(value) <= state.oxygen.supply;
   for (let value = 1; value <= 12; value += 1) {
     if (locked.includes(value)) continue;
+    if (!affordable(value)) continue;
     if (hand.some((wire) => wire.kind === 'blue' && wire.value === value)) ownValues.push(value);
   }
-  if (hand.some((wire) => wire.kind === 'yellow')) ownValues.push('yellow');
+  if (affordable('yellow') && hand.some((wire) => wire.kind === 'yellow')) ownValues.push('yellow');
 
   const numberValues = ownValues.filter((value) => value !== 'yellow');
   const ray = Boolean(usableCard(state, 10));
@@ -651,9 +761,10 @@ function pushDualCuts(state, player, out, limit) {
   // Plain cuts announce one value; X/Y Ray announces two. A usable Ray card
   // must not hide the plain options, so both variants are generated.
   const plainValues = ownValues.map((value) => [value]);
-  const rayValues = ray ? pairs(ownValues) : [];
+  const pairOk = (pair) => !state.oxygen || oxygenCostOf(pair) <= state.oxygen.supply;
+  const rayValues = ray ? pairs(ownValues).filter(pairOk) : [];
   const plainDetectorValues = numberValues.map((value) => [value]);
-  const rayDetectorValues = ray ? pairs(numberValues) : [];
+  const rayDetectorValues = ray ? pairs(numberValues).filter(pairOk) : [];
 
   for (let target = 0; target < state.playerCount; target += 1) {
     if (target === player) continue;
@@ -827,6 +938,33 @@ function pushEquipment(state, player, out, limit) {
   }
 }
 
+// Mission 46 forced cut: every group of wires that could be pointed at. The
+// list is capped; the UI builds its own choice from the wires on screen.
+function pushSecretCuts(state, player, out, limit) {
+  const need = Object.values(state.wires).filter(
+    (wire) => isOnStand(wire) && wire.kind === 'blue' && wire.value === state.finalValue,
+  ).length;
+  const ids = Object.values(state.wires)
+    .filter(isOnStand)
+    .map((wire) => wire.id)
+    .sort();
+  const picked = [];
+  const walk = (from) => {
+    if (out.length >= limit) return;
+    if (picked.length === need) {
+      out.push({ type: 'secretCut', playerId: state.players[player].id, wireIds: picked.slice() });
+      return;
+    }
+    for (let index = from; index < ids.length; index += 1) {
+      picked.push(ids[index]);
+      walk(index + 1);
+      picked.pop();
+      if (out.length >= limit) return;
+    }
+  };
+  walk(0);
+}
+
 export function legalActions(state, playerId, options = {}) {
   const player = findPlayerIndex(state, playerId);
   if (player === -1) return [];
@@ -866,7 +1004,23 @@ export function legalActions(state, playerId, options = {}) {
 
   pushEquipment(state, player, out, limit);
 
+  // Mission 10: while the turn is open, the only way forward is "Snip!".
+  if (state.openTurn) {
+    if (player !== state.lastActive && playerHasWires(state, player)) {
+      out.push({ type: 'snip', playerId });
+    }
+    return out;
+  }
+
   if (player !== state.activeIndex) return out;
+
+  if (state.oxygen) out.push({ type: 'passTurn', playerId });
+
+  if (holdsOnlyFinal(state, player)) {
+    out.push(...collectSoloGroups(state, player));
+    pushSecretCuts(state, player, out, Math.min(limit, 60));
+    return out;
+  }
 
   const revealHand = handWires(state, player);
   if (revealHand.length > 0 && revealHand.every((wire) => wire.kind === 'red')) {

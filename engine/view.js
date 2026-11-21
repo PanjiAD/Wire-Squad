@@ -22,6 +22,7 @@ function wireView(state, wire, mine) {
       cut: wire.cut,
       revealed: wire.revealed,
       info,
+      ...(wire.deadly ? { deadly: true } : {}),
     };
   }
 
@@ -36,6 +37,7 @@ function wireView(state, wire, mine) {
       revealed: wire.revealed,
       hidden: false,
       info,
+      ...(wire.deadly ? { deadly: true } : {}),
     };
   }
 
@@ -120,7 +122,16 @@ export function publicView(state, viewerId) {
         cut: state.sequence.cards.map((value) => cutBlueCount(state, value)),
       }
       : null,
+    locked: lockedValues(state),
+    deadlyValue: state.deadlyValue ?? null,
+    finalValue: state.finalValue ?? null,
+    oxygen: state.oxygen ? { supply: state.oxygen.supply, total: state.oxygen.total } : null,
+    openTurn: Boolean(state.openTurn),
+    lastActiveId: state.lastActive === null || state.lastActive === undefined
+      ? null
+      : state.players[state.lastActive].id,
     equipment: state.equipment.map((card) => ({
+      ...(card.tape ? { tape: card.tape } : {}),
       number: card.number,
       id: card.id,
       name: card.name,

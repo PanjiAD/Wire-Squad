@@ -41,5 +41,7 @@ export function missionSnapshot(mission) {
     success: mission.success,
     failure: mission.failure,
     unverified: mission.unverified.slice(),
+    freeTurns: Boolean(mission.freeTurns),
+    timerMinutes: mission.timer ? mission.timer.minutes : null,
   };
 }

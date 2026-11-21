@@ -158,10 +158,17 @@ export function newGame(options = {}) {
     };
   }
 
+  // Mission 11: one more Number card, drawn last so other seeds stay unchanged.
+  const deadlyValue = mission.deadlyValue ? rng.int(12) + 1 : null;
+
   const specs = [];
   for (const value of blueValues) {
     for (let copy = 0; copy < BLUE_COPIES; copy += 1) {
-      specs.push({ kind: 'blue', value, order: value, tileValue: value });
+      if (value === deadlyValue) {
+        specs.push({ kind: 'red', value: null, order: value, tileValue: value, deadly: true });
+      } else {
+        specs.push({ kind: 'blue', value, order: value, tileValue: value });
+      }
     }
   }
   for (const value of yellow.values) {
@@ -204,6 +211,13 @@ export function newGame(options = {}) {
     },
     markers: { yellow: yellow.markers, red: red.markers },
     sequence,
+    deadlyValue,
+    finalValue: mission.secretAgent ? mission.secretAgent.finalValue : null,
+    oxygen: mission.oxygen
+      ? { supply: mission.oxygen.perPlayer * playerCount, total: mission.oxygen.perPlayer * playerCount }
+      : null,
+    openTurn: false,
+    lastActive: null,
     equipment: [],
     infoSupply: {},
     tokens: [],
@@ -250,6 +264,7 @@ export function newGame(options = {}) {
           cut: false,
           revealed: false,
           info: [],
+          ...(spec.deadly ? { deadly: true } : {}),
         };
         state.stands[seat][stand].push(id);
       }
@@ -258,6 +273,13 @@ export function newGame(options = {}) {
   });
 
   state.equipment = dealEquipment(state, setup, rng);
+
+  // Mission 12: a Number card lies on every Equipment card.
+  if (mission.redTape) {
+    const deck = range(1, 12);
+    rng.shuffle(deck);
+    state.equipment.forEach((card, index) => { card.tape = deck[index]; });
+  }
 
   state.rng = rng.state;
   state.turnNumber = 1;
@@ -286,6 +308,7 @@ export function newGame(options = {}) {
     state.phase = 'playing';
     state.setupSeat = null;
     state.activeIndex = captainIndex;
+    state.openTurn = Boolean(mission.freeTurns);
     logEvent(state, { type: 'playing', player: state.activeIndex });
   }
 

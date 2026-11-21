@@ -61,16 +61,41 @@ export function cutBlueCount(state, value) {
 // Mission 9 style ordering: Number card i+1 stays locked until enough wires of
 // card i are cut. Returns the blue values that cannot be named or cut yet.
 export function lockedValues(state) {
-  const seq = state.sequence;
-  if (!seq) return [];
   const locked = [];
-  for (let index = 1; index < seq.cards.length; index += 1) {
-    const before = seq.cards[index - 1];
-    if (cutBlueCount(state, before) < seq.required || locked.includes(before)) {
-      locked.push(seq.cards[index]);
+  const seq = state.sequence;
+  if (seq) {
+    for (let index = 1; index < seq.cards.length; index += 1) {
+      const before = seq.cards[index - 1];
+      if (cutBlueCount(state, before) < seq.required || locked.includes(before)) {
+        locked.push(seq.cards[index]);
+      }
     }
   }
+  // Mission 46: the final value stays locked until every other wire is gone.
+  if (state.finalValue) {
+    const otherLeft = Object.values(state.wires).some(
+      (wire) => isOnStand(wire) && !(wire.kind === 'blue' && wire.value === state.finalValue),
+    );
+    if (otherLeft) locked.push(state.finalValue);
+  }
   return locked;
+}
+
+// Mission 46: a player who holds nothing but the final-value wires.
+export function holdsOnlyFinal(state, player) {
+  if (!state.finalValue) return false;
+  const hand = handWires(state, player);
+  return hand.length > 0 && hand.every(
+    (wire) => wire.kind === 'blue' && wire.value === state.finalValue,
+  );
+}
+
+// Mission 44: oxygen cost of cutting a value (yellow counts as 1).
+export function oxygenCost(value) {
+  if (value === 'yellow') return 1;
+  if (value <= 4) return 1;
+  if (value <= 8) return 2;
+  return 3;
 }
 
 export function isLockedWire(state, wire) {
@@ -180,7 +205,8 @@ export function placeInfoToken(state, wireId, owner, forcedKind = null) {
 export function refreshUnlocks(state) {
   for (const card of state.equipment) {
     if (card.used) continue;
-    if (!card.usable && cutBlueCount(state, card.number) >= EQUIP_UNLOCK_AT) {
+    const needs = card.tape ? [card.number, card.tape] : [card.number];
+    if (!card.usable && needs.every((value) => cutBlueCount(state, value) >= EQUIP_UNLOCK_AT)) {
       card.usable = true;
       logEvent(state, { type: 'equipmentUnlocked', card: card.number });
     }
@@ -228,10 +254,36 @@ export function advanceTurn(state) {
   state.turnNumber += 1;
   state.turn.stabilizer = null;
   const count = state.playerCount;
+
+  // Mission 10: no fixed order. The turn stays open until someone else says
+  // "Snip!". If nobody else holds wires, the same player simply goes on.
+  if (state.mission.freeTurns) {
+    const others = [];
+    for (let seat = 0; seat < count; seat += 1) {
+      if (seat !== state.activeIndex && playerHasWires(state, seat)) others.push(seat);
+    }
+    if (others.length > 0) {
+      state.lastActive = state.activeIndex;
+      state.openTurn = true;
+      logEvent(state, { type: 'turnOpen', after: state.activeIndex });
+      return;
+    }
+    if (playerHasWires(state, state.activeIndex)) {
+      logEvent(state, { type: 'turn', player: state.activeIndex });
+      return;
+    }
+    checkWin(state);
+    return;
+  }
+
   for (let step = 1; step <= count; step += 1) {
     const player = (state.activeIndex + step) % count;
     if (playerHasWires(state, player)) {
       state.activeIndex = player;
+      // Mission 44: the Captain's turn hands every Oxygen token back.
+      if (state.oxygen && player === state.captainIndex) {
+        state.oxygen.supply = state.oxygen.total;
+      }
       logEvent(state, { type: 'turn', player });
       checkStuck(state);
       return;
