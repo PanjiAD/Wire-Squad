@@ -2952,6 +2952,12 @@ html.colorblind .wire.yellow::after { background: radial-gradient(rgba(30,31,36,
 /* The log stays out of the play area: collapsed to its header until opened. */
 .log-panel:not(.open) .log { display: none; }
 .log-panel:not(.open) { max-height: none; overflow: hidden; }
+
+/* Phone: the main column always spans the screen, whatever its content. */
+@media (max-width: 699px) {
+  .game .table { width: 100%; box-sizing: border-box; }
+  .game .table-main { flex: 1 1 100%; width: 100%; }
+}
 </style>
 </head>
 <body>
