@@ -2744,6 +2744,145 @@ html.colorblind .wire.yellow::after { background: radial-gradient(rgba(30,31,36,
   .bottom-dock .choices .choice { flex: 0 0 auto; min-height: 38px; padding: 4px 12px; }
 }
 .help-scroll:not([data-tab="turn"]) .help-first { display: none; }
+
+/* ===================================================================== */
+/* P6c phone rev 2: slim top bar, table summary, Dual Cut + More, sheets  */
+/* Original components stay: summarised here, shown in full in Table.     */
+/* ===================================================================== */
+.phone-only { display: none; }
+@media (max-width: 699px) {
+  .desk-only, .game .topbar, .turn-banner, .log-fab, .arena > .board-center, .action-head,
+  .online-strip.quiet, .online-strip .room-code, .online-strip .muted, .online-strip-actions { display: none !important; }
+  .game { min-height: 100dvh; display: flex; flex-direction: column; }
+  .game > .table { flex: 1 1 auto; }
+  .game .table-main { flex: 1 1 auto; }
+  .game .online-strip { margin: 6px 8px 0; padding: 4px 10px; font-size: 13px; }
+
+  /* top bar */
+  .phone-bar { display: flex; align-items: center; gap: 8px; position: sticky; top: 0; z-index: 30; min-height: 52px; padding: 4px 6px 4px 10px; background: var(--ink); color: var(--cream); border-bottom: 3px solid var(--yellow); }
+  .phone-turn { min-width: 0; padding: 5px 12px; border-radius: 999px; background: var(--cream); color: var(--ink); font: 800 16px/1.1 system-ui, sans-serif; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .phone-turn.mine { background: var(--yellow); }
+  .pconn { flex: 0 0 auto; width: 10px; height: 10px; border-radius: 50%; border: 2px solid var(--cream); background: var(--green); }
+  .pconn.offline { background: var(--red); }
+  .phone-dial { margin-left: auto; display: flex; align-items: center; gap: 6px; min-height: 44px; padding: 0 8px; border: 2px solid var(--cream); border-radius: 10px; background: transparent; color: var(--cream); cursor: pointer; }
+  .phone-dial.danger { border-color: #ff8a8a; background: rgba(215, 38, 61, .35); }
+  .phone-dial-art { display: block; width: 38px; height: 36px; line-height: 0; }
+  .phone-dial-art svg { width: 100%; height: 100%; display: block; }
+  .phone-dial-num { font: 400 18px/1 Impact, 'Arial Narrow Bold', sans-serif; letter-spacing: .02em; white-space: nowrap; }
+  .phone-dial-num b { font-weight: 400; font-size: 22px; }
+  .phone-menu { flex: 0 0 auto; width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; border: 2px solid var(--cream); border-radius: 10px; background: transparent; color: var(--cream); cursor: pointer; padding: 0; }
+  .pico { display: block; flex: none; }
+
+  /* event line and table summary */
+  .event-line { display: flex; align-items: center; gap: 8px; width: 100%; min-height: 44px; padding: 0 12px; border: var(--line); border-radius: 12px; background: #fff; box-shadow: 3px 3px 0 var(--ink); font: 600 14px system-ui, sans-serif; text-align: left; color: var(--ink); cursor: pointer; }
+  .event-line span { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .phone-mid { margin-top: auto; padding-top: 4px; }
+  .table-sum { display: flex; flex-direction: column; gap: 4px; padding: 6px 8px 8px; border: var(--line); border-radius: 12px; background: var(--cream); box-shadow: 3px 3px 0 var(--ink); cursor: pointer; }
+  .ts-head { display: flex; align-items: center; justify-content: space-between; font: 800 11px system-ui, sans-serif; letter-spacing: .04em; text-transform: uppercase; }
+  .ts-head em { font-style: normal; font-weight: 700; letter-spacing: 0; text-transform: none; }
+  .ts-open { display: inline-flex; align-items: center; gap: 2px; text-transform: none; letter-spacing: 0; font-weight: 700; font-size: 12px; }
+  .ts-open .pico { width: 14px; height: 14px; }
+  .table-sum .board-track { padding: 0; gap: 2px; background: none; border: 0; box-shadow: none; }
+  .table-sum .tk-cell { min-height: 26px; }
+  .table-sum .tk-cell b { font-size: 13px; }
+  .table-sum .tk-mark { transform: scale(.7); transform-origin: top right; }
+  .vm-row { display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); gap: 2px; }
+  .vm-cell { min-height: 24px; display: flex; align-items: center; justify-content: center; border: 2px dashed #6b6d76; border-radius: 6px; background: rgba(255, 255, 255, .55); font-weight: 900; font-size: 14px; }
+  .vm-cell.done { border: 2px solid var(--ink); background: var(--green); color: var(--ink); }
+
+  /* dock: stand + Dual Cut + More */
+  .bottom-dock .action-dock { padding: 6px 12px calc(10px + env(safe-area-inset-bottom, 0px)); }
+  .bottom-dock .action-panel:not(.draft):not(.pending):not(.equip-bar) { display: block; }
+  .phone-actions { display: flex; gap: 10px; }
+  .phone-actions .dual-big { flex: 1 1 auto; display: flex; align-items: center; justify-content: center; gap: 10px; min-height: 56px; font-size: 20px; }
+  .more-btn { position: relative; flex: 0 0 104px; min-height: 56px; display: flex; align-items: center; justify-content: center; border: var(--line); border-radius: 12px; background: #fff; box-shadow: 3px 3px 0 var(--ink); font: 800 17px system-ui, sans-serif; color: var(--ink); cursor: pointer; }
+  .more-badge { position: absolute; top: -9px; right: -7px; min-width: 24px; height: 24px; padding: 0 5px; border-radius: 12px; border: 2px solid var(--cream); background: var(--ink); color: var(--cream); font: 800 13px/20px system-ui, sans-serif; font-style: normal; text-align: center; }
+  .bottom-dock .waiting-box { margin: 0; min-height: 56px; display: flex; align-items: center; justify-content: center; border: 3px solid #6b6d76; border-radius: 12px; background: #d9d6cc; color: #3a3c45; font-weight: 800; font-size: 17px; }
+  .bottom-dock .waiting-box::before { content: ''; width: 12px; height: 12px; margin-right: 10px; border-radius: 50%; background: var(--ink); animation: pdot 1.1s ease-in-out infinite; }
+  @keyframes pdot { 0%, 100% { opacity: 1; } 50% { opacity: .3; } }
+  /* the zoom button replaces the old "You hold" row */
+  .bottom-dock .me-seat { position: relative; }
+  .me-seat .hold-row { position: absolute; top: 4px; right: 8px; padding: 0; z-index: 2; }
+  .me-seat .hold-chips, .me-seat .hold-label { display: none; }
+
+  /* sheets */
+  .psheet-wrap { display: flex; position: fixed; inset: 0; z-index: 70; align-items: flex-end; background: rgba(30, 31, 36, .55); }
+  .psheet { width: 100%; max-height: 88dvh; display: flex; flex-direction: column; background: var(--cream); border-top: 4px solid var(--ink); border-radius: 22px 22px 0 0; padding: 8px 12px calc(14px + env(safe-area-inset-bottom, 0px)); }
+  .psheet-grip { width: 44px; height: 5px; margin: 0 auto 6px; border-radius: 3px; background: #9b9788; }
+  .psheet-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
+  .psheet-head strong { font: 400 24px/1 Impact, 'Arial Narrow Bold', sans-serif; text-transform: uppercase; letter-spacing: .02em; }
+  .psheet-x { width: 44px; height: 44px; border: var(--line); border-radius: 10px; background: #fff; font-size: 28px; line-height: 1; cursor: pointer; color: var(--ink); }
+  .psheet-body { overflow-y: auto; min-height: 0; }
+  .menu-row, .more-row { display: flex; align-items: center; gap: 12px; width: 100%; min-height: 56px; margin-bottom: 8px; padding: 6px 12px; border: var(--line); border-radius: 12px; background: #fff; box-shadow: 3px 3px 0 var(--ink); text-align: left; color: var(--ink); cursor: pointer; font: 700 17px system-ui, sans-serif; }
+  .menu-row.danger { color: #b01e31; }
+  .more-row.equip { background: #fbd7a8; }
+  .more-text { display: flex; flex-direction: column; min-width: 0; }
+  .more-text b { font-size: 17px; }
+  .more-text small { font: 500 13px system-ui, sans-serif; color: #3a3c45; }
+  .more-note { margin: 4px 4px 0; font: 500 12.5px system-ui, sans-serif; color: #3a3c45; }
+  .psheet.ps-table .board-center { margin: 0; }
+  .psheet.ps-table .board-center .board-mission { display: none; }
+  .psheet.ps-table .board-mission-card { display: block; }
+  .psheet .confirm-box { margin: 0; }
+
+  /* setup: one task per screen */
+  .setup-deal .deal-main { padding: 8px 12px 16px; gap: 10px; }
+  .setup-deal .deal-row { flex-direction: column; align-items: stretch; gap: 8px; }
+  .setup-deal .deal-card { max-width: none; padding: 10px 12px; text-align: center; }
+  .setup-deal .deal-card .setup-callout { font-size: 20px; line-height: 1.15; }
+  .setup-deal .deal-chips { flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; gap: 6px; }
+  .setup-deal .deal-chips::-webkit-scrollbar { display: none; }
+  .setup-deal .deal-chip { flex: 0 0 auto; }
+  .setup-deal .deal-stage { overflow-x: auto; padding-bottom: 6px; border: var(--line); border-radius: 12px; background: rgba(30, 31, 36, .12); }
+  .setup-deal .deal-stage .player { padding: 18px 8px 0; width: max-content; min-width: 100%; }
+  .setup-deal .deal-stage .stand { --lab: 0px; --ww: 40px; }
+  .setup-deal .deal-stage .stand .wire:not(.cut) { width: auto; height: auto; }
+  .setup-deal .deal-foot { position: sticky; bottom: 0; flex-direction: column; gap: 8px; padding: 8px 0 calc(8px + env(safe-area-inset-bottom, 0px)); background: linear-gradient(0deg, var(--desk) 70%, rgba(159, 180, 194, 0)); }
+  .setup-deal .deal-tray { flex: 0 0 auto; min-height: 44px; padding: 4px 12px; }
+  .setup-deal .deal-foot .btn.big { width: 100%; min-height: 56px; font-size: 20px; }
+  .setup-deal .deal-foot.no-pick .btn { display: none; }
+  .setup-deal .deal-foot.no-pick .deal-tray { border-style: solid; justify-content: center; text-align: center; font-size: 16px; }
+}
+
+@media (max-width: 699px) {
+  .game .table { display: flex; flex-direction: column; }
+  .game .table > .side { display: none; }
+  .opponents[data-n="2"] .player:not(.expanded) { flex: 1 1 0; min-width: 0; }
+  .opponents.scrolls { -webkit-mask-image: linear-gradient(90deg, #000 calc(100% - 30px), transparent); mask-image: linear-gradient(90deg, #000 calc(100% - 30px), transparent); }
+  .log-sheet { margin: 0 0 10px; padding-left: 18px; font-size: 14px; line-height: 1.4; }
+  .log-sheet li { margin-bottom: 4px; }
+}
+
+@media (max-width: 699px) {
+  .opponents[data-n="2"] .player:not(.expanded) .wire-count { display: none; }
+}
+
+@media (max-width: 699px) {
+  .setup-deal .deal-stage .stands { align-items: flex-start; }
+  .setup-deal .deal-stage[data-over="r"] { box-shadow: inset -22px 0 14px -14px rgba(30, 31, 36, .6); }
+  .setup-deal .deal-stage[data-over="l"] { box-shadow: inset 22px 0 14px -14px rgba(30, 31, 36, .6); }
+  .setup-deal .deal-stage[data-over="lr"] { box-shadow: inset 22px 0 14px -14px rgba(30, 31, 36, .6), inset -22px 0 14px -14px rgba(30, 31, 36, .6); }
+  .swipe-hint { display: none; margin: -4px 0 0; text-align: center; font: 700 12px system-ui, sans-serif; color: var(--ink); }
+  .deal-stage[data-over] + .swipe-hint { display: block; }
+}
+@media (max-width: 699px) {
+  .setup-deal .deal-main { min-width: 0; width: 100%; box-sizing: border-box; }
+  .setup-deal .deal-main > * { min-width: 0; max-width: 100%; }
+}
+@media (max-width: 699px) {
+  .setup-deal .deal-row { flex-wrap: nowrap; }
+}
+@media (max-width: 699px) {
+  .game .table { min-width: 0; max-width: 100%; }
+  .game .table-main, .game .arena, .game .opponents { min-width: 0; max-width: 100%; box-sizing: border-box; }
+}
+
+@media (max-width: 699px) {
+  .me-seat .hold-zoom { width: 44px; height: 44px; min-height: 44px; padding: 0; justify-content: center; border-radius: 10px; }
+  .me-seat .hold-zoom .zt { display: none; }
+  .me-seat .hold-row { top: 2px; }
+  .me-seat .player-head .wire-count { display: none; }
+}
 </style>
 </head>
 <body>
@@ -5202,7 +5341,7 @@ const  STRINGS = {
   helpRed: 'Red wires are face down. Never cut one. If every wire left in your own hand (both stands) is red, you may reveal them safely instead.',
   helpRedCaption: 'Reveal red only when every wire left in your hand is red.',
   helpEquipmentTitle: 'Equipment cards',
-  helpEquipment: 'From Mission 3 on, each player gets one Equipment card per mission. It can be used once. Click a card to read its effect and when it can be played.',
+  helpEquipment: 'From Mission 3 on, each player gets one Equipment card per mission. It can be used once. Tap a card to read its effect and when it can be played.',
   helpEquipmentCaption: 'Equipment card: unlocked by cutting its number, then used once.',
   helpEquipCardName: 'Triple Detector',
   helpEquipCardText: 'During your Dual Cut, name one number and point at three wires on one teammate stand. One match is enough.',
@@ -5240,6 +5379,28 @@ const  STRINGS = {
   helpRedReminder: 'Red wires end the mission at once. Never cut one.',
   colorblindHint: 'Adds stripes to red wires and dots to yellow wires.',
   youHold: 'You hold',
+  // Phone shell (rev 2)
+  phoneSetup: 'Setup',
+  yourTurnShort: 'Your turn',
+  turnOf: "{name}'s turn",
+  menuTitle: 'Menu',
+  moreTitle: 'More actions',
+  tableTitle: 'Table',
+  moreButton: 'More',
+  swipeHint: 'Swipe sideways to see all your wires.',
+  moreNote: 'Only actions you can do right now are listed.',
+  moreEquipReady: 'Ready to play. Tap for details.',
+  openTable: 'Open table',
+  validatedCount: '{done} of {total}',
+  soloChoiceTitle: 'Solo Cut {value}',
+  soloRowOne: 'Cut your 1 wire showing {value}.',
+  soloRowMany: 'Cut all {count} of your wires showing {value}.',
+  soloRowYellowOne: 'Cut your 1 yellow wire.',
+  soloRowYellowMany: 'Cut all {count} of your yellow wires.',
+  soloConfirmTextOne: 'This cuts your 1 remaining {value} wire. It does not move the dial.',
+  soloConfirmActionOne: 'Cut 1 wire',
+  revealRedShort: 'Show your red wires to the table.',
+  setupBannerMine: '{name}, tap one of your blue wires to place your info token.',
   zoomOpen: 'Zoom',
   zoomTitle: 'Your wires',
   zoomClose: 'Close',
@@ -5262,7 +5423,7 @@ const  STRINGS = {
   helpDone: 'Got it',
 
   setupBanner: 'Setup: {name} places one Info token on one of their blue wires.',
-  setupHint: 'Click a blue wire to place its number token.',
+  setupHint: 'Tap a blue wire to place its number token.',
   setupTurn: '{name}, place one Info token.',
   setupSupplyEmpty: 'No Info tokens left for: {values}. Pick a wire with another value.',
   supplyEmpty: 'No Info token is left for that value. Pick another wire.',
@@ -6105,6 +6266,7 @@ const UI = {
   equip: null,
   equipNeed: null,
   logOpen: false,
+  phoneSheet: null,
   stamp: null,
   leaveAsk: false,
   banners: [],
@@ -7342,8 +7504,9 @@ function onlineStrip(view) {
   const room = online.room || {};
   const stale = onlineStale();
   const status = roomStatusLabel(room);
+  const quiet = !stale.length && status !== 'paused' && online.connection !== 'offline';
   return `
-    <div class="online-strip">
+    <div class="online-strip${quiet ? ' quiet' : ''}">
       <span class="room-code">${esc(t('room'))} <b>${esc(online.code)}</b></span>
       <span class="conn ${online.connection === 'offline' ? 'offline' : 'online'}">
         ${esc(t(online.connection === 'offline' ? 'offline' : 'connected'))}
@@ -7546,12 +7709,12 @@ function normalActions(view) {
   const soloConfirmBox = soloConfirm
     ? `<div class="confirm-box sht">
         <strong class="q">${esc(t('soloConfirmTitle', { value: valueLabel(soloConfirm.value ?? 'yellow') }))}</strong>
-        <p>${esc(t('soloConfirmText', {
+        <p>${esc(t(soloConfirm.count === 1 ? 'soloConfirmTextOne' : 'soloConfirmText', {
           count: soloConfirm.count,
           value: valueLabel(soloConfirm.value ?? 'yellow'),
         }))}</p>
         <div class="action-buttons">
-          <button class="btn" data-act="solo-confirm">${esc(t('soloConfirmAction', { count: soloConfirm.count }))}</button>
+          <button class="btn" data-act="solo-confirm">${esc(t(soloConfirm.count === 1 ? 'soloConfirmActionOne' : 'soloConfirmAction', { count: soloConfirm.count }))}</button>
           <button class="btn ghost" data-act="solo-cancel">${esc(t('cancel'))}</button>
         </div>
       </div>`
@@ -7586,15 +7749,46 @@ function normalActions(view) {
   const soloIdle = solo.length
     ? ''
     : `<button class="btn ghost" disabled title="${esc(t('soloCutHint'))}">${esc(t('soloCut'))}</button>`;
+  // Phone: Dual Cut plus one More button. Only actions that can be done right
+  // now are listed in the More sheet; everything else stays out of sight.
+  const moreRows = [];
+  solo.forEach((action) => {
+    const seat = seatOf(view, actorId);
+    const count = handWiresOf(view, seat).filter((wire) => !wire.cut && !wire.revealed && (
+      action.kind === 'yellow' ? wire.kind === 'yellow' : wire.kind === 'blue' && wire.value === action.value
+    )).length;
+    const value = valueLabel(action.value ?? 'yellow');
+    const sub = action.kind === 'yellow'
+      ? t(count === 1 ? 'soloRowYellowOne' : 'soloRowYellowMany', { count })
+      : t(count === 1 ? 'soloRowOne' : 'soloRowMany', { count, value });
+    moreRows.push(moreRow('solo', 'cut', t('soloChoiceTitle', { value }), sub,
+      ` data-kind="${action.kind}" data-v="${action.value ?? ''}" data-count="${count}"`));
+  });
+  if (reveal) moreRows.push(moreRow('reveal', 'eye', t('revealRed'), t('revealRedShort')));
+  if (canCoffee) moreRows.push(moreRow('coffee', 'cup', t('coffeeMug'), t('coffeeMugHint'), '', ' equip'));
+  view.equipment.filter((card) => card.usable && !card.used && card.number !== 11).forEach((card) => {
+    moreRows.push(moreRow('equip', 'tool', `#${card.number} ${card.name}`, t('moreEquipReady'), ` data-card="${card.number}"`, ' equip'));
+  });
+  UI.cache.moreCount = myTurn ? moreRows.length : 0;
+  UI.cache.moreHtml = soloConfirm
+    ? soloConfirmBox
+    : UI.coffeeOpen
+      ? `<h4>${esc(t('chooseTarget'))}</h4><div class="target-row">${coffeeButtons || '<span class="muted">-</span>'}</div>`
+      : `<div class="more-list">${moreRows.join('')}</div><p class="more-note">${esc(t('moreNote'))}</p>`;
+  const phoneActions = `<div class="phone-actions phone-only">
+      <button class="mb dual-big" data-act="dual">${PHONE_ICON.cut}${esc(t('dualCut'))}</button>
+      ${UI.cache.moreCount ? `<button class="more-btn" data-act="psheet-open" data-v="more">${esc(t('moreButton'))}<i class="more-badge">${UI.cache.moreCount}</i></button>` : ''}
+    </div>`;
   const turnControls = myTurn
-    ? `<div class="action-buttons">
+    ? `<div class="action-buttons desk-only">
         <button class="mb" data-act="dual">${esc(t('dualCut'))}</button>
         ${soloIdle}
         ${revealButton}
         ${coffeeButton}
       </div>
-      ${soloButtons ? `<h4>${esc(t('soloCut'))}</h4>${soloConfirmBox}${soloConfirm ? '' : `<div class="choices">${soloButtons}</div>`}` : ''}
-      ${UI.coffeeOpen ? `<h4>${esc(t('chooseTarget'))}</h4><div class="target-row">${coffeeButtons || `<span class="muted">-</span>`}</div>` : ''}`
+      ${phoneActions}
+      ${soloButtons ? `<div class="desk-only"><h4>${esc(t('soloCut'))}</h4>${soloConfirmBox}${soloConfirm ? '' : `<div class="choices">${soloButtons}</div>`}</div>` : ''}
+      ${UI.coffeeOpen ? `<div class="desk-only"><h4>${esc(t('chooseTarget'))}</h4><div class="target-row">${coffeeButtons || `<span class="muted">-</span>`}</div></div>` : ''}`
     : `<p class="waiting-box">${esc(t('waiting', { name: playerName(view, view.activeId) }))}</p>`;
 
   return `
@@ -7602,8 +7796,8 @@ function normalActions(view) {
       ${actionHeader(view)}
       ${state.turn.stabilizer !== null ? `<p class="armed">${esc(t('equipStabilizer'))}</p>` : ''}
       ${turnControls}
-      ${equipmentCards ? `<h4>${esc(t('equipment'))}</h4><div class="equip-row">${equipmentCards}</div>` : ''}
-      ${anyTime.length ? `<p class="muted small">${esc(t('equipmentAnyPlayer'))}: ${anyTime.join(', ')}</p>` : ''}
+      ${equipmentCards ? `<h4 class="desk-only">${esc(t('equipment'))}</h4><div class="equip-row desk-only">${equipmentCards}</div>` : ''}
+      ${anyTime.length ? `<p class="muted small desk-only">${esc(t('equipmentAnyPlayer'))}: ${anyTime.join(', ')}</p>` : ''}
       ${errorBox()}
     </section>`;
 }
@@ -7783,6 +7977,7 @@ function equipPanel(view) {
 }
 
 function actionPanel(view) {
+  UI.cache.moreCount = 0;
   if (UI.state.phase === 'setup') return setupPanel(view);
   if (view.pending) return pendingPanel(view);
   if (UI.equip) return equipPanel(view);
@@ -8930,8 +9125,18 @@ async function onClick(event) {
   if (!el) return;
   const act = el.dataset.act;
   const state = UI.state;
+  if (UI.phoneSheet && PHONE_CLOSE.has(act)) UI.phoneSheet = null;
 
   switch (act) {
+    case 'psheet-open':
+      UI.phoneSheet = el.dataset.v;
+      render();
+      break;
+    case 'psheet-close':
+      if (el.classList.contains('psheet-wrap') && event.target.closest('.psheet')) break;
+      UI.phoneSheet = null;
+      render();
+      break;
     case 'help-open':
       UI.helpOpen = true;
       render();
@@ -9866,6 +10071,7 @@ function setupDealScreen(view) {
     : `<span class="muted">${esc(mine ? t('setupHint') : t('setupWaiting', { name: actor.name }))}</span>`;
   return `
     <div class="game setup-deal">
+      ${phoneBar(view)}
       <header class="topbar">
         <div class="topbar-brand"><span class="logo">${esc(t('appTitle'))}</span><span class="logo-sub">SETUP</span></div>
         <div class="topbar-right">
@@ -9880,13 +10086,14 @@ function setupDealScreen(view) {
       <main class="deal-main">
         <div class="deal-row">
           <div class="deal-card">
-            <strong class="setup-callout">${esc(mine ? t('setupBanner', { name: actor.name }) : t('setupWaiting', { name: actor.name }))}</strong>
+            <strong class="setup-callout">${esc(mine ? t('setupBannerMine', { name: actor.name }) : t('setupWaiting', { name: actor.name }))}</strong>
           </div>
           <div class="deal-chips">${chips}</div>
         </div>
         ${errorBox()}
         <div class="deal-stage">${playerPanel(view, view.players[stageSeat], stageSeat)}</div>
-        <div class="deal-foot">
+        <p class="swipe-hint phone-only">${esc(t('swipeHint'))}</p>
+        <div class="deal-foot${pick && mine ? '' : ' no-pick'}">
           <div class="deal-tray">${tray}</div>
           <button class="btn primary big" data-act="setup-confirm" ${pick && mine ? '' : 'disabled'}>${esc(pick ? `Confirm wire ${valueLabel(pick.value)}` : 'Confirm wire')}</button>
         </div>
@@ -9894,22 +10101,140 @@ function setupDealScreen(view) {
       ${characterSheet(view)}
       ${rulesSheet(view)}
       ${settingsSheet()}
+      ${phoneSheets(view)}
       ${overlay(view)}
     </div>`;
+}
+
+// ---------------------------------------------------------------------------
+// Phone shell (rev 2): slim top bar, one-line table summary, and three sheets
+// (Menu, More, Table). Every piece is hidden on tablet and desktop by CSS.
+const PHONE_CLOSE = new Set(['rules-open', 'settings-open', 'help-open', 'leave-room', 'leave-ask',
+  'setup', 'pause-room', 'resume-room', 'equip', 'reveal', 'coffee-target', 'dual',
+  'solo-confirm', 'solo-cancel', 'log-toggle', 'zoom-open']);
+
+const PHONE_ICON = (() => {
+  const svg = (body) => `<svg class="pico" viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${body}</svg>`;
+  return {
+    cut: svg('<circle cx="6" cy="7" r="3"/><circle cx="6" cy="17" r="3"/><path d="M8.5 8.5L20 18M8.5 15.5L20 6"/>'),
+    book: svg('<path d="M4 5h7v14H4zM13 5h7v14h-7z"/>'),
+    gear: svg('<circle cx="12" cy="12" r="3"/><path d="M12 3v3M12 18v3M3 12h3M18 12h3M5.6 5.6l2.1 2.1M16.3 16.3l2.1 2.1M5.6 18.4l2.1-2.1M16.3 7.7l2.1-2.1"/>'),
+    help: svg('<circle cx="12" cy="12" r="9"/><path d="M9.5 9.5a2.5 2.5 0 1 1 3.5 2.3c-.7.4-1 .9-1 1.7M12 17v.5"/>'),
+    pause: svg('<path d="M8 5v14M16 5v14"/>'),
+    play: svg('<path d="M7 5l12 7-12 7z"/>'),
+    leave: svg('<path d="M10 4H5v16h5M14 8l4 4-4 4M18 12H9"/>'),
+    eye: svg('<path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/>'),
+    cup: svg('<path d="M5 8h11v7a4 4 0 0 1-4 4H9a4 4 0 0 1-4-4zM16 10h2a2 2 0 0 1 0 4h-2M8 3v2M12 3v2"/>'),
+    tool: svg('<rect x="4" y="6" width="16" height="12" rx="2"/><path d="M9 12h6M12 9v6"/>'),
+    dots: svg('<circle cx="5" cy="12" r="1.4" fill="currentColor"/><circle cx="12" cy="12" r="1.4" fill="currentColor"/><circle cx="19" cy="12" r="1.4" fill="currentColor"/>'),
+    list: svg('<path d="M5 7h14M5 12h14M5 17h9"/>'),
+    chev: svg('<path d="M9 5l7 7-7 7"/>'),
+  };
+})();
+
+function moreRow(act, icon, title, sub, attrs = '', cls = '') {
+  return `<button class="more-row${cls}" data-act="${act}"${attrs}>${PHONE_ICON[icon]}<span class="more-text"><b>${esc(title)}</b><small>${esc(sub)}</small></span></button>`;
+}
+
+function turnInfo(view) {
+  const state = UI.state;
+  if (state.phase === 'setup' && state.setupSeat !== null) return { mine: canSetup(view), text: t('phoneSetup') };
+  if (state.phase !== 'playing') return { mine: false, text: '' };
+  const actorId = state.pending ? view.pending.actorId : state.players[state.activeIndex].id;
+  const mine = actorId === view.you;
+  return { mine, text: mine ? t('yourTurnShort') : t('turnOf', { name: playerName(view, actorId) }) };
+}
+
+function phoneBar(view) {
+  const info = turnInfo(view);
+  const dial = view.dial;
+  const danger = dial.zone >= dial.skullAt - 1 && view.phase === 'playing';
+  const dot = isOnline()
+    ? `<span class="pconn ${UI.online.connection === 'offline' ? 'offline' : 'online'}" title="${esc(t(UI.online.connection === 'offline' ? 'offline' : 'connected'))}"></span>`
+    : '';
+  return `<header class="phone-bar phone-only">
+      <span class="phone-turn${info.mine ? ' mine' : ''}">${esc(info.text)}</span>${dot}
+      <button class="phone-dial${danger ? ' danger' : ''}" data-act="psheet-open" data-v="table" aria-label="${esc(t('dial'))} ${dial.zone}/${dial.skullAt}">
+        <span class="phone-dial-art">${artDial(dial.zone, 44)}</span>
+        <span class="phone-dial-num"><b>${dial.zone}</b>/${dial.skullAt}</span>
+      </button>
+      <button class="phone-menu" data-act="psheet-open" data-v="menu" aria-label="${esc(t('menuTitle'))}">${PHONE_ICON.dots}</button>
+    </header>`;
+}
+
+function eventLine(view) {
+  const last = UI.state.log[UI.state.log.length - 1];
+  const text = last ? logText(view, last) : '';
+  if (!text) return '';
+  return `<button class="event-line phone-only" data-act="psheet-open" data-v="log">${PHONE_ICON.list}<span>${esc(text)}</span></button>`;
+}
+
+function tableSummary(view) {
+  const done = view.validation.length;
+  const cells = Array.from({ length: 12 }, (_, index) => {
+    const value = index + 1;
+    const ok = view.validation.includes(value);
+    return `<span class="vm-cell${ok ? ' done' : ''}" title="${esc(t('validation'))} ${value}">${ok ? '✓' : ''}</span>`;
+  }).join('');
+  return `<div class="table-sum phone-only" role="button" tabindex="0" data-act="psheet-open" data-v="table" aria-label="${esc(t('openTable'))}">
+      <span class="ts-head"><span>${esc(t('track'))}</span><span class="ts-open">${esc(t('openTable'))}${PHONE_ICON.chev}</span></span>
+      ${boardTrack(view)}
+      <span class="ts-head"><span>${esc(t('validation'))} <em>${esc(t('validatedCount', { done, total: 12 }))}</em></span></span>
+      <span class="vm-row">${cells}</span>
+    </div>`;
+}
+
+function menuRows(view) {
+  const row = (act, icon, label, cls = '') => `<button class="menu-row${cls}" data-act="${act}">${PHONE_ICON[icon]}<span>${esc(label)}</span></button>`;
+  const online = isOnline();
+  const status = online ? roomStatusLabel(UI.online.room || {}) : '';
+  const rows = [];
+  if (UI.state.phase === 'playing') rows.push(row('rules-open', 'book', t('missionRules')));
+  rows.push(row('settings-open', 'gear', t('settings')));
+  rows.push(row('help-open', 'help', t('howToPlay')));
+  if (online && UI.online.isHost && status === 'playing') rows.push(row('pause-room', 'pause', t('pauseRoom')));
+  if (online && UI.online.isHost && status === 'paused') rows.push(row('resume-room', 'play', t('resumeRoom')));
+  rows.push(online ? row('leave-ask', 'leave', t('leaveRoom'), ' danger') : row('setup', 'leave', t('changeMission'), ' danger'));
+  return rows.join('');
+}
+
+function psheet(title, body, cls) {
+  return `<div class="psheet-wrap phone-only" data-act="psheet-close">
+      <section class="psheet ${cls}" role="dialog" aria-label="${esc(title)}">
+        <span class="psheet-grip"></span>
+        <header class="psheet-head"><strong>${esc(title)}</strong><button class="psheet-x" data-act="psheet-close" aria-label="${esc(t('close'))}">&times;</button></header>
+        <div class="psheet-body">${body}</div>
+      </section>
+    </div>`;
+}
+
+function phoneSheets(view) {
+  const kind = UI.phoneSheet;
+  if (!kind) return '';
+  if (kind === 'menu') return psheet(t('menuTitle'), menuRows(view), 'ps-menu');
+  if (kind === 'more') {
+    if (!(UI.cache.moreCount > 0 || UI.soloConfirm || UI.coffeeOpen)) { UI.phoneSheet = null; return ''; }
+    return psheet(t('moreTitle'), UI.cache.moreHtml || '', 'ps-more');
+  }
+  if (kind === 'log') {
+    const lines = UI.state.log.slice(-40).reverse().map((entry) => `<li class="log-${esc(entry.type)}">${esc(logText(view, entry))}</li>`).join('');
+    return psheet(t('log'), `<ol class="log log-sheet">${lines}</ol><button class="btn ghost small" data-act="export-log">${esc(t('exportLog'))}</button>`, 'ps-log');
+  }
+  if (kind === 'table') {
+    const m = view.markers || {};
+    const hasMarkers = ((m.yellow || []).length + (m.red || []).length) > 0;
+    const legend = hasMarkers ? `<p class="more-note">${esc(t('helpMarkerCaption'))} ${esc(t('helpMarkerQCaption'))}</p>` : '';
+    return psheet(t('tableTitle'), boardCenter(view) + legend, 'ps-table');
+  }
+  return '';
 }
 
 // P6b / P2 phone helpers: the numbers you hold as a row of chips, and a zoom
 // sheet that shows your own stands with large tiles. Both are hidden on
 // desktop by CSS.
 function holdRow(view, seat) {
-  const held = ownValues(view, view.players[seat].id);
-  const values = [...held.filter((value) => value === 'yellow'), ...held.filter((value) => value !== 'yellow')];
-  if (!values.length) return '';
-  const chips = values.map((value) => `<span class="hold-chip${value === 'yellow' ? ' y' : ''}">${esc(value === 'yellow' ? 'Y' : valueLabel(value))}</span>`).join('');
   return `<div class="hold-row">
-      <span class="hold-label">${esc(t('youHold'))}</span>
-      <span class="hold-chips">${chips}</span>
-      <button class="hold-zoom" data-act="zoom-open" aria-label="${esc(t('zoomOpen'))}">${artIcon('eye', 16, 'currentColor', 2.2)} ${esc(t('zoomOpen'))}</button>
+      <button class="hold-zoom" data-act="zoom-open" aria-label="${esc(t('zoomOpen'))}">${artIcon('eye', 18, 'currentColor', 2.2)}<span class="zt">${esc(t('zoomOpen'))}</span></button>
     </div>`;
 }
 
@@ -9945,6 +10270,7 @@ function gameScreen(view) {
   const hasSides = slots.includes('left');
   return `
     <div class="game">
+      ${phoneBar(view)}
       <header class="topbar">
         ${logoRow(view)}
         <div class="topbar-right">
@@ -9961,11 +10287,13 @@ function gameScreen(view) {
         <div class="table-main">
           ${turnBanner(view)}
           <div class="arena${hasSides ? ' has-sides' : ''} facing">
-            <div class="opponents" style="--opps:${Math.max(1, others.length)}">
+            <div class="opponents${others.length > 2 ? ' scrolls' : ''}" data-n="${others.length}" style="--opps:${Math.max(1, others.length)}">
               ${others.map((seat, index) => playerPanel(view, view.players[seat], seat, slots[index])).join('')}
             </div>
             ${boardCenter(view)}
           </div>
+          ${eventLine(view)}
+          <div class="phone-mid">${tableSummary(view)}</div>
           <div class="bottom-dock">
             <div class="action-dock">${actionPanel(view)}</div>
             <div class="me-seat">${playerPanel(view, view.players[me], me)}${holdRow(view, me)}</div>
@@ -9981,8 +10309,21 @@ function gameScreen(view) {
       ${characterSheet(view)}
       ${rulesSheet(view)}
       ${settingsSheet()}
+      ${phoneSheets(view)}
       ${overlay(view)}
     </div>`;
+}
+
+// Rows that scroll sideways on a phone get an edge shadow and a hint line while
+// there is more to see (CSS reads data-over="l", "r" or "lr").
+function updateScrollHints() {
+  document.querySelectorAll('.deal-stage').forEach((el) => {
+    const left = el.scrollLeft > 4;
+    const right = el.scrollLeft + el.clientWidth < el.scrollWidth - 4;
+    const value = `${left ? 'l' : ''}${right ? 'r' : ''}`;
+    if (value) el.setAttribute('data-over', value);
+    else el.removeAttribute('data-over');
+  });
 }
 
 function render() {
@@ -9996,6 +10337,8 @@ function render() {
     panel: keepDraftScroll ? (root.querySelector('.action-panel')?.scrollTop || 0) : 0,
     draft: keepDraftScroll ? (root.querySelector('.draft-scroll')?.scrollTop || 0) : 0,
     log: root.querySelector('.log-panel')?.scrollTop || 0,
+    stage: root.querySelector('.deal-stage')?.scrollLeft || 0,
+    sheet: root.querySelector('.psheet-body')?.scrollTop || 0,
   };
   const oldNeedle = root.querySelector('.bb-needle');
   const oldAngle = oldNeedle ? oldNeedle.style.transform : '';
@@ -10016,6 +10359,11 @@ function render() {
     if (draftScroll && previous.draft) draftScroll.scrollTop = previous.draft;
     const log = root.querySelector('.log-panel');
     if (log && previous.log) log.scrollTop = previous.log;
+    const stage = root.querySelector('.deal-stage');
+    if (stage && previous.stage) stage.scrollLeft = previous.stage;
+    const sheetBody = root.querySelector('.psheet-body');
+    if (sheetBody && previous.sheet) sheetBody.scrollTop = previous.sheet;
+    updateScrollHints();
   };
   if (UI.screen === 'home') {
     paint(homeScreen() + helpSheet());
@@ -10064,6 +10412,9 @@ function render() {
 function boot() {
   const root = document.getElementById('app');
   if (!root) return;
+  document.addEventListener('scroll', (event) => {
+    if (event.target && event.target.classList && event.target.classList.contains('deal-stage')) updateScrollHints();
+  }, true);
   UI.savedSession = readSession();
   if (UI.savedSession && !UI.onlineName) UI.onlineName = UI.savedSession.name;
   root.addEventListener('click', onClick);

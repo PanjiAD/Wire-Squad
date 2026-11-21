@@ -2737,3 +2737,142 @@ html.colorblind .wire.yellow::after { background: radial-gradient(rgba(30,31,36,
   .bottom-dock .choices .choice { flex: 0 0 auto; min-height: 38px; padding: 4px 12px; }
 }
 .help-scroll:not([data-tab="turn"]) .help-first { display: none; }
+
+/* ===================================================================== */
+/* P6c phone rev 2: slim top bar, table summary, Dual Cut + More, sheets  */
+/* Original components stay: summarised here, shown in full in Table.     */
+/* ===================================================================== */
+.phone-only { display: none; }
+@media (max-width: 699px) {
+  .desk-only, .game .topbar, .turn-banner, .log-fab, .arena > .board-center, .action-head,
+  .online-strip.quiet, .online-strip .room-code, .online-strip .muted, .online-strip-actions { display: none !important; }
+  .game { min-height: 100dvh; display: flex; flex-direction: column; }
+  .game > .table { flex: 1 1 auto; }
+  .game .table-main { flex: 1 1 auto; }
+  .game .online-strip { margin: 6px 8px 0; padding: 4px 10px; font-size: 13px; }
+
+  /* top bar */
+  .phone-bar { display: flex; align-items: center; gap: 8px; position: sticky; top: 0; z-index: 30; min-height: 52px; padding: 4px 6px 4px 10px; background: var(--ink); color: var(--cream); border-bottom: 3px solid var(--yellow); }
+  .phone-turn { min-width: 0; padding: 5px 12px; border-radius: 999px; background: var(--cream); color: var(--ink); font: 800 16px/1.1 system-ui, sans-serif; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .phone-turn.mine { background: var(--yellow); }
+  .pconn { flex: 0 0 auto; width: 10px; height: 10px; border-radius: 50%; border: 2px solid var(--cream); background: var(--green); }
+  .pconn.offline { background: var(--red); }
+  .phone-dial { margin-left: auto; display: flex; align-items: center; gap: 6px; min-height: 44px; padding: 0 8px; border: 2px solid var(--cream); border-radius: 10px; background: transparent; color: var(--cream); cursor: pointer; }
+  .phone-dial.danger { border-color: #ff8a8a; background: rgba(215, 38, 61, .35); }
+  .phone-dial-art { display: block; width: 38px; height: 36px; line-height: 0; }
+  .phone-dial-art svg { width: 100%; height: 100%; display: block; }
+  .phone-dial-num { font: 400 18px/1 Impact, 'Arial Narrow Bold', sans-serif; letter-spacing: .02em; white-space: nowrap; }
+  .phone-dial-num b { font-weight: 400; font-size: 22px; }
+  .phone-menu { flex: 0 0 auto; width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; border: 2px solid var(--cream); border-radius: 10px; background: transparent; color: var(--cream); cursor: pointer; padding: 0; }
+  .pico { display: block; flex: none; }
+
+  /* event line and table summary */
+  .event-line { display: flex; align-items: center; gap: 8px; width: 100%; min-height: 44px; padding: 0 12px; border: var(--line); border-radius: 12px; background: #fff; box-shadow: 3px 3px 0 var(--ink); font: 600 14px system-ui, sans-serif; text-align: left; color: var(--ink); cursor: pointer; }
+  .event-line span { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .phone-mid { margin-top: auto; padding-top: 4px; }
+  .table-sum { display: flex; flex-direction: column; gap: 4px; padding: 6px 8px 8px; border: var(--line); border-radius: 12px; background: var(--cream); box-shadow: 3px 3px 0 var(--ink); cursor: pointer; }
+  .ts-head { display: flex; align-items: center; justify-content: space-between; font: 800 11px system-ui, sans-serif; letter-spacing: .04em; text-transform: uppercase; }
+  .ts-head em { font-style: normal; font-weight: 700; letter-spacing: 0; text-transform: none; }
+  .ts-open { display: inline-flex; align-items: center; gap: 2px; text-transform: none; letter-spacing: 0; font-weight: 700; font-size: 12px; }
+  .ts-open .pico { width: 14px; height: 14px; }
+  .table-sum .board-track { padding: 0; gap: 2px; background: none; border: 0; box-shadow: none; }
+  .table-sum .tk-cell { min-height: 26px; }
+  .table-sum .tk-cell b { font-size: 13px; }
+  .table-sum .tk-mark { transform: scale(.7); transform-origin: top right; }
+  .vm-row { display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); gap: 2px; }
+  .vm-cell { min-height: 24px; display: flex; align-items: center; justify-content: center; border: 2px dashed #6b6d76; border-radius: 6px; background: rgba(255, 255, 255, .55); font-weight: 900; font-size: 14px; }
+  .vm-cell.done { border: 2px solid var(--ink); background: var(--green); color: var(--ink); }
+
+  /* dock: stand + Dual Cut + More */
+  .bottom-dock .action-dock { padding: 6px 12px calc(10px + env(safe-area-inset-bottom, 0px)); }
+  .bottom-dock .action-panel:not(.draft):not(.pending):not(.equip-bar) { display: block; }
+  .phone-actions { display: flex; gap: 10px; }
+  .phone-actions .dual-big { flex: 1 1 auto; display: flex; align-items: center; justify-content: center; gap: 10px; min-height: 56px; font-size: 20px; }
+  .more-btn { position: relative; flex: 0 0 104px; min-height: 56px; display: flex; align-items: center; justify-content: center; border: var(--line); border-radius: 12px; background: #fff; box-shadow: 3px 3px 0 var(--ink); font: 800 17px system-ui, sans-serif; color: var(--ink); cursor: pointer; }
+  .more-badge { position: absolute; top: -9px; right: -7px; min-width: 24px; height: 24px; padding: 0 5px; border-radius: 12px; border: 2px solid var(--cream); background: var(--ink); color: var(--cream); font: 800 13px/20px system-ui, sans-serif; font-style: normal; text-align: center; }
+  .bottom-dock .waiting-box { margin: 0; min-height: 56px; display: flex; align-items: center; justify-content: center; border: 3px solid #6b6d76; border-radius: 12px; background: #d9d6cc; color: #3a3c45; font-weight: 800; font-size: 17px; }
+  .bottom-dock .waiting-box::before { content: ''; width: 12px; height: 12px; margin-right: 10px; border-radius: 50%; background: var(--ink); animation: pdot 1.1s ease-in-out infinite; }
+  @keyframes pdot { 0%, 100% { opacity: 1; } 50% { opacity: .3; } }
+  /* the zoom button replaces the old "You hold" row */
+  .bottom-dock .me-seat { position: relative; }
+  .me-seat .hold-row { position: absolute; top: 4px; right: 8px; padding: 0; z-index: 2; }
+  .me-seat .hold-chips, .me-seat .hold-label { display: none; }
+
+  /* sheets */
+  .psheet-wrap { display: flex; position: fixed; inset: 0; z-index: 70; align-items: flex-end; background: rgba(30, 31, 36, .55); }
+  .psheet { width: 100%; max-height: 88dvh; display: flex; flex-direction: column; background: var(--cream); border-top: 4px solid var(--ink); border-radius: 22px 22px 0 0; padding: 8px 12px calc(14px + env(safe-area-inset-bottom, 0px)); }
+  .psheet-grip { width: 44px; height: 5px; margin: 0 auto 6px; border-radius: 3px; background: #9b9788; }
+  .psheet-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
+  .psheet-head strong { font: 400 24px/1 Impact, 'Arial Narrow Bold', sans-serif; text-transform: uppercase; letter-spacing: .02em; }
+  .psheet-x { width: 44px; height: 44px; border: var(--line); border-radius: 10px; background: #fff; font-size: 28px; line-height: 1; cursor: pointer; color: var(--ink); }
+  .psheet-body { overflow-y: auto; min-height: 0; }
+  .menu-row, .more-row { display: flex; align-items: center; gap: 12px; width: 100%; min-height: 56px; margin-bottom: 8px; padding: 6px 12px; border: var(--line); border-radius: 12px; background: #fff; box-shadow: 3px 3px 0 var(--ink); text-align: left; color: var(--ink); cursor: pointer; font: 700 17px system-ui, sans-serif; }
+  .menu-row.danger { color: #b01e31; }
+  .more-row.equip { background: #fbd7a8; }
+  .more-text { display: flex; flex-direction: column; min-width: 0; }
+  .more-text b { font-size: 17px; }
+  .more-text small { font: 500 13px system-ui, sans-serif; color: #3a3c45; }
+  .more-note { margin: 4px 4px 0; font: 500 12.5px system-ui, sans-serif; color: #3a3c45; }
+  .psheet.ps-table .board-center { margin: 0; }
+  .psheet.ps-table .board-center .board-mission { display: none; }
+  .psheet.ps-table .board-mission-card { display: block; }
+  .psheet .confirm-box { margin: 0; }
+
+  /* setup: one task per screen */
+  .setup-deal .deal-main { padding: 8px 12px 16px; gap: 10px; }
+  .setup-deal .deal-row { flex-direction: column; align-items: stretch; gap: 8px; }
+  .setup-deal .deal-card { max-width: none; padding: 10px 12px; text-align: center; }
+  .setup-deal .deal-card .setup-callout { font-size: 20px; line-height: 1.15; }
+  .setup-deal .deal-chips { flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; gap: 6px; }
+  .setup-deal .deal-chips::-webkit-scrollbar { display: none; }
+  .setup-deal .deal-chip { flex: 0 0 auto; }
+  .setup-deal .deal-stage { overflow-x: auto; padding-bottom: 6px; border: var(--line); border-radius: 12px; background: rgba(30, 31, 36, .12); }
+  .setup-deal .deal-stage .player { padding: 18px 8px 0; width: max-content; min-width: 100%; }
+  .setup-deal .deal-stage .stand { --lab: 0px; --ww: 40px; }
+  .setup-deal .deal-stage .stand .wire:not(.cut) { width: auto; height: auto; }
+  .setup-deal .deal-foot { position: sticky; bottom: 0; flex-direction: column; gap: 8px; padding: 8px 0 calc(8px + env(safe-area-inset-bottom, 0px)); background: linear-gradient(0deg, var(--desk) 70%, rgba(159, 180, 194, 0)); }
+  .setup-deal .deal-tray { flex: 0 0 auto; min-height: 44px; padding: 4px 12px; }
+  .setup-deal .deal-foot .btn.big { width: 100%; min-height: 56px; font-size: 20px; }
+  .setup-deal .deal-foot.no-pick .btn { display: none; }
+  .setup-deal .deal-foot.no-pick .deal-tray { border-style: solid; justify-content: center; text-align: center; font-size: 16px; }
+}
+
+@media (max-width: 699px) {
+  .game .table { display: flex; flex-direction: column; }
+  .game .table > .side { display: none; }
+  .opponents[data-n="2"] .player:not(.expanded) { flex: 1 1 0; min-width: 0; }
+  .opponents.scrolls { -webkit-mask-image: linear-gradient(90deg, #000 calc(100% - 30px), transparent); mask-image: linear-gradient(90deg, #000 calc(100% - 30px), transparent); }
+  .log-sheet { margin: 0 0 10px; padding-left: 18px; font-size: 14px; line-height: 1.4; }
+  .log-sheet li { margin-bottom: 4px; }
+}
+
+@media (max-width: 699px) {
+  .opponents[data-n="2"] .player:not(.expanded) .wire-count { display: none; }
+}
+
+@media (max-width: 699px) {
+  .setup-deal .deal-stage .stands { align-items: flex-start; }
+  .setup-deal .deal-stage[data-over="r"] { box-shadow: inset -22px 0 14px -14px rgba(30, 31, 36, .6); }
+  .setup-deal .deal-stage[data-over="l"] { box-shadow: inset 22px 0 14px -14px rgba(30, 31, 36, .6); }
+  .setup-deal .deal-stage[data-over="lr"] { box-shadow: inset 22px 0 14px -14px rgba(30, 31, 36, .6), inset -22px 0 14px -14px rgba(30, 31, 36, .6); }
+  .swipe-hint { display: none; margin: -4px 0 0; text-align: center; font: 700 12px system-ui, sans-serif; color: var(--ink); }
+  .deal-stage[data-over] + .swipe-hint { display: block; }
+}
+@media (max-width: 699px) {
+  .setup-deal .deal-main { min-width: 0; width: 100%; box-sizing: border-box; }
+  .setup-deal .deal-main > * { min-width: 0; max-width: 100%; }
+}
+@media (max-width: 699px) {
+  .setup-deal .deal-row { flex-wrap: nowrap; }
+}
+@media (max-width: 699px) {
+  .game .table { min-width: 0; max-width: 100%; }
+  .game .table-main, .game .arena, .game .opponents { min-width: 0; max-width: 100%; box-sizing: border-box; }
+}
+
+@media (max-width: 699px) {
+  .me-seat .hold-zoom { width: 44px; height: 44px; min-height: 44px; padding: 0; justify-content: center; border-radius: 10px; }
+  .me-seat .hold-zoom .zt { display: none; }
+  .me-seat .hold-row { top: 2px; }
+  .me-seat .player-head .wire-count { display: none; }
+}

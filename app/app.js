@@ -89,6 +89,7 @@ const UI = {
   equip: null,
   equipNeed: null,
   logOpen: false,
+  phoneSheet: null,
   stamp: null,
   leaveAsk: false,
   banners: [],
@@ -1326,8 +1327,9 @@ function onlineStrip(view) {
   const room = online.room || {};
   const stale = onlineStale();
   const status = roomStatusLabel(room);
+  const quiet = !stale.length && status !== 'paused' && online.connection !== 'offline';
   return `
-    <div class="online-strip">
+    <div class="online-strip${quiet ? ' quiet' : ''}">
       <span class="room-code">${esc(t('room'))} <b>${esc(online.code)}</b></span>
       <span class="conn ${online.connection === 'offline' ? 'offline' : 'online'}">
         ${esc(t(online.connection === 'offline' ? 'offline' : 'connected'))}
@@ -1530,12 +1532,12 @@ function normalActions(view) {
   const soloConfirmBox = soloConfirm
     ? `<div class="confirm-box sht">
         <strong class="q">${esc(t('soloConfirmTitle', { value: valueLabel(soloConfirm.value ?? 'yellow') }))}</strong>
-        <p>${esc(t('soloConfirmText', {
+        <p>${esc(t(soloConfirm.count === 1 ? 'soloConfirmTextOne' : 'soloConfirmText', {
           count: soloConfirm.count,
           value: valueLabel(soloConfirm.value ?? 'yellow'),
         }))}</p>
         <div class="action-buttons">
-          <button class="btn" data-act="solo-confirm">${esc(t('soloConfirmAction', { count: soloConfirm.count }))}</button>
+          <button class="btn" data-act="solo-confirm">${esc(t(soloConfirm.count === 1 ? 'soloConfirmActionOne' : 'soloConfirmAction', { count: soloConfirm.count }))}</button>
           <button class="btn ghost" data-act="solo-cancel">${esc(t('cancel'))}</button>
         </div>
       </div>`
@@ -1570,15 +1572,46 @@ function normalActions(view) {
   const soloIdle = solo.length
     ? ''
     : `<button class="btn ghost" disabled title="${esc(t('soloCutHint'))}">${esc(t('soloCut'))}</button>`;
+  // Phone: Dual Cut plus one More button. Only actions that can be done right
+  // now are listed in the More sheet; everything else stays out of sight.
+  const moreRows = [];
+  solo.forEach((action) => {
+    const seat = seatOf(view, actorId);
+    const count = handWiresOf(view, seat).filter((wire) => !wire.cut && !wire.revealed && (
+      action.kind === 'yellow' ? wire.kind === 'yellow' : wire.kind === 'blue' && wire.value === action.value
+    )).length;
+    const value = valueLabel(action.value ?? 'yellow');
+    const sub = action.kind === 'yellow'
+      ? t(count === 1 ? 'soloRowYellowOne' : 'soloRowYellowMany', { count })
+      : t(count === 1 ? 'soloRowOne' : 'soloRowMany', { count, value });
+    moreRows.push(moreRow('solo', 'cut', t('soloChoiceTitle', { value }), sub,
+      ` data-kind="${action.kind}" data-v="${action.value ?? ''}" data-count="${count}"`));
+  });
+  if (reveal) moreRows.push(moreRow('reveal', 'eye', t('revealRed'), t('revealRedShort')));
+  if (canCoffee) moreRows.push(moreRow('coffee', 'cup', t('coffeeMug'), t('coffeeMugHint'), '', ' equip'));
+  view.equipment.filter((card) => card.usable && !card.used && card.number !== 11).forEach((card) => {
+    moreRows.push(moreRow('equip', 'tool', `#${card.number} ${card.name}`, t('moreEquipReady'), ` data-card="${card.number}"`, ' equip'));
+  });
+  UI.cache.moreCount = myTurn ? moreRows.length : 0;
+  UI.cache.moreHtml = soloConfirm
+    ? soloConfirmBox
+    : UI.coffeeOpen
+      ? `<h4>${esc(t('chooseTarget'))}</h4><div class="target-row">${coffeeButtons || '<span class="muted">-</span>'}</div>`
+      : `<div class="more-list">${moreRows.join('')}</div><p class="more-note">${esc(t('moreNote'))}</p>`;
+  const phoneActions = `<div class="phone-actions phone-only">
+      <button class="mb dual-big" data-act="dual">${PHONE_ICON.cut}${esc(t('dualCut'))}</button>
+      ${UI.cache.moreCount ? `<button class="more-btn" data-act="psheet-open" data-v="more">${esc(t('moreButton'))}<i class="more-badge">${UI.cache.moreCount}</i></button>` : ''}
+    </div>`;
   const turnControls = myTurn
-    ? `<div class="action-buttons">
+    ? `<div class="action-buttons desk-only">
         <button class="mb" data-act="dual">${esc(t('dualCut'))}</button>
         ${soloIdle}
         ${revealButton}
         ${coffeeButton}
       </div>
-      ${soloButtons ? `<h4>${esc(t('soloCut'))}</h4>${soloConfirmBox}${soloConfirm ? '' : `<div class="choices">${soloButtons}</div>`}` : ''}
-      ${UI.coffeeOpen ? `<h4>${esc(t('chooseTarget'))}</h4><div class="target-row">${coffeeButtons || `<span class="muted">-</span>`}</div>` : ''}`
+      ${phoneActions}
+      ${soloButtons ? `<div class="desk-only"><h4>${esc(t('soloCut'))}</h4>${soloConfirmBox}${soloConfirm ? '' : `<div class="choices">${soloButtons}</div>`}</div>` : ''}
+      ${UI.coffeeOpen ? `<div class="desk-only"><h4>${esc(t('chooseTarget'))}</h4><div class="target-row">${coffeeButtons || `<span class="muted">-</span>`}</div></div>` : ''}`
     : `<p class="waiting-box">${esc(t('waiting', { name: playerName(view, view.activeId) }))}</p>`;
 
   return `
@@ -1586,8 +1619,8 @@ function normalActions(view) {
       ${actionHeader(view)}
       ${state.turn.stabilizer !== null ? `<p class="armed">${esc(t('equipStabilizer'))}</p>` : ''}
       ${turnControls}
-      ${equipmentCards ? `<h4>${esc(t('equipment'))}</h4><div class="equip-row">${equipmentCards}</div>` : ''}
-      ${anyTime.length ? `<p class="muted small">${esc(t('equipmentAnyPlayer'))}: ${anyTime.join(', ')}</p>` : ''}
+      ${equipmentCards ? `<h4 class="desk-only">${esc(t('equipment'))}</h4><div class="equip-row desk-only">${equipmentCards}</div>` : ''}
+      ${anyTime.length ? `<p class="muted small desk-only">${esc(t('equipmentAnyPlayer'))}: ${anyTime.join(', ')}</p>` : ''}
       ${errorBox()}
     </section>`;
 }
@@ -1767,6 +1800,7 @@ function equipPanel(view) {
 }
 
 function actionPanel(view) {
+  UI.cache.moreCount = 0;
   if (UI.state.phase === 'setup') return setupPanel(view);
   if (view.pending) return pendingPanel(view);
   if (UI.equip) return equipPanel(view);
@@ -2914,8 +2948,18 @@ async function onClick(event) {
   if (!el) return;
   const act = el.dataset.act;
   const state = UI.state;
+  if (UI.phoneSheet && PHONE_CLOSE.has(act)) UI.phoneSheet = null;
 
   switch (act) {
+    case 'psheet-open':
+      UI.phoneSheet = el.dataset.v;
+      render();
+      break;
+    case 'psheet-close':
+      if (el.classList.contains('psheet-wrap') && event.target.closest('.psheet')) break;
+      UI.phoneSheet = null;
+      render();
+      break;
     case 'help-open':
       UI.helpOpen = true;
       render();
@@ -3850,6 +3894,7 @@ function setupDealScreen(view) {
     : `<span class="muted">${esc(mine ? t('setupHint') : t('setupWaiting', { name: actor.name }))}</span>`;
   return `
     <div class="game setup-deal">
+      ${phoneBar(view)}
       <header class="topbar">
         <div class="topbar-brand"><span class="logo">${esc(t('appTitle'))}</span><span class="logo-sub">SETUP</span></div>
         <div class="topbar-right">
@@ -3864,13 +3909,14 @@ function setupDealScreen(view) {
       <main class="deal-main">
         <div class="deal-row">
           <div class="deal-card">
-            <strong class="setup-callout">${esc(mine ? t('setupBanner', { name: actor.name }) : t('setupWaiting', { name: actor.name }))}</strong>
+            <strong class="setup-callout">${esc(mine ? t('setupBannerMine', { name: actor.name }) : t('setupWaiting', { name: actor.name }))}</strong>
           </div>
           <div class="deal-chips">${chips}</div>
         </div>
         ${errorBox()}
         <div class="deal-stage">${playerPanel(view, view.players[stageSeat], stageSeat)}</div>
-        <div class="deal-foot">
+        <p class="swipe-hint phone-only">${esc(t('swipeHint'))}</p>
+        <div class="deal-foot${pick && mine ? '' : ' no-pick'}">
           <div class="deal-tray">${tray}</div>
           <button class="btn primary big" data-act="setup-confirm" ${pick && mine ? '' : 'disabled'}>${esc(pick ? `Confirm wire ${valueLabel(pick.value)}` : 'Confirm wire')}</button>
         </div>
@@ -3878,22 +3924,140 @@ function setupDealScreen(view) {
       ${characterSheet(view)}
       ${rulesSheet(view)}
       ${settingsSheet()}
+      ${phoneSheets(view)}
       ${overlay(view)}
     </div>`;
+}
+
+// ---------------------------------------------------------------------------
+// Phone shell (rev 2): slim top bar, one-line table summary, and three sheets
+// (Menu, More, Table). Every piece is hidden on tablet and desktop by CSS.
+const PHONE_CLOSE = new Set(['rules-open', 'settings-open', 'help-open', 'leave-room', 'leave-ask',
+  'setup', 'pause-room', 'resume-room', 'equip', 'reveal', 'coffee-target', 'dual',
+  'solo-confirm', 'solo-cancel', 'log-toggle', 'zoom-open']);
+
+const PHONE_ICON = (() => {
+  const svg = (body) => `<svg class="pico" viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${body}</svg>`;
+  return {
+    cut: svg('<circle cx="6" cy="7" r="3"/><circle cx="6" cy="17" r="3"/><path d="M8.5 8.5L20 18M8.5 15.5L20 6"/>'),
+    book: svg('<path d="M4 5h7v14H4zM13 5h7v14h-7z"/>'),
+    gear: svg('<circle cx="12" cy="12" r="3"/><path d="M12 3v3M12 18v3M3 12h3M18 12h3M5.6 5.6l2.1 2.1M16.3 16.3l2.1 2.1M5.6 18.4l2.1-2.1M16.3 7.7l2.1-2.1"/>'),
+    help: svg('<circle cx="12" cy="12" r="9"/><path d="M9.5 9.5a2.5 2.5 0 1 1 3.5 2.3c-.7.4-1 .9-1 1.7M12 17v.5"/>'),
+    pause: svg('<path d="M8 5v14M16 5v14"/>'),
+    play: svg('<path d="M7 5l12 7-12 7z"/>'),
+    leave: svg('<path d="M10 4H5v16h5M14 8l4 4-4 4M18 12H9"/>'),
+    eye: svg('<path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/>'),
+    cup: svg('<path d="M5 8h11v7a4 4 0 0 1-4 4H9a4 4 0 0 1-4-4zM16 10h2a2 2 0 0 1 0 4h-2M8 3v2M12 3v2"/>'),
+    tool: svg('<rect x="4" y="6" width="16" height="12" rx="2"/><path d="M9 12h6M12 9v6"/>'),
+    dots: svg('<circle cx="5" cy="12" r="1.4" fill="currentColor"/><circle cx="12" cy="12" r="1.4" fill="currentColor"/><circle cx="19" cy="12" r="1.4" fill="currentColor"/>'),
+    list: svg('<path d="M5 7h14M5 12h14M5 17h9"/>'),
+    chev: svg('<path d="M9 5l7 7-7 7"/>'),
+  };
+})();
+
+function moreRow(act, icon, title, sub, attrs = '', cls = '') {
+  return `<button class="more-row${cls}" data-act="${act}"${attrs}>${PHONE_ICON[icon]}<span class="more-text"><b>${esc(title)}</b><small>${esc(sub)}</small></span></button>`;
+}
+
+function turnInfo(view) {
+  const state = UI.state;
+  if (state.phase === 'setup' && state.setupSeat !== null) return { mine: canSetup(view), text: t('phoneSetup') };
+  if (state.phase !== 'playing') return { mine: false, text: '' };
+  const actorId = state.pending ? view.pending.actorId : state.players[state.activeIndex].id;
+  const mine = actorId === view.you;
+  return { mine, text: mine ? t('yourTurnShort') : t('turnOf', { name: playerName(view, actorId) }) };
+}
+
+function phoneBar(view) {
+  const info = turnInfo(view);
+  const dial = view.dial;
+  const danger = dial.zone >= dial.skullAt - 1 && view.phase === 'playing';
+  const dot = isOnline()
+    ? `<span class="pconn ${UI.online.connection === 'offline' ? 'offline' : 'online'}" title="${esc(t(UI.online.connection === 'offline' ? 'offline' : 'connected'))}"></span>`
+    : '';
+  return `<header class="phone-bar phone-only">
+      <span class="phone-turn${info.mine ? ' mine' : ''}">${esc(info.text)}</span>${dot}
+      <button class="phone-dial${danger ? ' danger' : ''}" data-act="psheet-open" data-v="table" aria-label="${esc(t('dial'))} ${dial.zone}/${dial.skullAt}">
+        <span class="phone-dial-art">${artDial(dial.zone, 44)}</span>
+        <span class="phone-dial-num"><b>${dial.zone}</b>/${dial.skullAt}</span>
+      </button>
+      <button class="phone-menu" data-act="psheet-open" data-v="menu" aria-label="${esc(t('menuTitle'))}">${PHONE_ICON.dots}</button>
+    </header>`;
+}
+
+function eventLine(view) {
+  const last = UI.state.log[UI.state.log.length - 1];
+  const text = last ? logText(view, last) : '';
+  if (!text) return '';
+  return `<button class="event-line phone-only" data-act="psheet-open" data-v="log">${PHONE_ICON.list}<span>${esc(text)}</span></button>`;
+}
+
+function tableSummary(view) {
+  const done = view.validation.length;
+  const cells = Array.from({ length: 12 }, (_, index) => {
+    const value = index + 1;
+    const ok = view.validation.includes(value);
+    return `<span class="vm-cell${ok ? ' done' : ''}" title="${esc(t('validation'))} ${value}">${ok ? '✓' : ''}</span>`;
+  }).join('');
+  return `<div class="table-sum phone-only" role="button" tabindex="0" data-act="psheet-open" data-v="table" aria-label="${esc(t('openTable'))}">
+      <span class="ts-head"><span>${esc(t('track'))}</span><span class="ts-open">${esc(t('openTable'))}${PHONE_ICON.chev}</span></span>
+      ${boardTrack(view)}
+      <span class="ts-head"><span>${esc(t('validation'))} <em>${esc(t('validatedCount', { done, total: 12 }))}</em></span></span>
+      <span class="vm-row">${cells}</span>
+    </div>`;
+}
+
+function menuRows(view) {
+  const row = (act, icon, label, cls = '') => `<button class="menu-row${cls}" data-act="${act}">${PHONE_ICON[icon]}<span>${esc(label)}</span></button>`;
+  const online = isOnline();
+  const status = online ? roomStatusLabel(UI.online.room || {}) : '';
+  const rows = [];
+  if (UI.state.phase === 'playing') rows.push(row('rules-open', 'book', t('missionRules')));
+  rows.push(row('settings-open', 'gear', t('settings')));
+  rows.push(row('help-open', 'help', t('howToPlay')));
+  if (online && UI.online.isHost && status === 'playing') rows.push(row('pause-room', 'pause', t('pauseRoom')));
+  if (online && UI.online.isHost && status === 'paused') rows.push(row('resume-room', 'play', t('resumeRoom')));
+  rows.push(online ? row('leave-ask', 'leave', t('leaveRoom'), ' danger') : row('setup', 'leave', t('changeMission'), ' danger'));
+  return rows.join('');
+}
+
+function psheet(title, body, cls) {
+  return `<div class="psheet-wrap phone-only" data-act="psheet-close">
+      <section class="psheet ${cls}" role="dialog" aria-label="${esc(title)}">
+        <span class="psheet-grip"></span>
+        <header class="psheet-head"><strong>${esc(title)}</strong><button class="psheet-x" data-act="psheet-close" aria-label="${esc(t('close'))}">&times;</button></header>
+        <div class="psheet-body">${body}</div>
+      </section>
+    </div>`;
+}
+
+function phoneSheets(view) {
+  const kind = UI.phoneSheet;
+  if (!kind) return '';
+  if (kind === 'menu') return psheet(t('menuTitle'), menuRows(view), 'ps-menu');
+  if (kind === 'more') {
+    if (!(UI.cache.moreCount > 0 || UI.soloConfirm || UI.coffeeOpen)) { UI.phoneSheet = null; return ''; }
+    return psheet(t('moreTitle'), UI.cache.moreHtml || '', 'ps-more');
+  }
+  if (kind === 'log') {
+    const lines = UI.state.log.slice(-40).reverse().map((entry) => `<li class="log-${esc(entry.type)}">${esc(logText(view, entry))}</li>`).join('');
+    return psheet(t('log'), `<ol class="log log-sheet">${lines}</ol><button class="btn ghost small" data-act="export-log">${esc(t('exportLog'))}</button>`, 'ps-log');
+  }
+  if (kind === 'table') {
+    const m = view.markers || {};
+    const hasMarkers = ((m.yellow || []).length + (m.red || []).length) > 0;
+    const legend = hasMarkers ? `<p class="more-note">${esc(t('helpMarkerCaption'))} ${esc(t('helpMarkerQCaption'))}</p>` : '';
+    return psheet(t('tableTitle'), boardCenter(view) + legend, 'ps-table');
+  }
+  return '';
 }
 
 // P6b / P2 phone helpers: the numbers you hold as a row of chips, and a zoom
 // sheet that shows your own stands with large tiles. Both are hidden on
 // desktop by CSS.
 function holdRow(view, seat) {
-  const held = ownValues(view, view.players[seat].id);
-  const values = [...held.filter((value) => value === 'yellow'), ...held.filter((value) => value !== 'yellow')];
-  if (!values.length) return '';
-  const chips = values.map((value) => `<span class="hold-chip${value === 'yellow' ? ' y' : ''}">${esc(value === 'yellow' ? 'Y' : valueLabel(value))}</span>`).join('');
   return `<div class="hold-row">
-      <span class="hold-label">${esc(t('youHold'))}</span>
-      <span class="hold-chips">${chips}</span>
-      <button class="hold-zoom" data-act="zoom-open" aria-label="${esc(t('zoomOpen'))}">${artIcon('eye', 16, 'currentColor', 2.2)} ${esc(t('zoomOpen'))}</button>
+      <button class="hold-zoom" data-act="zoom-open" aria-label="${esc(t('zoomOpen'))}">${artIcon('eye', 18, 'currentColor', 2.2)}<span class="zt">${esc(t('zoomOpen'))}</span></button>
     </div>`;
 }
 
@@ -3929,6 +4093,7 @@ function gameScreen(view) {
   const hasSides = slots.includes('left');
   return `
     <div class="game">
+      ${phoneBar(view)}
       <header class="topbar">
         ${logoRow(view)}
         <div class="topbar-right">
@@ -3945,11 +4110,13 @@ function gameScreen(view) {
         <div class="table-main">
           ${turnBanner(view)}
           <div class="arena${hasSides ? ' has-sides' : ''} facing">
-            <div class="opponents" style="--opps:${Math.max(1, others.length)}">
+            <div class="opponents${others.length > 2 ? ' scrolls' : ''}" data-n="${others.length}" style="--opps:${Math.max(1, others.length)}">
               ${others.map((seat, index) => playerPanel(view, view.players[seat], seat, slots[index])).join('')}
             </div>
             ${boardCenter(view)}
           </div>
+          ${eventLine(view)}
+          <div class="phone-mid">${tableSummary(view)}</div>
           <div class="bottom-dock">
             <div class="action-dock">${actionPanel(view)}</div>
             <div class="me-seat">${playerPanel(view, view.players[me], me)}${holdRow(view, me)}</div>
@@ -3965,8 +4132,21 @@ function gameScreen(view) {
       ${characterSheet(view)}
       ${rulesSheet(view)}
       ${settingsSheet()}
+      ${phoneSheets(view)}
       ${overlay(view)}
     </div>`;
+}
+
+// Rows that scroll sideways on a phone get an edge shadow and a hint line while
+// there is more to see (CSS reads data-over="l", "r" or "lr").
+function updateScrollHints() {
+  document.querySelectorAll('.deal-stage').forEach((el) => {
+    const left = el.scrollLeft > 4;
+    const right = el.scrollLeft + el.clientWidth < el.scrollWidth - 4;
+    const value = `${left ? 'l' : ''}${right ? 'r' : ''}`;
+    if (value) el.setAttribute('data-over', value);
+    else el.removeAttribute('data-over');
+  });
 }
 
 function render() {
@@ -3980,6 +4160,8 @@ function render() {
     panel: keepDraftScroll ? (root.querySelector('.action-panel')?.scrollTop || 0) : 0,
     draft: keepDraftScroll ? (root.querySelector('.draft-scroll')?.scrollTop || 0) : 0,
     log: root.querySelector('.log-panel')?.scrollTop || 0,
+    stage: root.querySelector('.deal-stage')?.scrollLeft || 0,
+    sheet: root.querySelector('.psheet-body')?.scrollTop || 0,
   };
   const oldNeedle = root.querySelector('.bb-needle');
   const oldAngle = oldNeedle ? oldNeedle.style.transform : '';
@@ -4000,6 +4182,11 @@ function render() {
     if (draftScroll && previous.draft) draftScroll.scrollTop = previous.draft;
     const log = root.querySelector('.log-panel');
     if (log && previous.log) log.scrollTop = previous.log;
+    const stage = root.querySelector('.deal-stage');
+    if (stage && previous.stage) stage.scrollLeft = previous.stage;
+    const sheetBody = root.querySelector('.psheet-body');
+    if (sheetBody && previous.sheet) sheetBody.scrollTop = previous.sheet;
+    updateScrollHints();
   };
   if (UI.screen === 'home') {
     paint(homeScreen() + helpSheet());
@@ -4048,6 +4235,9 @@ function render() {
 function boot() {
   const root = document.getElementById('app');
   if (!root) return;
+  document.addEventListener('scroll', (event) => {
+    if (event.target && event.target.classList && event.target.classList.contains('deal-stage')) updateScrollHints();
+  }, true);
   UI.savedSession = readSession();
   if (UI.savedSession && !UI.onlineName) UI.onlineName = UI.savedSession.name;
   root.addEventListener('click', onClick);
