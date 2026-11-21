@@ -824,7 +824,7 @@ button:disabled { opacity: 0.55; cursor: not-allowed; box-shadow: none; }
 .home-main,
 .online-main {
   width: 100%;
-  max-width: 1080px;
+  max-width: 1099px;
   margin: 0 auto;
   padding: 22px clamp(16px, 4vw, 48px) 48px;
   display: grid;
@@ -941,7 +941,7 @@ button:disabled { opacity: 0.55; cursor: not-allowed; box-shadow: none; }
 
 /* ------------------------------------------------------------- responsive */
 
-@media (max-width: 1080px) {
+@media (max-width: 1099px) {
   .board, .table { grid-template-columns: minmax(0, 1fr); }
   .board-center { grid-template-columns: minmax(0, 1fr); }
   .side { position: static; }
@@ -949,7 +949,7 @@ button:disabled { opacity: 0.55; cursor: not-allowed; box-shadow: none; }
   .log-panel { max-height: 220px; }
 }
 
-@media (max-width: 760px) {
+@media (max-width: 699px) {
   .setup-main { grid-template-columns: minmax(0, 1fr); }
   .online-main { grid-template-columns: minmax(0, 1fr); }
   .setup-help { position: static; }
@@ -1060,13 +1060,13 @@ button:disabled { opacity: 0.55; cursor: not-allowed; box-shadow: none; }
 
 /* Responsive overrides for the table. They sit last so they beat the base
    .table rules above. */
-@media (max-width: 1080px) {
+@media (max-width: 1099px) {
   .table { grid-template-columns: minmax(0, 1fr); }
   .board-center { grid-template-columns: minmax(0, 1fr); }
   .board-dial { flex-direction: row; justify-content: space-around; flex-wrap: wrap; gap: 12px; }
   .table .side { position: static; }
 }
-@media (max-width: 760px) {
+@media (max-width: 699px) {
   .table { padding: 8px 8px 20px; gap: 10px; }
   .table-main { gap: 10px; }
   .turn-banner { font-size: 12px; padding: 3px 14px; text-align: center; }
@@ -1083,7 +1083,7 @@ button:disabled { opacity: 0.55; cursor: not-allowed; box-shadow: none; }
   .board-dial .dial-container { flex-direction: row; }
   .board-mission { max-width: none; flex: 1 1 100%; }
 }
-@media (max-width: 760px) {
+@media (max-width: 699px) {
   .board-dial .dial-track { flex-wrap: wrap; justify-content: center; }
   .board-dial .dial { min-width: 0; flex: 1 1 140px; }
 }
@@ -1092,7 +1092,7 @@ button:disabled { opacity: 0.55; cursor: not-allowed; box-shadow: none; }
 /* ------------------------------------------------------ seats around the board
    Desktop: .opponents dissolves so each seat is a grid item of .arena. Four
    and five players get a left and right seat whose racks run vertically. */
-@media (min-width: 1081px) {
+@media (min-width: 1100px) {
   .arena {
     display: grid;
     grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
@@ -1117,7 +1117,7 @@ button:disabled { opacity: 0.55; cursor: not-allowed; box-shadow: none; }
 }
 
 /* Side seats: the rack is a vertical column of rotated tiles (desktop only). */
-@media (min-width: 1081px) {
+@media (min-width: 1100px) {
   .side-seat .player-head { gap: 4px; }
   .side-seat .personal-pill { display: none; }
   .side-seat .stand { flex-direction: column; align-items: flex-start; gap: 2px; }
@@ -1164,7 +1164,7 @@ button:disabled { opacity: 0.55; cursor: not-allowed; box-shadow: none; }
 
 /* Mid-size desktops: slimmer side column and a one-column board so the seats
    and the shared board keep enough room. */
-@media (min-width: 1081px) and (max-width: 1500px) {
+@media (min-width: 1100px) and (max-width: 1500px) {
   .table { grid-template-columns: minmax(0, 1fr) 320px; }
   .arena.has-sides { grid-template-columns: 170px minmax(0, 1fr) minmax(0, 1fr) 170px; }
   .arena.has-sides .board-center { grid-template-columns: minmax(0, 1fr); }
@@ -1255,7 +1255,7 @@ button:disabled { opacity: 0.55; cursor: not-allowed; box-shadow: none; }
 
 /* Phone: opponents are mini cards; tap a nameplate to open the stand. The
    action dock sticks to the bottom like a sheet. */
-@media (max-width: 760px) {
+@media (max-width: 699px) {
   .opponents .player:not(.expanded) .stands,
   .opponents .player:not(.expanded) .badges { display: none; }
   .opponents .player:not(.expanded) { flex-basis: min(190px, 56vw); }
@@ -1386,7 +1386,7 @@ button:disabled { opacity: 0.55; cursor: not-allowed; box-shadow: none; }
 .welcome-decor.left .a { transform: rotate(-16deg) translate(-18px, -10px); }
 .welcome-decor.left .b { transform: rotate(9deg) translate(52px, 52px); }
 .welcome-decor.right .c { transform: rotate(14deg) translate(70px, 80px); }
-.welcome-foot { max-width: 760px; width: 100%; margin: 0 auto; padding: 8px 24px 28px; display: flex; flex-direction: column; gap: 10px; align-items: center; }
+.welcome-foot { max-width: 699px; width: 100%; margin: 0 auto; padding: 8px 24px 28px; display: flex; flex-direction: column; gap: 10px; align-items: center; }
 @media (max-width: 860px) {
   .welcome-hero { grid-template-columns: 1fr; padding-top: 24px; }
   .welcome-decor { min-height: 0; order: 3; }
@@ -1663,10 +1663,10 @@ body.reduce-motion .wire.fx-drop .wire-tokens { animation: none; }
 .board-center.danger .dial-svg-box { animation: danger-pulse 1.1s ease-in-out infinite; }
 @keyframes danger-pulse { 0%,100% { filter: drop-shadow(0 0 0 rgba(215,38,61,0)); } 50% { filter: drop-shadow(0 0 12px rgba(215,38,61,.95)); } }
 html.reduced-motion .board-center.danger .dial-svg-box { animation: none; }
-@media (max-width: 760px) { .eq-slot .eq-art svg { max-height: 54px; } .tk-cell { min-height: 34px; } .tk-cell b { font-size: 15px; } }
+@media (max-width: 699px) { .eq-slot .eq-art svg { max-height: 54px; } .tk-cell { min-height: 34px; } .tk-cell b { font-size: 15px; } }
 
 .wire.solo-target { outline: 3px dashed var(--valid, #3fbf5e); outline-offset: 3px; border-radius: 6px; }
-@media (max-width: 760px) {
+@media (max-width: 699px) {
   .action-dock .action-panel.draft,
   .action-dock .action-panel.pending {
     position: fixed; left: 0; right: 0; bottom: 0; z-index: 40; margin: 0;
@@ -1711,13 +1711,13 @@ html.reduced-motion .player.is-active .turn-arrow svg { animation: none; }
 @keyframes bb-stamp { 0% { transform: scale(1.3); opacity: 0; } 45% { transform: scale(1); opacity: 1; } 100% { transform: scale(1); opacity: 1; } }
 @keyframes bb-ring { from { transform: scale(.8); opacity: .9; } to { transform: scale(1.9); opacity: 0; } }
 html.reduced-motion .tray-slot.stamp svg, html.reduced-motion .tray-slot.stamp::after { animation: none; }
-@media (max-width: 760px) { .tray-slot { min-height: 38px; } .tray-slot .ghost-no { font-size: 16px; } }
+@media (max-width: 699px) { .tray-slot { min-height: 38px; } .tray-slot .ghost-no { font-size: 16px; } }
 .tray-grid { flex: 1 1 100%; width: 100%; max-width: 460px; }
 
 
 /* P6: phone tap targets, safe area, collapsible log */
 .log-toggle { display: none; }
-@media (max-width: 760px) {
+@media (max-width: 699px) {
   .log-toggle { display: inline-flex; }
   .log-panel .log-head { gap: 8px; }
   .log-panel:not(.open) { max-height: none; overflow: hidden; }
@@ -1754,7 +1754,7 @@ html.reduced-motion .tray-slot.stamp svg, html.reduced-motion .tray-slot.stamp::
 .help-list { margin: 0 0 10px; padding-left: 20px; font-size: 15px; line-height: 1.5; }
 .help-list li { margin-bottom: 4px; }
 .help-head h3 { font-size: 22px; }
-@media (max-width: 760px) {
+@media (max-width: 699px) {
   .help-hero { grid-template-columns: minmax(0, 1fr); }
   .help-blocks { grid-template-columns: minmax(0, 1fr); }
   .help-block p, .help-hero-copy p, .help-list { font-size: 14px; }
@@ -1767,7 +1767,7 @@ html.reduced-motion .tray-slot.stamp svg, html.reduced-motion .tray-slot.stamp::
 .equip-all { margin-top: 10px; font-size: 13px; }
 .equip-all summary { cursor: pointer; font-weight: 700; padding: 6px 0; }
 .equip-bar .value-row, .equip-bar .target-row { display: flex; flex-wrap: wrap; gap: 6px; margin: 6px 0; }
-@media (max-width: 760px) {
+@media (max-width: 699px) {
   .action-dock .action-panel.equip-bar {
     position: fixed; left: 0; right: 0; bottom: 0; z-index: 40; margin: 0;
     border-radius: 22px 22px 0 0; border-width: 4px 0 0; box-shadow: 0 -4px 0 rgba(30,31,36,.25);
@@ -2468,7 +2468,7 @@ html.reduced-motion .tray-slot.stamp svg, html.reduced-motion .tray-slot.stamp::
    bottom dock that pins the viewer's own stand above the action bar. The
    dock wrapper does not exist on desktop (display: contents). */
 .bottom-dock { display: contents; }
-@media (max-width: 760px) {
+@media (max-width: 699px) {
   /* header: one line of chips, one scrolling row of small buttons */
   .game .topbar { padding: 6px 10px; gap: 4px 8px; border-bottom-width: 4px; }
   .game .topbar .logo { font-size: 18px; }
@@ -2570,3 +2570,170 @@ html.reduced-motion .tray-slot.stamp svg, html.reduced-motion .tray-slot.stamp::
 @media (max-width: 960px) and (max-height: 500px) {
   .bottom-dock { position: static; margin-bottom: 0; }
 }
+
+/* ===================================== P2 zoom + P6b "you hold" + P10a phone */
+.hold-row, .zoom-wrap { display: none; }
+@media (max-width: 699px) {
+  .me-seat .hold-row { display: flex; align-items: center; gap: 6px; padding: 4px 8px 6px; }
+  .hold-label { flex: 0 0 auto; font-size: 10px; font-weight: 800; letter-spacing: .05em; text-transform: uppercase; color: var(--muted); }
+  .hold-chips { flex: 1 1 auto; display: flex; gap: 3px; overflow-x: auto; scrollbar-width: none; }
+  .hold-chips::-webkit-scrollbar { display: none; }
+  .hold-chip { flex: 0 0 auto; min-width: 22px; height: 22px; padding: 0 3px; display: inline-flex; align-items: center; justify-content: center; border: 2px solid var(--ink); border-radius: 6px; background: var(--ink); color: var(--cream); font: 400 14px/1 Impact, 'Arial Narrow Bold', sans-serif; }
+  .hold-chip.y { background: var(--yellow); color: var(--ink); }
+  .hold-zoom { flex: 0 0 auto; display: inline-flex; align-items: center; gap: 4px; min-height: 30px; padding: 2px 10px; border: 2px solid var(--ink); border-radius: 999px; background: var(--cream); font-weight: 800; font-size: 12px; }
+
+  .zoom-wrap { display: flex; position: fixed; inset: 0; z-index: 60; align-items: flex-end; background: rgba(30,31,36,.55); }
+  .zoom-sheet { width: 100%; max-height: 80vh; overflow: auto; background: var(--cream); border-top: 4px solid var(--ink); border-radius: 22px 22px 0 0; padding: 12px 12px calc(16px + env(safe-area-inset-bottom, 0px)); }
+  .zoom-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; font-size: 18px; }
+  .zoom-sheet .player { border-width: 0; box-shadow: none; padding: 0; background: transparent; }
+  .zoom-sheet .badges, .zoom-sheet .player-head { display: none; }
+  .zoom-sheet .stand { --lab: 0px; --ww: 38px; }
+  .zoom-sheet .stand-label { display: block; }
+  .zoom-sheet .stand .rk-row { min-height: 0; overflow-x: auto; }
+  .zoom-sheet .stand .wire:not(.cut) { width: auto; height: auto; }
+  .zoom-sheet .stand .rack { overflow-x: auto; }
+}
+
+/* P10a on phones: one-line lobby rows, primary actions pinned to the bottom */
+@media (max-width: 640px) {
+  .li { flex-wrap: nowrap; }
+  .li-name { flex: 1 1 auto; flex-basis: auto; font-size: 15px; }
+  .li-name .pill { font-size: 10px; padding: 1px 6px; }
+  .li-state { margin-left: 0; }
+  .li-state .cd-label { display: none; }
+  .create-dial svg, .create-dial .dial-art { width: 150px; height: auto; }
+  .create-bottom, .start-box {
+    position: sticky; bottom: 0; z-index: 10; margin: 10px -14px 0; padding: 10px 14px calc(10px + env(safe-area-inset-bottom, 0px));
+    background: #f6f1e7; border-top: 3px solid var(--ink);
+  }
+}
+
+
+/* ===================================================== P6 tablet (700 to 1099)
+   Same table as desktop, one column. The log is a drawer opened from a
+   floating button, trays are slimmer, and the own stand plus action bar are
+   pinned to the bottom like on the phone. */
+.log-fab { display: none; }
+@media (min-width: 700px) and (max-width: 1099px) {
+  .log-fab {
+    display: inline-flex; align-items: center; position: fixed; right: 14px; bottom: calc(14px + env(safe-area-inset-bottom, 0px)); z-index: 45;
+    min-height: 44px; padding: 6px 18px; border: 3px solid var(--ink); border-radius: 999px; background: var(--yellow); box-shadow: 3px 3px 0 var(--ink);
+    font-weight: 800; letter-spacing: .05em; text-transform: uppercase; font-size: 13px;
+  }
+  .table:has(.log-panel.open) .log-fab { display: none; }
+  .table { padding: 10px 14px 20px; }
+  .table .side {
+    position: fixed; top: 0; right: 0; bottom: 0; width: min(380px, 92vw); z-index: 50; margin: 0; padding: 12px;
+    background: var(--cream); border-left: 4px solid var(--ink); box-shadow: -6px 0 0 rgba(30,31,36,.25);
+    transform: translateX(110%); transition: transform .22s ease; overflow: auto;
+  }
+  .table .side:has(.log-panel.open) { transform: none; }
+  .table .side .log-panel { max-height: none; height: 100%; border: 0; box-shadow: none; background: none; }
+  .table .side .log-panel:not(.open) .log li:not(:first-child) { display: block; }
+  .log-toggle { display: inline-flex; }
+  .log-panel.open { max-height: none; overflow: auto; }
+
+  .tray-info .tray-grid { grid-template-columns: repeat(14, minmax(0, 1fr)); }
+  .tray-valid .tray-grid { grid-template-columns: repeat(12, minmax(0, 1fr)); }
+  .tray-slot, .tray-valid .tray-slot { min-height: 30px; }
+  .board-center { padding: 10px 14px; gap: 10px; }
+
+  .bottom-dock {
+    display: flex; flex-direction: column; position: sticky; bottom: 0; z-index: 25; order: 3;
+    margin: 0 -14px -20px; background: var(--cream); border-top: 4px solid var(--ink); box-shadow: 0 -4px 0 rgba(30,31,36,.18);
+  }
+  .bottom-dock .me-seat { order: 0; }
+  .bottom-dock .action-dock { order: 1; position: static; margin: 0; padding: 6px 14px 10px; background: none; }
+  .me-seat .player { border-width: 0; border-radius: 0; box-shadow: none; padding: 6px 14px 0; background: transparent; }
+  .me-seat .badges { display: none; }
+  .me-seat .stand { --ww: min(30px, max(9px, calc((100cqw - var(--lab) - 4px * var(--u, 8)) / var(--u, 8)))); }
+  .me-seat .stand .rk-row { min-height: 0; }
+  .me-seat .stand .wire:not(.cut) { width: auto; height: auto; }
+  .me-seat .stands { gap: 4px; }
+  .bottom-dock .action-panel:not(.draft):not(.pending):not(.equip-bar) { border-width: 0; box-shadow: none; padding: 0; background: none; max-height: none; }
+  .bottom-dock .action-panel:not(.draft):not(.pending):not(.equip-bar) > .muted,
+  .bottom-dock .action-panel:not(.draft):not(.pending):not(.equip-bar) > h4 { display: none; }
+  .bottom-dock .action-panel.draft, .bottom-dock .action-panel.pending, .bottom-dock .action-panel.equip-bar { max-height: 60vh; overflow: auto; }
+}
+@media (min-width: 700px) and (max-width: 1099px) {
+  .opponents .player .stand .rk-row { min-height: 0; }
+  .opponents .player .stand .wire:not(.cut) { width: auto; height: auto; }
+}
+
+
+/* P2: empty slot (Walkie-Talkies in flight) and the 9 degree table perspective */
+.slot-empty { display: inline-block; align-self: flex-end; width: var(--ww, 28px); aspect-ratio: 88 / 274; border: 2px dashed rgba(30,31,36,.45); border-radius: 8px; background: rgba(30,31,36,.06); box-sizing: border-box; }
+@media (min-width: 700px) {
+  .arena.facing [data-slot^="top"] .rack { transform: perspective(560px) rotateX(9deg) rotate(180deg); transform-origin: 50% 50%; }
+}
+
+
+/* P9: rules side of the mission card, compact board-pocket version */
+.mc.back .rp { left: 12px; right: 12px; top: 86px; height: 188px; background: var(--ink); border-radius: 12px; padding: 10px 12px; color: var(--cream); overflow: auto; }
+.mc.back .rp h4 { margin: 0 0 6px; font-family: var(--bb-font-display); font-weight: 400; font-size: 15px; letter-spacing: .12em; color: var(--yellow); }
+.mc.back .rp ol { margin: 0; padding-left: 18px; font-size: 12px; line-height: 1.35; }
+.mc.back .rp li { margin-bottom: 4px; }
+.mc.back .fl, .mc.back .ok { left: 12px; right: 12px; height: 70px; border: 2.5px solid var(--ink); border-radius: 12px; padding: 8px 12px; font-size: 12px; line-height: 1.3; color: #fff; overflow: hidden; }
+.mc.back .fl { top: 284px; background: var(--red); }
+.mc.back .ok { top: 362px; background: #1f8a3b; }
+.mc.back .fl b, .mc.back .ok b { display: flex; align-items: center; gap: 6px; font-family: var(--bb-font-display); font-weight: 400; font-size: 13px; letter-spacing: .08em; margin-bottom: 2px; }
+.mc-scale.compact { --mc-s: .5; }
+.board-mission-card { display: none; cursor: pointer; align-self: center; }
+.board-mission { cursor: pointer; }
+.card-pop { --mc-s: .9; margin: 0 auto 10px; }
+@media (min-width: 1100px) {
+  .board-mission-card { display: block; }
+  .board-mission { display: none; }
+}
+@media (max-width: 420px) { .card-pop { --mc-s: .85; } }
+.mission-rules-card:has(.card-pop) { background: none; border: 0; box-shadow: none; padding: 0; text-align: center; color: var(--ink); }
+.mc.back .rp { height: 196px; }
+.mc.back .rp ol { font-size: 11.5px; }
+.mc.back .fl { top: 288px; height: 68px; }
+.mc.back .ok { top: 364px; height: 66px; }
+.card-pop .mc { text-align: left; }
+
+
+/* P10c: help tabs with a red reminder, colorblind patterns, phone fixes */
+.help-reminder { display: flex; align-items: center; gap: 8px; padding: 8px 18px; background: var(--red); color: #fff; font-weight: 800; font-size: 14px; }
+.help-tabs { display: flex; gap: 6px; padding: 8px 14px; overflow-x: auto; border-bottom: 3px solid var(--ink); background: var(--cream); scrollbar-width: none; }
+.help-tabs::-webkit-scrollbar { display: none; }
+.help-tab { flex: 0 0 auto; min-height: 40px; padding: 4px 14px; border: 3px solid var(--ink); border-radius: 999px; background: var(--cream); font-weight: 800; font-size: 14px; }
+.help-tab.on { background: var(--yellow); box-shadow: 2px 2px 0 var(--ink); }
+.help-scroll:not([data-tab="turn"]) .help-hero { display: none; }
+.help-blocks[data-tab="turn"] .help-block:not([data-tab="turn"]),
+.help-blocks[data-tab="actions"] .help-block:not([data-tab="actions"]),
+.help-blocks[data-tab="wires"] .help-block:not([data-tab="wires"]),
+.help-blocks[data-tab="equipment"] .help-block:not([data-tab="equipment"]),
+.help-blocks[data-tab="talk"] .help-block:not([data-tab="talk"]) { display: none; }
+.set-sub { display: block; font-size: 11px; font-weight: 500; color: var(--muted); }
+.set-row .switch, .size-btn { min-height: 44px; }
+
+html.colorblind .wire.red .wire-art, html.colorblind .wire.yellow .wire-art { position: relative; }
+html.colorblind .wire.red::after, html.colorblind .wire.yellow::after { content: ""; position: absolute; inset: 0; border-radius: 6px; pointer-events: none; }
+html.colorblind .wire.red::after { background: repeating-linear-gradient(45deg, rgba(255,255,255,.55) 0 3px, transparent 3px 7px); }
+html.colorblind .wire.yellow::after { background: radial-gradient(rgba(30,31,36,.7) 1.6px, transparent 2px) 0 0 / 7px 7px; }
+
+@media (max-width: 699px) {
+  /* two stands side by side when they are short enough: saves a whole row */
+  .me-seat .stands.pair { flex-direction: row; gap: 10px; }
+  .me-seat .stands.pair .stand { flex: 1 1 0; min-width: 0; --lab: 6px; --ww: min(23px, max(9px, calc((50cqw - 16px - var(--lab) - 4px * var(--u, 8)) / var(--u, 8)))); }
+  .me-seat .stands.pair .rack { padding: 0 2px; }
+  .me-seat .stands.pair .rk-row { gap: 3px; }
+  .help-reminder { padding: 6px 14px; font-size: 13px; }
+  .help-tabs { padding: 6px 10px; }
+  /* Dual Cut sheet: tighter, so more of the table stays visible */
+  .action-dock .action-panel.draft .picked { display: none; }
+  .action-dock .action-panel.draft .draft-steps { gap: 6px; }
+  .action-dock .action-panel.draft .step strong { font-size: 14px; }
+  .action-dock .action-panel.draft .value-btn, .action-dock .action-panel.draft .target-btn, .action-dock .action-panel.draft .toggle { min-height: 40px; }
+}
+.help-reminder, .help-tabs { flex: 0 0 auto; }
+@media (max-width: 699px) {
+  /* tall own hand (two long stands): drop the name row and put solo choices on the equipment row */
+  .me-seat .stands.multi:not(.pair) { margin-top: 2px; }
+  .me-seat .player:has(.stands.multi:not(.pair)) .player-head { display: none; }
+  .bottom-dock .choices { display: flex; flex-wrap: nowrap; overflow-x: auto; gap: 6px; scrollbar-width: none; }
+  .bottom-dock .choices .choice { flex: 0 0 auto; min-height: 38px; padding: 4px 12px; }
+}
+.help-scroll:not([data-tab="turn"]) .help-first { display: none; }

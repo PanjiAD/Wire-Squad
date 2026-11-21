@@ -419,6 +419,23 @@ function artMissionCard(mission) {
     + '</div>';
 }
 
+// Rules side of the mission card (p9.py back template): black MISSION RULES
+// panel, red FAILURE block, green SUCCESS block. Same 300 x 440 geometry.
+function artMissionCardBack(mission) {
+  if (!mission) return '';
+  const rules = (mission.rules || []).slice(0, 5).map((rule) => `<li>${artEsc(rule)}</li>`).join('')
+    || '<li>Standard rules.</li>';
+  const failure = artEsc(mission.failure || 'A red wire is cut, or the Detonator dial reaches the SKULL.');
+  const success = artEsc(mission.success || 'Every wire is cut or safely revealed.');
+  return `<div class="mc back" role="img" aria-label="${artEsc(`Mission ${mission.id}, ${mission.title}, rules side`)}" data-n="${mission.id}">`
+    + `<div class="tab"><span>${artEsc(mission.title || '')}</span></div>`
+    + `<div class="num" data-n="${mission.id}"></div>`
+    + `<div class="rp"><h4>MISSION RULES</h4><ol>${rules}</ol></div>`
+    + `<div class="fl"><b>${artIcon('cross', 16, '#fff', 2.6)} FAILURE</b>${failure}</div>`
+    + `<div class="ok"><b>${artIcon('check', 16, '#fff', 2.6)} SUCCESS</b>${success}</div>`
+    + '</div>';
+}
+
 // --------------------------------------------------------------- stand rack
 
 // Exact layout from generators/rack.py. The CSS lives in styles.css under

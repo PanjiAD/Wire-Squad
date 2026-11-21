@@ -51,6 +51,7 @@ import {
   artCharacter,
   artRack,
   artMissionCard,
+  artMissionCardBack,
 } from './help-art.js';
 
 const SESSION_KEY = 'wireSquad.session.v1';
@@ -78,6 +79,7 @@ function applySettings() {
   if (typeof document === 'undefined') return;
   const root = document.documentElement;
   root.classList.toggle('reduced-motion', Boolean(UI.settings.reducedMotion));
+  root.classList.toggle('colorblind', Boolean(UI.settings.colorblind));
   root.dataset.text = UI.settings.textSize || 'M';
 }
 
@@ -95,7 +97,7 @@ const UI = {
   captain: 0,
   ackViewer: null,
   setupPick: null,
-  settings: { reducedMotion: false, textSize: 'M', ...loadSettings() },
+  settings: { reducedMotion: false, colorblind: false, textSize: 'M', ...loadSettings() },
   settingsOpen: false,
   rulesOpen: false,
   expandedSeat: null,
@@ -572,7 +574,6 @@ function setupScreen() {
       <main class="pregame-main setup-main">
         <section class="card2 setup-missions">
           <h2>${esc(t('setupTitle'))}</h2>
-          <p class="muted">${esc(t('setupIntro'))}</p>
           ${missionGrid()}
         </section>
         <aside class="setup-side">
@@ -606,8 +607,7 @@ function selectedMissionHelp(missionId = UI.missionId) {
     </div>
     <p class="muted">${esc(mission.lesson || '')}</p>
     <div class="chip-row">${missionSummary(mission).split(' - ').map((part) => `<span class="info-chip">${esc(part)}</span>`).join('')}</div>
-    <ul class="rules">${rules || '<li>Standard rules.</li>'}</ul>
-    <p class="muted small">${esc(mission.success || '')}</p>`;
+    <ul class="rules">${rules || '<li>Standard rules.</li>'}</ul>`;
 }
 
 function logoRow(view) {
@@ -735,13 +735,17 @@ function playerPanel(view, player, seat, slot = '') {
     const tiles = live.map((wire, index) => {
       const next = live[index + 1];
       const mark = next ? labelMark(view, seat, stand, wire.id, next.id) : '';
-      const tile = wireTile(view, wire, {
-        seat,
-        stand,
-        draft,
-        isTarget,
-        pendingCandidates,
-      });
+      // Walkie-Talkies: the offered wire leaves its stand until the swap lands.
+      const inTransit = view.pending && view.pending.kind === 'walkieReturn' && view.pending.sourceWireId === wire.id;
+      const tile = inTransit
+        ? `<span class="slot-empty" role="img" aria-label="${esc(t('emptySlot'))}"></span>`
+        : wireTile(view, wire, {
+          seat,
+          stand,
+          draft,
+          isTarget,
+          pendingCandidates,
+        });
       return mark ? `${tile}${mark}` : tile;
     }).join('');
     return `
@@ -775,7 +779,7 @@ function playerPanel(view, player, seat, slot = '') {
         </span>
       </header>
       <div class="badges">${badges.join('')}</div>
-      <div class="stands${player.hands.length > 1 ? ' multi' : ''}">${stands}</div>
+      <div class="stands${player.hands.length > 1 ? ' multi' : ''}${player.hands.length === 2 && player.hands[0].length + player.hands[1].length <= 15 ? ' pair' : ''}">${stands}</div>
     </section>`;
 }
 
@@ -1000,7 +1004,6 @@ function missionDetail(mission, playerCount) {
       <div class="two-note${dim ? ' dim' : ''}"><b>${artIcon('users', 16, 'currentColor', 2.2)}${esc(t('twoPlayerBox'))}</b>${esc(two)}</div>
       <ul class="rules">${rules || `<li>${esc(t('missionRules'))}</li>`}</ul>
       ${playerCount === 2 ? `<p class="muted small">${esc(t('twoPlayerBox'))}: ${esc(two)}</p>` : ''}
-      <p class="muted small">${esc(mission.success || '')}</p>
       ${(mission.unverified || []).length ? `<p class="flag-note">${esc(t('unverified'))}</p>` : ''}
     </div>`;
 }
@@ -1267,7 +1270,7 @@ function lobbyScreen() {
 
   return `
     <div class="pregame lobby-screen">
-      ${pregameTopbar(t('lobbyTitle'), `<button class="btn ghost small" data-act="help-open">${esc(t('howToPlay'))}</button>`)}
+      ${pregameTopbar(t('lobbyTitle'))}
       <main class="pregame-main lobby-main">
         <section class="card2 lobby-card">
           <div class="share-bar">
@@ -1277,7 +1280,6 @@ function lobbyScreen() {
           </div>
           <div class="lobby-head">
             <h2>${esc(t('lobbyPlayers', { count: players.length, max: target }))}</h2>
-            <p class="muted">${esc(t('lobbyReadyHint'))}</p>
           </div>
           <ul class="li-list">${rows || `<li class="li muted">-</li>`}</ul>
           ${targetControls}
@@ -1296,7 +1298,7 @@ function lobbyScreen() {
           <div class="start-box">
             ${isHost
               ? `<button class="btn primary big" data-act="start-online" ${canStart ? '' : 'disabled'}>${esc(startLabel)}</button>
-                 <p class="muted small">${esc(canStart ? t('lobbyStartHint') : tooMany ? t('roomFullText', { max: target }) : t('lobbyStartHint'))}</p>`
+                 ${tooMany ? `<p class="muted small">${esc(t('roomFullText', { max: target }))}</p>` : ''}`
               : `<p class="waiting-box">${esc(t('waitingHost'))}</p>`}
           </div>
           ${noticeBox()}
@@ -1309,7 +1311,6 @@ function lobbyScreen() {
         </section>
         <aside class="card2 pregame-aside">
           <h3>${esc(t('crew'))}</h3>
-          <p class="muted">${esc(t('lobbyCrewHint'))}</p>
           <p class="muted small">${esc(t('lobbyMissionHint'))}</p>
           ${staleList.length ? `<p class="waiting-box">${esc(t('staleNames', { names: staleList.map((player) => player.name).join(', ') }))}</p>` : ''}
           <p class="trust-note small">${esc(t('trustNote'))}</p>
@@ -1383,7 +1384,6 @@ function setupPanel(view) {
     <section class="panel action-panel">
       ${actionHeader(view)}
       <p class="setup-callout">${esc(t('setupBanner', { name }))}</p>
-      <p class="muted">${esc(t('setupHint'))}</p>
       ${exhausted.length ? `<p class="muted small">${esc(t('setupSupplyEmpty', { values: exhausted.join(', ') }))}</p>` : ''}
       ${errorBox()}
     </section>`;
@@ -1478,13 +1478,12 @@ function draftPanel(view) {
   return `
     <section class="panel action-panel draft">
       ${actionHeader(view)}
-      <p class="muted">${esc(t('dualCutHint'))}</p>
       <div class="draft-scroll">
       <div class="draft-steps">
         <div class="step"><span class="step-no">1</span><div><strong>${esc(t('target'))}</strong><div class="target-row">${targets}</div></div></div>
-        <div class="step"><span class="step-no">2</span><div><strong>${esc(t('wires'))}</strong><p class="muted small">${esc(t('pickWires', { count: needWires === Infinity ? '1+' : needWires }))} ${esc(t('pickOneStand'))}</p><p class="picked">${draft.wireIds.length ? draft.wireIds.map((id) => wireName(UI.state.wires[id])).join(' + ') : '-'}</p></div></div>
+        <div class="step"><span class="step-no">2</span><div><strong>${esc(t('wires'))}</strong><p class="muted small">${esc(t('pickWires', { count: needWires === Infinity ? '1+' : needWires }))}</p><p class="picked">${draft.wireIds.length ? draft.wireIds.map((id) => wireName(UI.state.wires[id])).join(' + ') : '-'}</p></div></div>
         <div class="step"><span class="step-no">3</span><div><strong>${esc(t('pickValues', { count: needValues }))}</strong><div class="value-row">${valueButtons || `<span class="muted">${esc(t('mustHold'))}</span>`}</div></div></div>
-        <div class="step"><span class="step-no">4</span><div><strong>${esc(t('extras'))}</strong><div class="toggle-row">${detectorButtons.join('')}</div><p class="muted small">${esc(t('personalDetectorHint'))}</p><p class="picked">${esc(t('target'))}: ${esc(target || '-')}</p></div></div>
+        <div class="step"><span class="step-no">4</span><div><strong>${esc(t('extras'))}</strong><div class="toggle-row">${detectorButtons.join('')}</div><p class="picked">${esc(t('target'))}: ${esc(target || '-')}</p></div></div>
       </div>
       ${errorBox()}
       </div>
@@ -1578,7 +1577,6 @@ function normalActions(view) {
         ${revealButton}
         ${coffeeButton}
       </div>
-      <p class="muted small">${esc(t('dualCutHint'))}</p>
       ${soloButtons ? `<h4>${esc(t('soloCut'))}</h4>${soloConfirmBox}${soloConfirm ? '' : `<div class="choices">${soloButtons}</div>`}` : ''}
       ${UI.coffeeOpen ? `<h4>${esc(t('chooseTarget'))}</h4><div class="target-row">${coffeeButtons || `<span class="muted">-</span>`}</div>` : ''}`
     : `<p class="waiting-box">${esc(t('waiting', { name: playerName(view, view.activeId) }))}</p>`;
@@ -2922,6 +2920,10 @@ async function onClick(event) {
       UI.helpOpen = true;
       render();
       break;
+    case 'help-tab':
+      UI.helpTab = el.dataset.v;
+      render();
+      break;
     case 'help-close':
       UI.helpOpen = false;
       render();
@@ -3252,9 +3254,18 @@ async function onClick(event) {
       saveSettings();
       render();
       break;
+    case 'set-colorblind':
+      UI.settings.colorblind = !UI.settings.colorblind;
+      saveSettings();
+      render();
+      break;
     case 'set-text':
       UI.settings.textSize = el.dataset.v;
       saveSettings();
+      render();
+      break;
+    case 'card-flip':
+      UI.cardSide = UI.cardSide === 'front' ? 'back' : 'front';
       render();
       break;
     case 'rules-open':
@@ -3271,6 +3282,15 @@ async function onClick(event) {
       break;
     case 'char-close':
       UI.charSeat = null;
+      render();
+      break;
+    case 'zoom-open':
+      UI.zoom = true;
+      render();
+      break;
+    case 'zoom-close':
+      if (event.target.closest('.zoom-sheet') && !event.target.closest('button')) break;
+      UI.zoom = false;
       render();
       break;
     case 'expand-seat': {
@@ -3359,8 +3379,17 @@ async function onClick(event) {
 
 function helpSheet() {
   if (!UI.helpOpen) return '';
+  const TAB_OF = {
+    helpSetupTitle: 'turn', helpTurnTitle: 'turn', helpMissTitle: 'turn', helpOrderTitle: 'turn', helpCaptainTitle: 'turn', helpEndTitle: 'turn',
+    helpSpecialTitle: 'actions', helpDetectorTitle: 'actions', helpTwoStandsTitle: 'actions',
+    helpTableTitle: 'wires', helpTokensTitle: 'wires', helpBoardTitle: 'wires',
+    helpEquipmentTitle: 'equipment', helpTalkTitle: 'talk',
+  };
+  const helpTab = UI.helpTab || 'turn';
+  const tabs = [['turn', 'helpTabTurn'], ['actions', 'helpTabActions'], ['wires', 'helpTabWires'], ['equipment', 'helpTabEquipment'], ['talk', 'helpTabTalk']]
+    .map(([id, key]) => `<button class="help-tab${helpTab === id ? ' on' : ''}" role="tab" aria-selected="${helpTab === id}" data-act="help-tab" data-v="${id}">${esc(t(key))}</button>`).join('');
   const block = (title, body, extra = '') => `
-    <section class="help-block${extra}">
+    <section class="help-block${extra}" data-tab="${TAB_OF[title] || 'turn'}">
       <h4>${esc(t(title))}</h4>
       ${body}
     </section>`;
@@ -3393,7 +3422,9 @@ function helpSheet() {
           <h3>${esc(t('helpTitle'))}</h3>
           <button class="btn ghost small" data-act="help-close">${esc(t('close'))}</button>
         </header>
-        <div class="help-scroll">
+        <div class="help-reminder" role="note">${artIcon('warn', 18, '#fff', 2.4)} ${esc(t('helpRedReminder'))}</div>
+        <nav class="help-tabs" role="tablist">${tabs}</nav>
+        <div class="help-scroll" data-tab="${helpTab}">
           <section class="help-hero">
             <div class="help-hero-copy">
               <p class="help-intro">${esc(t('helpIntro'))}</p>
@@ -3402,7 +3433,7 @@ function helpSheet() {
             ${figure(artDial(4, 240), 'helpDialCaption')}
           </section>
 
-          <div class="help-blocks">
+          <div class="help-blocks" data-tab="${helpTab}">
           ${block('helpTableTitle', `
             <p>${esc(t('helpTable'))}</p>
             <div class="help-legend">
@@ -3620,8 +3651,8 @@ function settingsSheet() {
         <div class="set-row"><span>${esc(t('reducedMotion'))}</span>
           <button class="switch${UI.settings.reducedMotion ? ' on' : ''}" data-act="set-motion" role="switch" aria-checked="${UI.settings.reducedMotion ? 'true' : 'false'}"><i></i></button></div>
         <div class="set-row"><span>${esc(t('textSize'))}</span><span class="size-row">${sizes}</span></div>
-        <div class="set-row off"><span>${esc(t('soundSetting'))}</span><em>${esc(t('comingLater'))}</em></div>
-        <div class="set-row off"><span>${esc(t('colorblindSetting'))}</span><em>${esc(t('comingLater'))}</em></div>
+        <div class="set-row"><span>${esc(t('colorblindSetting'))}<small class="set-sub">${esc(t('colorblindHint'))}</small></span>
+          <button class="switch${UI.settings.colorblind ? ' on' : ''}" data-act="set-colorblind" role="switch" aria-checked="${UI.settings.colorblind ? 'true' : 'false'}"><i></i></button></div>
       </div>
     </div>`;
 }
@@ -3632,7 +3663,15 @@ function rulesSheet(view) {
     <div class="modal" data-act="rules-close">
       <div class="modal-card settings-card" data-act="noop">
         <div class="sheet-head"><h3>${esc(t('missionRules'))}</h3><button class="btn small ghost" data-act="rules-close" aria-label="${esc(t('close'))}">X</button></div>
-        <div class="mission-rules-card">${selectedMissionHelp(view.missionId)}</div>
+        <div class="mission-rules-card">
+          ${(() => {
+            const mission = MISSIONS.find((candidate) => candidate.id === view.missionId);
+            if (!mission) return selectedMissionHelp(view.missionId);
+            const back = UI.cardSide !== 'front';
+            return `<div class="mc-scale card-pop">${back ? artMissionCardBack(mission) : artMissionCard(mission)}</div>
+              <button class="btn small" data-act="card-flip">${esc(t(back ? 'cardShowSetup' : 'cardShowRules'))}</button>`;
+          })()}
+        </div>
       </div>
     </div>`;
 }
@@ -3692,10 +3731,7 @@ function turnBanner(view) {
   const text = mine
     ? (key === 'setup' ? t('setupTurn', { name }) : 'YOUR TURN')
     : (key === 'setup' ? t('setupWaiting', { name }) : `${name}'s turn`);
-  const strip = key === 'setup'
-    ? `<div class="progress-strip" aria-label="Setup progress"><span class="done">${esc(t('stepShuffle'))}</span><span class="done">${esc(t('stepDeal'))}</span><span class="done">${esc(t('stepSort'))}</span><span class="active">${esc(t('stepInfo'))}</span></div>`
-    : '';
-  return `${strip}<div class="turn-banner${mine ? ' mine' : ''}">${esc(text)}</div>`;
+  return `<div class="turn-banner${mine ? ' mine' : ''}">${esc(text)}</div>`;
 }
 
 function boardSlots(view) {
@@ -3751,9 +3787,12 @@ function boardCenter(view) {
         ${validationStrip(view)}
       </div>
       <div class="board-col board-dial">
-        <div class="board-mission">
+        <div class="board-mission" data-act="rules-open">
           <b>#${view.missionId}</b> ${esc(view.mission.title)}
           <small>${esc(missionSummary(view.mission))}</small>
+        </div>
+        <div class="board-mission-card" data-act="rules-open" role="button" tabindex="0" aria-label="${esc(t('missionRules'))}">
+          <div class="mc-scale compact">${artMissionCardBack(MISSIONS.find((candidate) => candidate.id === view.missionId))}</div>
         </div>
         ${dialTrack(view, 104)}
       </div>
@@ -3806,7 +3845,6 @@ function setupDealScreen(view) {
       <span class="avatar sm" style="--av:${SEAT_COLORS[index % 5]}">${artCharacter(SEAT_AVATARS[index % 5], 22)}</span>
       ${esc(player.name)}${placed ? ' &#10003;' : ''}</span>`;
   }).join('');
-  const clockwise = order.map((index) => view.players[index].name).join(', ');
   const tray = pick
     ? `<span class="deal-token">${artInfoToken(pick.value, 56)}</span><span>${esc(t('infoSupply'))} ${esc(valueLabel(pick.value))}</span>`
     : `<span class="muted">${esc(mine ? t('setupHint') : t('setupWaiting', { name: actor.name }))}</span>`;
@@ -3824,11 +3862,9 @@ function setupDealScreen(view) {
       </header>
       ${isOnline() ? onlineStrip(view) : ''}
       <main class="deal-main">
-        <div class="progress-strip"><span class="done">1 ${esc(t('stepShuffle'))}</span><span class="done">2 ${esc(t('stepDeal'))}</span><span class="done">3 ${esc(t('stepSort'))}</span><span class="active">4 ${esc(t('stepInfo'))}</span></div>
         <div class="deal-row">
           <div class="deal-card">
             <strong class="setup-callout">${esc(mine ? t('setupBanner', { name: actor.name }) : t('setupWaiting', { name: actor.name }))}</strong>
-            <small>${esc(t('setupHint'))} ${esc(clockwise)}.</small>
           </div>
           <div class="deal-chips">${chips}</div>
         </div>
@@ -3846,8 +3882,35 @@ function setupDealScreen(view) {
     </div>`;
 }
 
+// P6b / P2 phone helpers: the numbers you hold as a row of chips, and a zoom
+// sheet that shows your own stands with large tiles. Both are hidden on
+// desktop by CSS.
+function holdRow(view, seat) {
+  const held = ownValues(view, view.players[seat].id);
+  const values = [...held.filter((value) => value === 'yellow'), ...held.filter((value) => value !== 'yellow')];
+  if (!values.length) return '';
+  const chips = values.map((value) => `<span class="hold-chip${value === 'yellow' ? ' y' : ''}">${esc(value === 'yellow' ? 'Y' : valueLabel(value))}</span>`).join('');
+  return `<div class="hold-row">
+      <span class="hold-label">${esc(t('youHold'))}</span>
+      <span class="hold-chips">${chips}</span>
+      <button class="hold-zoom" data-act="zoom-open" aria-label="${esc(t('zoomOpen'))}">${artIcon('eye', 16, 'currentColor', 2.2)} ${esc(t('zoomOpen'))}</button>
+    </div>`;
+}
+
+function zoomSheet(view, seat) {
+  return `<div class="zoom-wrap" data-act="zoom-close">
+      <section class="zoom-sheet" role="dialog" aria-label="${esc(t('zoomTitle'))}">
+        <header class="zoom-head">
+          <strong>${esc(t('zoomTitle'))}</strong>
+          <button class="btn small" data-act="zoom-close">${esc(t('zoomClose'))}</button>
+        </header>
+        ${playerPanel(view, view.players[seat], seat)}
+      </section>
+    </div>`;
+}
+
 function gameScreen(view) {
-  if (curtainNeeded(view)) return curtainScreen(view);
+  if (curtainNeeded(view)) { UI.zoom = false; return curtainScreen(view); }
   if (UI.state.phase === 'setup') return setupDealScreen(view);
   const me = meSeat(view);
   const others = [];
@@ -3889,8 +3952,10 @@ function gameScreen(view) {
           </div>
           <div class="bottom-dock">
             <div class="action-dock">${actionPanel(view)}</div>
-            <div class="me-seat">${playerPanel(view, view.players[me], me)}</div>
+            <div class="me-seat">${playerPanel(view, view.players[me], me)}${holdRow(view, me)}</div>
           </div>
+          ${UI.zoom ? zoomSheet(view, me) : ''}
+          <button class="log-fab" data-act="log-toggle" aria-label="${esc(t('logShow'))}">${esc(t('log'))}</button>
         </div>
         <aside class="side">
           ${logPanel(view)}
@@ -3972,7 +4037,7 @@ function render() {
   UI.selectedText = selected;
   if (!curtainNeeded(view)) collectBanners(view);
   paint(gameScreen(view) + bannerStack() + leaveModal() + helpSheet() + toastMarkup() + onlineStatusModal());
-  if (UI.draft && UI.draft.targetId && window.innerWidth <= 760 && UI.draftScrolled !== UI.draft.targetId) {
+  if (UI.draft && UI.draft.targetId && window.innerWidth < 700 && UI.draftScrolled !== UI.draft.targetId) {
     UI.draftScrolled = UI.draft.targetId;
     const seat = root.querySelector('.player.is-target');
     if (seat) seat.scrollIntoView({ block: 'start', behavior: 'auto' });
@@ -3986,6 +4051,10 @@ function boot() {
   UI.savedSession = readSession();
   if (UI.savedSession && !UI.onlineName) UI.onlineName = UI.savedSession.name;
   root.addEventListener('click', onClick);
+  root.addEventListener('dblclick', (event) => {
+    if (window.innerWidth >= 700 || UI.zoom || !UI.state || UI.screen !== 'game') return;
+    if (event.target.closest('.me-seat .stands')) { UI.zoom = true; render(); }
+  });
   root.addEventListener('input', (event) => {
     const input = event.target.closest('[data-name-input]');
     if (input) {
@@ -4053,6 +4122,7 @@ if (typeof globalThis !== 'undefined') {
       leave: leaveOnline,
     },
     ui: UI,
+    render,
   };
 }
 
