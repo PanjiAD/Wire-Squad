@@ -80,6 +80,7 @@ function applySettings() {
   const root = document.documentElement;
   root.classList.toggle('reduced-motion', Boolean(UI.settings.reducedMotion));
   root.classList.toggle('colorblind', Boolean(UI.settings.colorblind));
+  root.classList.toggle('no-ordhint', UI.settings.orderHint === false);
   root.dataset.text = UI.settings.textSize || 'M';
 }
 
@@ -781,6 +782,7 @@ function playerPanel(view, player, seat, slot = '') {
       </header>
       <div class="badges">${badges.join('')}</div>
       <div class="stands${player.hands.length > 1 ? ' multi' : ''}${player.hands.length === 2 && player.hands[0].length + player.hands[1].length <= 15 ? ' pair' : ''}">${stands}</div>
+      <div class="ord" aria-hidden="true"><span>${esc(t('ordLow'))}</span><i></i><span>${esc(t('ordHigh'))}</span></div>
     </section>`;
 }
 
@@ -3303,6 +3305,11 @@ async function onClick(event) {
       saveSettings();
       render();
       break;
+    case 'set-ordhint':
+      UI.settings.orderHint = UI.settings.orderHint === false;
+      saveSettings();
+      render();
+      break;
     case 'set-text':
       UI.settings.textSize = el.dataset.v;
       saveSettings();
@@ -3697,6 +3704,8 @@ function settingsSheet() {
         <div class="set-row"><span>${esc(t('textSize'))}</span><span class="size-row">${sizes}</span></div>
         <div class="set-row"><span>${esc(t('colorblindSetting'))}<small class="set-sub">${esc(t('colorblindHint'))}</small></span>
           <button class="switch${UI.settings.colorblind ? ' on' : ''}" data-act="set-colorblind" role="switch" aria-checked="${UI.settings.colorblind ? 'true' : 'false'}"><i></i></button></div>
+        <div class="set-row"><span>${esc(t('orderHintSetting'))}<small class="set-sub">${esc(t('orderHintHint'))}</small></span>
+          <button class="switch${UI.settings.orderHint !== false ? ' on' : ''}" data-act="set-ordhint" role="switch" aria-checked="${UI.settings.orderHint !== false ? 'true' : 'false'}"><i></i></button></div>
       </div>
     </div>`;
 }

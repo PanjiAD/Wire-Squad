@@ -2883,6 +2883,17 @@ html.colorblind .wire.yellow::after { background: radial-gradient(rgba(30,31,36,
   .me-seat .hold-row { top: 2px; }
   .me-seat .player-head .wire-count { display: none; }
 }
+
+/* Order hint: every stand reads from the smallest number on the left to the largest on the right. */
+.ord { display: flex; align-items: center; gap: 6px; margin: 3px 6px 0; font: 800 10px/1 system-ui, sans-serif; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); pointer-events: none; }
+.ord i { position: relative; flex: 1 1 auto; height: 2px; border-radius: 1px; background: currentColor; opacity: .7; }
+.ord i::after { content: ''; position: absolute; right: -1px; top: -3px; border-left: 6px solid currentColor; border-top: 4px solid transparent; border-bottom: 4px solid transparent; }
+.no-ordhint .ord { display: none; }
+.side-seat .ord { display: none; }
+@media (max-width: 699px) {
+  .opponents .player:not(.expanded) .ord { margin-top: 2px; font-size: 9px; }
+  .me-seat .ord { margin: 1px 10px 0; }
+}
 </style>
 </head>
 <body>
@@ -5387,6 +5398,10 @@ const  STRINGS = {
   moreTitle: 'More actions',
   tableTitle: 'Table',
   moreButton: 'More',
+  ordLow: 'low',
+  ordHigh: 'high',
+  orderHintSetting: 'Show low to high hint',
+  orderHintHint: 'A small arrow under each stand: the smallest numbers are on the left.',
   swipeHint: 'Swipe sideways to see all your wires.',
   moreNote: 'Only actions you can do right now are listed.',
   moreEquipReady: 'Ready to play. Tap for details.',
@@ -6257,6 +6272,7 @@ function applySettings() {
   const root = document.documentElement;
   root.classList.toggle('reduced-motion', Boolean(UI.settings.reducedMotion));
   root.classList.toggle('colorblind', Boolean(UI.settings.colorblind));
+  root.classList.toggle('no-ordhint', UI.settings.orderHint === false);
   root.dataset.text = UI.settings.textSize || 'M';
 }
 
@@ -6958,6 +6974,7 @@ function playerPanel(view, player, seat, slot = '') {
       </header>
       <div class="badges">${badges.join('')}</div>
       <div class="stands${player.hands.length > 1 ? ' multi' : ''}${player.hands.length === 2 && player.hands[0].length + player.hands[1].length <= 15 ? ' pair' : ''}">${stands}</div>
+      <div class="ord" aria-hidden="true"><span>${esc(t('ordLow'))}</span><i></i><span>${esc(t('ordHigh'))}</span></div>
     </section>`;
 }
 
@@ -9480,6 +9497,11 @@ async function onClick(event) {
       saveSettings();
       render();
       break;
+    case 'set-ordhint':
+      UI.settings.orderHint = UI.settings.orderHint === false;
+      saveSettings();
+      render();
+      break;
     case 'set-text':
       UI.settings.textSize = el.dataset.v;
       saveSettings();
@@ -9874,6 +9896,8 @@ function settingsSheet() {
         <div class="set-row"><span>${esc(t('textSize'))}</span><span class="size-row">${sizes}</span></div>
         <div class="set-row"><span>${esc(t('colorblindSetting'))}<small class="set-sub">${esc(t('colorblindHint'))}</small></span>
           <button class="switch${UI.settings.colorblind ? ' on' : ''}" data-act="set-colorblind" role="switch" aria-checked="${UI.settings.colorblind ? 'true' : 'false'}"><i></i></button></div>
+        <div class="set-row"><span>${esc(t('orderHintSetting'))}<small class="set-sub">${esc(t('orderHintHint'))}</small></span>
+          <button class="switch${UI.settings.orderHint !== false ? ' on' : ''}" data-act="set-ordhint" role="switch" aria-checked="${UI.settings.orderHint !== false ? 'true' : 'false'}"><i></i></button></div>
       </div>
     </div>`;
 }
