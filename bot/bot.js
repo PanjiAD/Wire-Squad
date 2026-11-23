@@ -9,6 +9,10 @@
 //
 // null means "nothing for this bot to do right now".
 
+// Chance that a bot takes a wire that already carries an Info token.
+const TOKEN_TAKE_CHANCE = 0.3;
+const TOKEN_PENALTY = 0.4;
+
 const SPEECH = ['Ollie', 'Fenn', 'Otta', 'Hedda', 'Gus'];
 
 export function botNameForSeat(seat) {
@@ -77,6 +81,7 @@ function bot_readTable(view, seat) {
           value: Number.isInteger(wire.value) ? wire.value : null,
           order: typeof wire.order === 'number' ? wire.order : null,
           deadly: Boolean(wire.deadly),
+          token: Boolean(wire.knownByToken),
         };
         // A blue wire known by a token or by being cut sits at its own value.
         if (entry.kind === 'blue' && entry.order === null && entry.value !== null) {
@@ -449,6 +454,13 @@ function bot_chooseTurn(view, me, seat) {
           const open = view.sequence.cards.find((card) => !locked.includes(card)
             && (view.sequence.cut[view.sequence.cards.indexOf(card)] || 0) < view.sequence.required);
           if (open === value) score += 0.08;
+        }
+        // Wires already marked with an Info token are the helpers people play
+        // with. Taking them every time leaves the table without hints, so a
+        // bot reaches for one only now and then (about one turn in four) and
+        // otherwise prefers a good guess elsewhere.
+        if (wire.token && !wire.cut && bot_jitter(view, `tok${wire.id}`) >= TOKEN_TAKE_CHANCE) {
+          score -= TOKEN_PENALTY;
         }
         score += bot_jitter(view, `${wire.id}:${value}`) * 0.01;
         if (score > bestScore) {

@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { publicView } from '../engine/index.js';
-import { botNameForSeat, isBotName, chooseBotAction } from '../bot/bot.js';
+import { publicView, applyAction } from '../engine/index.js';
+import { botNameForSeat, isBotName, chooseBotAction, botToAct } from '../bot/bot.js';
 import { fresh } from './util.js';
 import { playBots } from './botplay.js';
 
@@ -69,4 +69,27 @@ test('B5 a bot only acts on its own turn', () => {
     const action = chooseBotActionFor(state, id);
     if (id === acting) assert.ok(action); else assert.equal(action, null);
   }
+});
+
+test('B6 bots do not always take wires that carry an Info token', () => {
+  let tokenTargets = 0;
+  let cuts = 0;
+  for (let seed = 1; seed <= 30; seed += 1) {
+    let state = fresh(2, 4, seed);
+    const ids = new Set(state.players.map((p) => p.id));
+    for (let step = 0; step < 400 && (state.phase === 'setup' || state.phase === 'playing'); step += 1) {
+      const botId = botToAct(publicView(state, state.players[0].id), ids);
+      const view = publicView(state, botId);
+      const action = chooseBotAction(view, botId);
+      if (action && action.type === 'dualCut') {
+        const target = view.players.find((p) => p.id === action.targetId);
+        const wire = target.hands.flat().find((w) => w.id === action.wireIds[0]);
+        cuts += 1;
+        if (wire.knownByToken) tokenTargets += 1;
+      }
+      state = applyAction(state, action);
+    }
+  }
+  assert.ok(cuts > 50);
+  assert.ok(tokenTargets / cuts < 0.45, `token share ${tokenTargets}/${cuts}`);
 });

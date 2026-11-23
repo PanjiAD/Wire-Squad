@@ -1768,7 +1768,7 @@ function normalActions(view) {
   }
 
   const revealButton = redLeft
-    ? `<button class="mb${reveal ? '' : ' off'}" data-act="reveal" ${reveal ? '' : 'disabled'} title="${esc(t('revealRedHint'))}">${esc(t('revealRed'))}</button>`
+    ? `<button class="mb${reveal ? ' sel' : ' off'}" data-act="reveal" ${reveal ? '' : 'disabled'} title="${esc(t('revealRedHint'))}">${esc(t('revealRed'))}</button>`
     : '';
   const coffeeButton = coffeeCard
     ? `<button class="mb sel${canCoffee ? '' : ' off'}" data-act="coffee" ${canCoffee ? '' : 'disabled'} title="${esc(t('coffeeMugHint'))}">${esc(t('coffeeMug'))}</button>`
@@ -1799,7 +1799,6 @@ function normalActions(view) {
     moreRows.push(moreRow('solo', 'cut', t('soloChoiceTitle', { value }), sub,
       ` data-kind="${action.kind}" data-v="${action.value ?? ''}" data-count="${count}"`));
   });
-  if (reveal) moreRows.push(moreRow('reveal', 'eye', t('revealRed'), t('revealRedShort')));
   if (view.oxygen) moreRows.push(moreRow('pass-turn', 'cut', t('passTurn'), t('passTurnShort')));
   if (forcedFinal) moreRows.push(moreRow('agent-start', 'cut', t('agentStart'), t('agentHint')));
   if (canCoffee) moreRows.push(moreRow('coffee', 'cup', t('coffeeMug'), t('coffeeMugHint'), '', ' equip'));
@@ -1815,12 +1814,14 @@ function normalActions(view) {
   const phoneActions = `<div class="phone-actions phone-only">
       ${forcedFinal
         ? `<button class="mb dual-big" data-act="agent-start">${PHONE_ICON.cut}${esc(t('agentStart'))}</button>`
-        : `<button class="mb dual-big" data-act="dual">${PHONE_ICON.cut}${esc(t('dualCut'))}</button>`}
+        : reveal
+          ? `<button class="mb dual-big" data-act="reveal">${PHONE_ICON.eye}${esc(t('revealRed'))}</button>`
+          : `<button class="mb dual-big" data-act="dual">${PHONE_ICON.cut}${esc(t('dualCut'))}</button>`}
       ${UI.cache.moreCount ? `<button class="more-btn" data-act="psheet-open" data-v="more">${esc(t('moreButton'))}<i class="more-badge">${UI.cache.moreCount}</i></button>` : ''}
     </div>`;
   const turnControls = myTurn
     ? `<div class="action-buttons desk-only">
-        ${forcedFinal ? '' : `<button class="mb" data-act="dual">${esc(t('dualCut'))}</button>`}
+        ${forcedFinal || reveal ? '' : `<button class="mb" data-act="dual">${esc(t('dualCut'))}</button>`}
         ${agentButton}
         ${soloIdle}
         ${revealButton}

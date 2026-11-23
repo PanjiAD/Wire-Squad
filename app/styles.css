@@ -1215,9 +1215,6 @@ button:disabled { opacity: 0.55; cursor: not-allowed; box-shadow: none; }
 .table .side .log-panel { max-height: 78vh; }
 
 /* Facing racks: online, an opponent's rack is seen from the other side. */
-.arena.facing [data-slot^="top"] .rack { transform: rotate(180deg); }
-.arena.facing [data-slot^="top"] .wire-tokens { transform: translateX(-50%) rotate(180deg); }
-.arena.facing [data-slot^="top"] .stand-label { order: -1; }
 
 /* Board trays (P5): info tokens on a blue tray, validation on a green one. */
 .board-center .supply,
@@ -2664,7 +2661,7 @@ html.reduced-motion .tray-slot.stamp svg, html.reduced-motion .tray-slot.stamp::
 /* P2: empty slot (Walkie-Talkies in flight) and the 9 degree table perspective */
 .slot-empty { display: inline-block; align-self: flex-end; width: var(--ww, 28px); aspect-ratio: 88 / 274; border: 2px dashed rgba(30,31,36,.45); border-radius: 8px; background: rgba(30,31,36,.06); box-sizing: border-box; }
 @media (min-width: 700px) {
-  .arena.facing [data-slot^="top"] .rack { transform: perspective(560px) rotateX(9deg) rotate(180deg); transform-origin: 50% 50%; }
+  .arena.facing [data-slot^="top"] .rack { transform: perspective(560px) rotateX(9deg); transform-origin: 50% 50%; }
 }
 
 
@@ -2883,8 +2880,6 @@ html.colorblind .wire.yellow::after { background: radial-gradient(rgba(30,31,36,
 .ord i::after { content: ''; position: absolute; right: -1px; top: -3px; border-left: 6px solid currentColor; border-top: 4px solid transparent; border-bottom: 4px solid transparent; }
 .no-ordhint .ord { display: none; }
 /* Opponent racks at the top are seen from their side (rotated 180deg): low is on the viewer's right. */
-.arena.facing [data-slot^="top"] .ord { flex-direction: row-reverse; }
-.arena.facing [data-slot^="top"] .ord i::after { right: auto; left: -1px; border-left: 0; border-right: 6px solid currentColor; }
 .side-seat .ord { display: none; }
 @media (max-width: 699px) {
   .opponents .player:not(.expanded) .ord { margin-top: 2px; font-size: 9px; }
@@ -3008,3 +3003,12 @@ html.colorblind .wire.yellow::after { background: radial-gradient(rgba(30,31,36,
 }
 @media (max-width: 699px) and (max-height: 780px) { .phone-board .pb-head { display: none; } .phone-board { padding: 6px 10px; margin-bottom: 6px; } }
 @media (max-width: 699px) and (max-height: 700px) { .phone-board { display: none; } }
+
+/* Phone: a player with no wires left collapses to a header. */
+@media (max-width: 699px) {
+  .game .opponents .player.cleared .stands,
+  .game .opponents .player.cleared .ord { display: none; }
+}
+@media (max-width: 699px) {
+  .me-seat .cutstrip-live { align-self: flex-start; align-content: flex-start; max-height: 64px; overflow: auto; }
+}

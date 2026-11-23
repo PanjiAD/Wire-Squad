@@ -181,7 +181,7 @@ export const STRINGS = {
   ordLow: 'low',
   ordHigh: 'high',
   orderHintSetting: 'Show low to high hint',
-  orderHintHint: 'A small arrow under each stand. Your own stand reads low to high from the left; an opponent stand is seen from their side, so low is on your right.',
+  orderHintHint: 'A small arrow under each stand. Every stand reads from the smallest number on the left to the largest on the right.',
   missionTapHint: 'Tap the card for rules',
   missionInfoOpen: 'Show mission details',
   swipeHint: 'Swipe sideways to see all your wires.',
